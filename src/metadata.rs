@@ -1,8 +1,13 @@
 pub mod mp4;
 
-pub trait Track {}
+// /// A name to be specified in the CLI to edit matching tag.
+// pub static NAMED_TAGS: [&'static str; 3] = [
+//         "album",
+//         "title",
+//         "movement",
+// ];
 
-pub trait ModifiedTrack {}
+pub trait Track {}
 
 pub struct WorkAndMovementData(
     tags::Work,
@@ -11,35 +16,29 @@ pub struct WorkAndMovementData(
     tags::MovementCount,
 );
 
-pub trait Tag<T> {
-    fn value(&self) -> &T;
+pub struct WorkMovementDependencies(
+    tags::Title,
+);
+
+pub enum Tag {
+    Album(tags::Album),
+    Title(tags::Title),
+    Work(tags::Work),
+    Movement(tags::Movement),
+    MovementIndex(tags::MovementIndex),
+    MovementCount(tags::MovementCount),
 }
 
 pub mod tags {
-    use super::Tag;
-
+    //! Until rust will have a type for Enum variant ...
+    
+    // TODO: should I create constructor that validates strings?
     pub struct Album(String);
     pub struct Title(String);
     pub struct Work(String);
     pub struct Movement(String);
     pub struct MovementIndex(u16);
     pub struct MovementCount(u16);
-
-    /// Avoid repeatable Tag implementation for every tag.
-    macro_rules! impl_tag {
-        ($tag:ty, $tipe:ty) => {
-            impl Tag<$tipe> for $tag {
-                fn value(&self) -> &$tipe {
-                    &self.0
-                }
-            }
-        };
-    }
-
-    impl_tag! { Album, String }
-    impl_tag! { Title, String }
-    impl_tag! { Work, String }
-    impl_tag! { Movement, String }
-    impl_tag! { MovementIndex, u16 }
-    impl_tag! { MovementCount, u16 }
 }
+
+// fn extract_work_movement()
