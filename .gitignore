@@ -447,3 +447,7 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 
 # End of https://www.toptal.com/developers/gitignore/api/linux,windows,visualstudio,visualstudiocode,fsharp,macos
+
+# My tests
+Workpad.fsx
+references.fsx
