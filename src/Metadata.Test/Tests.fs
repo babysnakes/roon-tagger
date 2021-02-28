@@ -1,6 +1,7 @@
 module Tests
 
 open NUnit.Framework
+open FsUnit
 open RoonTagger.Metadata
 open TestsUtils
 
@@ -52,3 +53,29 @@ module ``Loading Tracks`` =
         | Error err -> Assert.Fail $"Result: Error {err}"
         | Ok _ -> Assert.Fail "Result: track"
         |> testLoadTrack "no-such-file.flac"
+
+
+module ``Apply tags tests`` =
+
+    let loadTrack =
+        getResourcePath >> TrackOps.load >> Result.unwrap
+
+    [<Test>]
+    let ``apply title on m4a file should succeed`` () =
+        let track = loadTrack "empty.m4a"
+
+        TrackOps.applyTags track [ Title "my title" ]
+        |> ignore
+
+        (TrackOps.getTrack track).Title
+        |> should equal "my title"
+
+    [<Test>]
+    let ``apply title on flac file should succeed`` () =
+        let track = loadTrack "empty.flac"
+
+        TrackOps.applyTags track [ Title "my title" ]
+        |> ignore
+
+        (TrackOps.getTrack track).Title
+        |> should equal "my title"

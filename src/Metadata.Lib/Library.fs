@@ -2,18 +2,7 @@
 
 open System.IO
 open ATL
-
-type TrackFormat =
-    | MP4 of Track
-    | Flac of Track
-
-type AudioTrack = { Path: string; Track: TrackFormat }
-
-type MetadataErrors =
-    | UnsupportedFileFormat of string
-    | FileDoesNotExist
-    | MetadataError
-    | UnknownError of string
+open Metadata.Formats
 
 module TrackOps =
 
@@ -32,6 +21,12 @@ module TrackOps =
         | true -> Ok path
         | false -> Error FileDoesNotExist
 
+    /// Extracts the `ATL.Track` object our of AudioTrack
+    let getTrack { Track = track } =
+        match track with
+        | MP4 t -> t
+        | Flac t -> t
+
     /// Loads the metadata from audio track.
     let load (path: string): Result<AudioTrack, MetadataErrors> =
         // IMPORTANT: This function is doing all kind of checks around
@@ -48,3 +43,11 @@ module TrackOps =
         |> Result.map Track
         |> Result.bind validateMetadata
         |> Result.bind mkAudioTrack
+
+    /// Applies the specified tags to the track. **Note: This does not save the
+    /// track, It just applies the metadata**.
+    let applyTags audioTrack tags =
+        match audioTrack.Track with
+        | MP4 track -> M4a.applyTags track tags
+        | Flac track -> Flac.applyTags track tags
+        |> Result.map (fun _ -> audioTrack)

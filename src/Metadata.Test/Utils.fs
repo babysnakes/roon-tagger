@@ -10,3 +10,12 @@ let getResourcePath fileName =
         fileName
     |]
     |> IO.Path.Combine
+
+
+[<RequireQualifiedAccess>]
+module Result =
+    /// After Rust's unwrap. Can throw `System.Exception`
+    let unwrap =
+        function
+        | Ok value -> value
+        | Error err -> failwith $"Called unwrap on Error {err}"
