@@ -19,3 +19,9 @@ module Result =
         function
         | Ok value -> value
         | Error err -> failwith $"Called unwrap on Error {err}"
+
+    /// See unwrap ...
+    let unwrapError =
+        function
+        | Ok value -> failwith $"Called unwrapError on Ok {value}"
+        | Error err -> err

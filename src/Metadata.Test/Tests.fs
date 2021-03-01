@@ -7,52 +7,45 @@ open TestsUtils
 
 module ``Loading Tracks`` =
 
-    let testLoadTrack fileName testF =
-        fileName
-        |> getResourcePath
-        |> TrackOps.load
-        |> Result.map (fun t -> t.Track)
-        |> testF
+    let loadTrack =
+        getResourcePath
+        >> TrackOps.load
+        >> Result.map (fun t -> t.Track)
 
     [<Test>]
     let ``Loading unsupported Format should return unsupported file format error`` () =
-        function
-        | Error (UnsupportedFileFormat _) -> Assert.Pass "Ok"
-        | Error err -> Assert.Fail $"Result: Error {err}"
-        | Ok t -> Assert.Fail $"Result: Ok: {t}"
-        |> testLoadTrack "empty.mp3"
+        "empty.mp3"
+        |> loadTrack
+        |> Result.unwrapError
+        |> should be (ofCase <@ UnsupportedFileFormat @>)
 
     [<Test>]
     let ``Loading m4a file should result in MP4 track`` () =
-        function
-        | Ok (MP4 _) -> Assert.Pass "Ok"
-        | Ok t -> Assert.Fail $"Result wrong track type: {t}"
-        | Error err -> Assert.Fail $"Result: Error: {err}"
-        |> testLoadTrack "empty.m4a"
+        "empty.m4a"
+        |> loadTrack
+        |> Result.unwrap
+        |> should be (ofCase <@ MP4 @>)
 
     [<Test>]
     let ``Loading flac file should result in flac track`` () =
-        function
-        | Ok (Flac _) -> Assert.Pass "Ok"
-        | Ok t -> Assert.Fail $"Result: Ok: {t}"
-        | Error err -> Assert.Fail "Result: Error {err}"
-        |> testLoadTrack "empty.flac"
+        "empty.flac"
+        |> loadTrack
+        |> Result.unwrap
+        |> should be (ofCase<@ Flac @>)
 
     [<Test>]
     let ``Loading invalid File (not audio format) returns metadata error`` () =
-        function
-        | Error MetadataError -> Assert.Pass "Ok"
-        | Error err -> Assert.Fail $"Result: Error {err}"
-        | Ok _ -> Assert.Fail "Result: track"
-        |> testLoadTrack "non-audio.flac"
+        "non-audio.flac"
+        |> loadTrack
+        |> Result.unwrapError
+        |> should be (ofCase<@ MetadataError @>)
 
     [<Test>]
     let ``Loading non-existing file returns file not found error`` () =
-        function
-        | Error FileDoesNotExist -> Assert.Pass "Ok"
-        | Error err -> Assert.Fail $"Result: Error {err}"
-        | Ok _ -> Assert.Fail "Result: track"
-        |> testLoadTrack "no-such-file.flac"
+        "no-such-file.flac"
+        |> loadTrack
+        |> Result.unwrapError
+        |> should be (ofCase <@ FileDoesNotExist @>)
 
 
 module ``Apply tags tests`` =
@@ -62,20 +55,13 @@ module ``Apply tags tests`` =
 
     [<Test>]
     let ``apply title on m4a file should succeed`` () =
-        let track = loadTrack "empty.m4a"
+        let test fileName =
+            let track = loadTrack fileName
 
-        TrackOps.applyTags track [ Title "my title" ]
-        |> ignore
+            TrackOps.applyTags track [ Title "my title" ]
+            |> ignore
 
-        (TrackOps.getTrack track).Title
-        |> should equal "my title"
+            (TrackOps.getTrack track).Title
+            |> should equal "my title"
 
-    [<Test>]
-    let ``apply title on flac file should succeed`` () =
-        let track = loadTrack "empty.flac"
-
-        TrackOps.applyTags track [ Title "my title" ]
-        |> ignore
-
-        (TrackOps.getTrack track).Title
-        |> should equal "my title"
+        [ "empty.m4a"; "empty.flac" ] |> List.iter test
