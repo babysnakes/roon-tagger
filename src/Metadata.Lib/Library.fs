@@ -3,6 +3,7 @@
 open System.IO
 open ATL
 open Metadata.Formats
+open RoonTagger.Metadata.Utils
 
 module TrackOps =
 
@@ -44,10 +45,19 @@ module TrackOps =
         |> Result.bind validateMetadata
         |> Result.bind mkAudioTrack
 
-    /// Applies the specified tags to the track. **Note: This does not save the
+    /// Applies the requested tag to the track. **Note: This does not save the
     /// track, It just applies the metadata**.
-    let applyTags audioTrack tags =
+    let applyTag audioTrack tag =
         match audioTrack.Track with
-        | MP4 track -> M4a.applyTags track tags
-        | Flac track -> Flac.applyTags track tags
+        | MP4 track -> M4a.applyTag track tag
+        | Flac track -> Flac.applyTag track tag
         |> Result.map (fun _ -> audioTrack)
+
+    /// Applies the requested tags to the track. Returns an error if any of the
+    /// tags failed.
+    /// 
+    /// **Note: This does not save the track, It just applies the metadata**
+    let applyTags audioTrack tags =
+        tags
+        |> List.map (fun t -> applyTag audioTrack t)
+        |> List.fold Result.folder (Ok audioTrack)

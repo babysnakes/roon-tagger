@@ -9,7 +9,7 @@ module Result =
         | Ok _ -> true
         | Error _ -> false
 
-    /// A folder function for folding results into one result. Returns the first
+    /// A folder function for folding a collection of results into one result. Returns the first
     /// error or the last Ok.
     let folder state result =
         match state with
