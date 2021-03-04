@@ -799,17 +799,11 @@
           "System.Xml.XmlDocument": "4.3.0"
         }
       },
-      "z440.atl.core": {
-        "type": "Transitive",
-        "resolved": "3.18.0",
-        "contentHash": "upWCT3X+symQqqo4cu9xAY5m1IR04O+SyyX6C5BhoVs1S+iMXyVj6ydMD0co9AJ9An1mLb3RypgxYZpzih/10A=="
-      },
       "metadata.lib": {
         "type": "Project",
         "dependencies": {
           "FParsec": "1.1.1",
-          "FSharp.Core": "5.0.0",
-          "z440.atl.core": "3.18.0"
+          "FSharp.Core": "5.0.0"
         }
       }
     }

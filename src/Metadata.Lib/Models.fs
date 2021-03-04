@@ -1,12 +1,10 @@
 namespace RoonTagger.Metadata
 
-open ATL
+open System
 
-type TrackFormat =
-    | MP4 of Track
-    | Flac of Track
+type Track = | Flac
 
-type AudioTrack = { Path: string; Track: TrackFormat }
+type AudioTrack = { Path: string; Track: Track }
 
 type RoonTags =
     | Title of string
@@ -14,10 +12,9 @@ type RoonTags =
     | Movement of string
     | MovementIndex of int
     | MovementCount of int
+    | ImportDate of DateTime
+    | OriginalReleaseDate of DateTime
+    | Year of int // Roon's "Released" field
 
 type MetadataErrors =
     | UnsupportedFileFormat of string
-    | FileDoesNotExist
-    | MetadataError
-    | UnsupportedTagPerFormat of string
-    | UnknownError of string
