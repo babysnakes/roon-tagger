@@ -41,11 +41,27 @@ module ``Track operations`` =
         |> Result.unwrap
         |> ignore
 
-        // TODO: should be replaced with general get value instead of flac specific
-        let flac = track |> extractFlac
-
-        flac.VorbisComment.[Flac.ImportDateTag].[0]
+        (Track.getTagStringValue track TagName.ImportDate).[0]
         |> should equal "2021-05-21"
 
-        flac.VorbisComment.[Flac.OriginalReleaseDateTag].[0]
+        (Track.getTagStringValue track TagName.OriginalReleaseDate).[0]
         |> should equal "2021-05-21"
+
+    [<Test>]
+    let ``Setting year should be parsed correctly`` () =
+        let track = "empty.flac" |> loadTrackSuccess
+
+        Track.setTags track [ Year 2012 ]
+        |> Result.unwrap
+        |> ignore
+
+        (Track.getTagStringValue track TagName.Year).[0]
+        |> should equal "2012"
+
+    [<Test>]
+    let ``Setting credits is forbidden`` () =
+        let track = "empty.flac" |> loadTrackSuccess
+
+        Track.setTag track (Credit(Custom "custom - Flute"))
+        |> Result.unwrapError
+        |> should be (ofCase <@ UnsupportedTagOperation @>)

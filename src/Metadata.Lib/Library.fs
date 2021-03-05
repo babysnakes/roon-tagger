@@ -24,3 +24,7 @@ module Track =
         tags
         |> List.map (fun t -> setTag track t)
         |> List.fold Result.folder (Ok ())
+
+    let getTagStringValue (track: AudioTrack) (tagName: TagName) =
+        match track.Track with
+        | Flac file -> Flac.getTagStringValue file tagName
