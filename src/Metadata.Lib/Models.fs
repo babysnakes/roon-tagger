@@ -3,7 +3,7 @@ namespace RoonTagger.Metadata
 open System
 open FlacLibSharp
 
-type TrackFormat = | Flac of FlacFile
+type TrackFormat = Flac of FlacFile
 
 type AudioTrack = { Path: string; Track: TrackFormat }
 
@@ -16,7 +16,7 @@ type Personnel =
     | DoubleBass of string
     | ElectricBass of string
     | Orchestra of string
-    // ...
+// ...
 
 type RoonTag =
     | Title of string
