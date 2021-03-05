@@ -1,6 +1,7 @@
 module TestsUtils
 
 open System
+open RoonTagger.Metadata
 
 /// Get the path for a file in the project 'Resources' directory.
 let getResourcePath fileName =
@@ -10,6 +11,11 @@ let getResourcePath fileName =
         fileName
     |]
     |> IO.Path.Combine
+
+/// Force extract flac file from `AudioTrack`. Throw exception if not flac.
+let extractFlac (file: AudioTrack) =
+    match file.Track with
+    | Flac file -> file
 
 
 [<RequireQualifiedAccess>]

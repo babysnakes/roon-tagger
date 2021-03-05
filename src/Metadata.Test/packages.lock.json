@@ -55,6 +55,14 @@
           "System.Xml.XmlDocument": "4.3.0"
         }
       },
+      "FlacLibSharp": {
+        "type": "Transitive",
+        "resolved": "3.2.1",
+        "contentHash": "jIjmGciDA75LsWBCSTvYDaTX2WSMDxIHysNBVYGjgH/m4ya7rKX9dv9tZqGFNERLjYFC2gAb92Voq8Kp+R+g/g==",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        }
+      },
       "FParsec": {
         "type": "Transitive",
         "resolved": "1.1.1",
@@ -803,7 +811,8 @@
         "type": "Project",
         "dependencies": {
           "FParsec": "1.1.1",
-          "FSharp.Core": "5.0.0"
+          "FSharp.Core": "5.0.0",
+          "FlacLibSharp": "3.2.1"
         }
       }
     }
