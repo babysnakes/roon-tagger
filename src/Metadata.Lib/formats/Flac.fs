@@ -44,3 +44,8 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
     | TagName.Credit -> comment.[CreditTag]
     | _ -> VorbisCommentValues()
     |> List.ofSeq
+
+let applyChanges (track: FlacFile) =
+    try track.Save() |> Ok
+    with
+        ex -> Error (FileSaveError ex.Message)

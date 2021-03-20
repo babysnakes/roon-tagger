@@ -48,3 +48,4 @@ type MetadataErrors =
     | UnexpectedError of string
     | UnsupportedTagOperation of string
     | UnsupportedTagForFormat
+    | FileSaveError of string

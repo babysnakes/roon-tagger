@@ -1,6 +1,7 @@
 ﻿namespace RoonTagger.Metadata
 
 open FlacLibSharp
+open FsToolkit.ErrorHandling
 open RoonTagger.Metadata.Formats
 open RoonTagger.Metadata.Utils
 
@@ -16,14 +17,20 @@ module Track =
         | err -> Error(UnexpectedError err.Message)
 
     /// Sets (replaces if needed) the tag in the track.
-    let setTag (track: AudioTrack) (tag: RoonTag) : Result<unit, MetadataErrors> =
+    let setTag (track: AudioTrack) (tag: RoonTag) : Result<AudioTrack, MetadataErrors> =
         match track.Track with
         | Flac file -> Flac.setTag file tag
+        |> Result.map (fun _ -> track)
 
+    /// Sets (replaces if needed) the tags in the track.
     let setTags (track: AudioTrack) (tags: RoonTag list) =
         tags
-        |> List.map (fun t -> setTag track t)
-        |> List.fold Result.folder (Ok())
+        |> List.traverseResultM (setTag track)
+    
+    let applyTags =
+        function
+        | Flac file -> Flac.applyChanges file
+
 
     let getTagStringValue (track: AudioTrack) (tagName: TagName) =
         match track.Track with
