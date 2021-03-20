@@ -25,7 +25,7 @@ module Track =
     /// Sets (replaces if needed) the tags in the track.
     let setTags (track: AudioTrack) (tags: RoonTag list) =
         tags
-        |> List.traverseResultM (setTag track)
+        |> List.traverseResultA (setTag track)
     
     let applyTags =
         function

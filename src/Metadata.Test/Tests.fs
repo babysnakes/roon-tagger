@@ -38,7 +38,6 @@ module ``Track operations`` =
         let originalRelease = OriginalReleaseDate sampleDate
 
         Track.setTags track [ import; originalRelease ]
-        |> Result.unwrap
         |> ignore
 
         (Track.getTagStringValue track TagName.ImportDate).[0]
@@ -52,7 +51,6 @@ module ``Track operations`` =
         let track = "empty.flac" |> loadTrackSuccess
 
         Track.setTags track [ Year 2012 ]
-        |> Result.unwrap
         |> ignore
 
         (Track.getTagStringValue track TagName.Year).[0]
