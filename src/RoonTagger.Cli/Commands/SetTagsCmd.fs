@@ -2,6 +2,7 @@ module RoonTagger.Cli.Commands.SetTags
 
 open Argu
 open FsToolkit.ErrorHandling
+open FsToolkit.ErrorHandling.Operator.Result
 open RoonTagger
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Output
@@ -29,7 +30,8 @@ let extractTags (opts: ParseResults<SetTagsArgs>) =
             None
 
     let yearTag =
-        opts.TryGetResult SetTagsArgs.Year |> Option.map Metadata.Year
+        opts.TryGetResult SetTagsArgs.Year
+        |> Option.map Metadata.Year
 
     [ titleTag
       importDateTag
@@ -46,8 +48,8 @@ let handleCmd (opts: ParseResults<SetTagsArgs>) =
 
     opts.GetResult Files
     |> List.traverseResultA Track.load
-    |> Result.bind (List.traverseResultM (fun f -> Track.setTags f tags))
+    >>= List.traverseResultM (fun f -> Track.setTags f tags)
     |> Result.map List.concat
-    |> Result.bind (List.traverseResultM Track.applyTags)
+    >>= List.traverseResultM Track.applyTags
     |> Result.map (fun _ -> [ "Operation finished successfully" ])
     |> Result.mapError (fun errs -> handleErrors errs)
