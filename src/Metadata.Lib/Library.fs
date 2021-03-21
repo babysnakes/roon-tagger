@@ -3,7 +3,6 @@
 open FlacLibSharp
 open FsToolkit.ErrorHandling
 open RoonTagger.Metadata.Formats
-open RoonTagger.Metadata.Utils
 
 module Track =
 
@@ -27,8 +26,8 @@ module Track =
         tags
         |> List.traverseResultA (setTag track)
     
-    let applyTags =
-        function
+    let applyTags (track: AudioTrack) =
+        match track.Track with
         | Flac file -> Flac.applyChanges file
 
 

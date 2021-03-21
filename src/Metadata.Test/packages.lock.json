@@ -71,6 +71,14 @@
           "FSharp.Core": "4.3.4"
         }
       },
+      "FsToolkit.ErrorHandling": {
+        "type": "Transitive",
+        "resolved": "2.1.2",
+        "contentHash": "8hCWvZrnlzkq7XZ4dIkhUCX15Mxxgk7tWxxlQQQg4A2L1oic6smtdunsTqEMgS2mWoUmOQqjVYIzs9WkK6vYBQ==",
+        "dependencies": {
+          "FSharp.Core": "4.6.2"
+        }
+      },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
         "resolved": "16.5.0",
@@ -812,7 +820,8 @@
         "dependencies": {
           "FParsec": "1.1.1",
           "FSharp.Core": "5.0.0",
-          "FlacLibSharp": "3.2.1"
+          "FlacLibSharp": "3.2.1",
+          "FsToolkit.ErrorHandling": "2.1.2"
         }
       }
     }

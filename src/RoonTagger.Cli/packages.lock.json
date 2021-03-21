@@ -18,6 +18,15 @@
         "resolved": "5.0.0",
         "contentHash": "iHoYXA0VaSQUONGENB1aVafjDDZDZpwu39MtaRCTrmwFW/cTcK0b2yKNVYneFHJMc3ChtsSoM9lNtJ1dYXkHfA=="
       },
+      "FsToolkit.ErrorHandling": {
+        "type": "Direct",
+        "requested": "[2.1.2, )",
+        "resolved": "2.1.2",
+        "contentHash": "8hCWvZrnlzkq7XZ4dIkhUCX15Mxxgk7tWxxlQQQg4A2L1oic6smtdunsTqEMgS2mWoUmOQqjVYIzs9WkK6vYBQ==",
+        "dependencies": {
+          "FSharp.Core": "4.6.2"
+        }
+      },
       "FlacLibSharp": {
         "type": "Transitive",
         "resolved": "3.2.1",
@@ -950,7 +959,8 @@
         "dependencies": {
           "FParsec": "1.1.1",
           "FSharp.Core": "5.0.0",
-          "FlacLibSharp": "3.2.1"
+          "FlacLibSharp": "3.2.1",
+          "FsToolkit.ErrorHandling": "2.1.2"
         }
       }
     }
