@@ -42,6 +42,7 @@ let extractTags (opts: ParseResults<SetTagsArgs>) =
 let handleCmd (opts: ParseResults<SetTagsArgs>) =
 
     printfn "DEBUG: opts: %A" opts
+    printfn ""
 
     let tags = extractTags opts
 
@@ -50,5 +51,5 @@ let handleCmd (opts: ParseResults<SetTagsArgs>) =
     >>= List.traverseResultM (fun f -> Track.setTags f tags)
     |> Result.map List.concat
     >>= List.traverseResultM Track.applyTags
-    |> Result.map (fun _ -> [ "Operation finished successfully" ])
-    |> Result.mapError (fun errs -> handleErrors errs)
+    |> Result.map (fun _ -> handleOutput "Operation finished successfully")
+    |> Result.mapError handleErrors

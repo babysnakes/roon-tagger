@@ -27,6 +27,15 @@
           "FSharp.Core": "4.6.2"
         }
       },
+      "Spectre.Console": {
+        "type": "Direct",
+        "requested": "[0.38.0, )",
+        "resolved": "0.38.0",
+        "contentHash": "v8ORlAgTEE0wc1F1lnIllgsczseFjJ0jw9VpRCACAdQ1073p/BxYjy1sfPbFksNnmkf0GXW/w7dwa7HVdVFOMg==",
+        "dependencies": {
+          "Wcwidth": "0.2.0"
+        }
+      },
       "FlacLibSharp": {
         "type": "Transitive",
         "resolved": "3.2.1",
@@ -953,6 +962,11 @@
           "System.Threading": "4.3.0",
           "System.Xml.ReaderWriter": "4.3.0"
         }
+      },
+      "Wcwidth": {
+        "type": "Transitive",
+        "resolved": "0.2.0",
+        "contentHash": "H7no2W0vuLJTvSPanlrijtG3UdJNVoeWBOp2a5dJFVa2tqSQuP5GfbJw1xAtPG9agRW310nFTUUsyPz5tuVIxw=="
       },
       "metadata.lib": {
         "type": "Project",

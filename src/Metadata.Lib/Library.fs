@@ -12,7 +12,11 @@ module Track =
             Ok { Path = fileName; Track = Flac track }
         with
         | :? System.IO.FileNotFoundException as err -> Error(FileDoesNotExist err.Message)
-        | :? Exceptions.FlacLibSharpInvalidFormatException as err -> Error(InvalidFileFormat err.Message)
+        | :? Exceptions.FlacLibSharpInvalidFormatException ->
+            Error(
+                sprintf "Not a valid FLAC file: '%s'" fileName
+                |> InvalidFileFormat
+            )
         | err -> Error(UnexpectedError err.Message)
 
     /// Sets (replaces if needed) the tag in the track.
@@ -23,9 +27,8 @@ module Track =
 
     /// Sets (replaces if needed) the tags in the track.
     let setTags (track: AudioTrack) (tags: RoonTag list) =
-        tags
-        |> List.traverseResultA (setTag track)
-    
+        tags |> List.traverseResultA (setTag track)
+
     let applyTags (track: AudioTrack) =
         match track.Track with
         | Flac file -> Flac.applyChanges file
