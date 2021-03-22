@@ -46,6 +46,6 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
     |> List.ofSeq
 
 let applyChanges (track: FlacFile) =
-    try track.Save() |> Ok
-    with
-        ex -> Error [FileSaveError ex.Message]
+    try
+        track.Save() |> Ok
+    with ex -> Error [ FileSaveError ex.Message ]

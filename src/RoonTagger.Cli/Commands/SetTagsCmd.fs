@@ -4,19 +4,19 @@ open Argu
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
 open RoonTagger
+open RoonTagger.Metadata
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Output
-open RoonTagger.Metadata
 
 let extractTags (opts: ParseResults<SetTagsArgs>) =
     let titleTag =
-        opts.TryGetResult SetTagsArgs.Title
+        opts.TryGetResult Title
         |> Option.map Metadata.Title
 
     let importDateTag =
         if (opts.Contains Import_Date) then
             opts.PostProcessResult(<@ Import_Date @>, parseDate)
-            |> Metadata.ImportDate
+            |> ImportDate
             |> Some
         else
             None
@@ -24,14 +24,13 @@ let extractTags (opts: ParseResults<SetTagsArgs>) =
     let ordTag =
         if (opts.Contains Release_Date) then
             opts.PostProcessResult(<@ Release_Date @>, parseDate)
-            |> Metadata.OriginalReleaseDate
+            |> OriginalReleaseDate
             |> Some
         else
             None
 
     let yearTag =
-        opts.TryGetResult SetTagsArgs.Year
-        |> Option.map Metadata.Year
+        opts.TryGetResult Year |> Option.map Metadata.Year
 
     [ titleTag
       importDateTag
