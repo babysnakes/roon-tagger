@@ -12,7 +12,7 @@ let error2String (err: MetadataErrors) : string =
     | UnsupportedTagForFormat _
     | FileSaveError _ -> "TODO: ERROR"
 
-let handleErrors (errs: MetadataErrors list) =
+let handleErrors (errs: string list) =
     AnsiConsole.MarkupLine("[red]Errors:[/]")
     let grid = Grid()
 
@@ -24,10 +24,13 @@ let handleErrors (errs: MetadataErrors list) =
     errs
     |> List.iter
         (fun err ->
-            grid.AddRow("  [red]*[/]", error2String (err))
+            grid.AddRow("  [red]*[/]", err)
             |> ignore)
 
     AnsiConsole.Render(grid)
 
 let handleOutput (out: string) =
     AnsiConsole.MarkupLine($"[green]Success:[/] {out}")
+
+let infoMessage (message: string) =
+    AnsiConsole.MarkupLine($"[yellow]Info:[/] {message}")

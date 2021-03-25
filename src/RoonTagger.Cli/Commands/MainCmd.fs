@@ -5,11 +5,13 @@ open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Commands
 open RoonTagger.Cli.Output
 
-let (|VersionCmd|SetTagsCmd|NoCmd|) (opts: ParseResults<MainArgs>) =
+let (|VersionCmd|SetTagsCmd|EditTitlesCmd|NoCmd|) (opts: ParseResults<MainArgs>) =
     if (opts.Contains Version) then
         VersionCmd
     elif (opts.Contains Set_Tags) then
-        (SetTagsCmd(opts.GetResult Set_Tags))
+        SetTagsCmd(opts.GetResult Set_Tags)
+    elif (opts.Contains Edit_Titles) then
+        EditTitlesCmd(opts.GetResult Edit_Titles)
     else
         NoCmd
 
@@ -17,4 +19,7 @@ let handleCmd (opts: ParseResults<MainArgs>) =
     match opts with
     | VersionCmd -> handleOutput "Version ..." |> Ok
     | SetTagsCmd args -> SetTags.handleCmd args
-    | NoCmd -> handleOutput "Move along, nothing to see here..." |> Ok
+    | EditTitlesCmd args -> EditTitles.handleCmd args
+    | NoCmd ->
+        handleOutput "Move along, nothing to see here..."
+        |> Ok

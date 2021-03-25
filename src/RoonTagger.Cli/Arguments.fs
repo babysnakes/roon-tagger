@@ -19,16 +19,26 @@ type SetTagsArgs =
             | Year _ -> "The year the album was released (yyyy)."
             | Files _ -> "files to edit."
 
+type EditTitlesArgs =
+    | [<MainCommand; ExactlyOnce; Last; Mandatory>] Files of file:string list
+
+    interface IArgParserTemplate with
+        member s.Usage =
+            match s with
+            | Files _ -> "Files to edit"
+
 [<HelpFlags([|"-h"; "--help"|])>]
 type MainArgs =
     | Version
     | [<CliPrefix(CliPrefix.None)>] Set_Tags of ParseResults<SetTagsArgs>
+    | [<CliPrefix(CliPrefix.None)>] Edit_Titles of ParseResults<EditTitlesArgs>
 
     interface IArgParserTemplate with
         member s.Usage =
             match s with
             | Version -> "print version and exit."
             | Set_Tags _ -> "set tags"
+            | Edit_Titles _ -> "Edit the titles of the provided files as a text file"
 
 let parseFiles files =
     match files with
