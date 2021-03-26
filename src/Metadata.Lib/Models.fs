@@ -41,6 +41,7 @@ type TagName =
     | OriginalReleaseDate = 7
     | Year = 8
     | Credit = 9
+    | TrackNumber = 10
 
 type MetadataErrors =
     | FileDoesNotExist of string

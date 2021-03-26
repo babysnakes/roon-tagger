@@ -64,14 +64,14 @@ module ``Track operations`` =
         |> should be (ofCase <@ UnsupportedTagOperation @>)
 
     [<Test>]
-    let ``getTagStringValue returns empty list on non-existing tags`` () =
+    let ``getTagStringValue returns empty list on nonexisting tags`` () =
         let track = "empty.flac" |> loadTrackSuccess
 
         Track.getTagStringValue track TagName.Movement
         |> should haveLength 0
 
     [<Test>]
-    let ``safeGetTagStringValue will return at least one empty element in non-existing tags`` () =
+    let ``safeGetTagStringValue will return at least one empty element in nonexisting tags`` () =
         let track = "empty.flac" |> loadTrackSuccess
 
         Track.safeGetTagStringValue track TagName.Movement

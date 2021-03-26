@@ -42,6 +42,7 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
     | TagName.OriginalReleaseDate -> comment.[OriginalReleaseDateTag]
     | TagName.Year -> comment.[YearTag]
     | TagName.Credit -> comment.[CreditTag]
+    | TagName.TrackNumber -> comment.TrackNumber
     | _ -> VorbisCommentValues()
     |> List.ofSeq
 

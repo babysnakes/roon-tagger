@@ -16,6 +16,25 @@ let private titlesFilePath =
 
 let getTracks = List.traverseResultA Track.load
 
+let sortTrackByTrackNumber (tracks: AudioTrack list) =
+    result {
+        let tnsString =
+            tracks
+            |> List.map (fun t -> Track.safeGetTagStringValue t TagName.TrackNumber)
+            |> List.map List.head
+
+        let! tns =
+            try
+                tnsString |> List.map int |> Ok
+            with :? System.FormatException ->
+                Error [ UnexpectedError "Couldn't parse track number. Does all tracks have valid track numbers?" ]
+        
+        return
+            List.zip tracks tns
+            |> List.sortBy snd
+            |> List.map fst
+    }
+
 let extractTitles =
     List.map (fun t -> Track.safeGetTagStringValue t TagName.Title)
     >> List.map List.head
@@ -29,7 +48,7 @@ let writeTitlesFile (lines: string list) path =
 let prompt filePath =
     let message =
         [ ""
-          $"Titles are saved to: '{filePath}' ordered as provided files. Please edit the file without deleting/adding lines and without modifying the order of the lines."
+          $"Titles are saved to: '{filePath}' ordered by track number. Please edit the file without deleting/adding lines and without modifying the order of the lines."
           ""
           "ENTER to continue (after you edited the file), CTRL+c to cancel: " ]
         |> String.concat "\n"
@@ -59,7 +78,10 @@ let applyTitles (tracks: AudioTrack list) (titles: string list) =
 
 let handleCmd (args: ParseResults<EditTitlesArgs>) : Result<unit, unit> =
     result {
-        let! tracks = getTracks (args.GetResult Files)
+        let! tracks =
+            getTracks (args.GetResult Files)
+            |> Result.bind sortTrackByTrackNumber
+
         let titles = extractTitles tracks
         let! path = writeTitlesFile titles titlesFilePath
         do prompt path

@@ -2,6 +2,7 @@
 
 open Argu
 open System
+open FsToolkit.ErrorHandling
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Commands
 
@@ -20,6 +21,7 @@ let main argv =
 
     parser.Parse argv
     |> Main.handleCmd
+    |> Result.tee (fun _ -> Console.WriteLine("")) // Add an empty line for a little space
     |> function
     | Ok _ -> 0
     | _ -> 1
