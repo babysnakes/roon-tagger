@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Arguments.fs" />
+    <Compile Include="Info.fs" />
     <Compile Include="Output.fs" />
     <Compile Include="Commands\EditTitlesCmd.fs" />
     <Compile Include="Commands\SetTagsCmd.fs" />

@@ -1,6 +1,7 @@
 module RoonTagger.Cli.Commands.Main
 
 open Argu
+open RoonTagger.Cli
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Commands
 open RoonTagger.Cli.Output
@@ -17,7 +18,7 @@ let (|VersionCmd|SetTagsCmd|EditTitlesCmd|NoCmd|) (opts: ParseResults<MainArgs>)
 
 let handleCmd (opts: ParseResults<MainArgs>) =
     match opts with
-    | VersionCmd -> handleOutput "Version ..." |> Ok
+    | VersionCmd -> infoMessage $"{Info.Name}: {Info.Version}" |> Ok
     | SetTagsCmd args -> SetTags.handleCmd args
     | EditTitlesCmd args -> EditTitles.handleCmd args
     | NoCmd ->
