@@ -34,6 +34,17 @@ module Track =
         | Flac file -> Flac.applyChanges file
 
 
-    let getTagStringValue (track: AudioTrack) (tagName: TagName) =
+    /// Extracts the requested tag from the track and returns it as a list of
+    /// strings. Note that if the tag is not set it will return empty list.
+    let getTagStringValue (track: AudioTrack) (tagName: TagName) : string list =
         match track.Track with
         | Flac file -> Flac.getTagStringValue file tagName
+
+    /// Extracts the requested tag from the track and returns it as a list of
+    /// strings. If the tag is not set it will return a list of single empty
+    /// string (hence "safe")
+    let safeGetTagStringValue track tagName =
+        getTagStringValue track tagName
+        |> function
+        | [] -> [ "" ]
+        | l -> l

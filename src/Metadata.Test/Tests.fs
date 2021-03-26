@@ -50,8 +50,7 @@ module ``Track operations`` =
     let ``Setting year should be parsed correctly`` () =
         let track = "empty.flac" |> loadTrackSuccess
 
-        Track.setTags track [ Year 2012 ]
-        |> ignore
+        Track.setTags track [ Year 2012 ] |> ignore
 
         (Track.getTagStringValue track TagName.Year).[0]
         |> should equal "2012"
@@ -63,3 +62,17 @@ module ``Track operations`` =
         Track.setTag track (Credit(Custom "custom - Flute"))
         |> Result.unwrapError
         |> should be (ofCase <@ UnsupportedTagOperation @>)
+
+    [<Test>]
+    let ``getTagStringValue returns empty list on non-existing tags`` () =
+        let track = "empty.flac" |> loadTrackSuccess
+
+        Track.getTagStringValue track TagName.Movement
+        |> should haveLength 0
+
+    [<Test>]
+    let ``safeGetTagStringValue will return at least one empty element in non-existing tags`` () =
+        let track = "empty.flac" |> loadTrackSuccess
+
+        Track.safeGetTagStringValue track TagName.Movement
+        |> should equal [ "" ]

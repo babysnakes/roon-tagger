@@ -17,7 +17,7 @@ let private titlesFilePath =
 let getTracks = List.traverseResultA Track.load
 
 let extractTitles =
-    List.map (fun t -> Track.getTagStringValue t TagName.Title)
+    List.map (fun t -> Track.safeGetTagStringValue t TagName.Title)
     >> List.map List.head
 
 let writeTitlesFile (lines: string list) path =
