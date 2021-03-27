@@ -3,6 +3,7 @@
 open Argu
 open System
 open FsToolkit.ErrorHandling
+open RoonTagger.Cli
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Commands
 
@@ -17,7 +18,7 @@ let main argv =
         )
 
     let parser =
-        ArgumentParser.Create<MainArgs>(programName = "roon-tagger", errorHandler = errorHandler)
+        ArgumentParser.Create<MainArgs>(programName = Info.Name, errorHandler = errorHandler)
 
     parser.Parse argv
     |> Main.handleCmd
