@@ -28,7 +28,7 @@ let sortTrackByTrackNumber (tracks: AudioTrack list) =
                 tnsString |> List.map int |> Ok
             with :? System.FormatException ->
                 Error [ UnexpectedError "Couldn't parse track number. Does all tracks have valid track numbers?" ]
-        
+
         return
             List.zip tracks tns
             |> List.sortBy snd
@@ -44,6 +44,14 @@ let writeTitlesFile (lines: string list) path =
         File.WriteAllLines(path, lines)
         Ok path
     with ex -> [ UnexpectedError ex.Message ] |> Error
+
+let cleanup path =
+    try
+        if File.Exists path then
+            File.Delete path
+
+        Ok()
+    with ex -> Error [ UnexpectedError ex.Message ]
 
 let prompt filePath =
     let message =
@@ -89,10 +97,13 @@ let handleCmd (args: ParseResults<EditTitlesArgs>) : Result<unit, unit> =
 
         if titles = newTitles then
             do handleOutput "No change required ..."
+            do! cleanup titlesFilePath
         else
             do!
                 applyTitles tracks newTitles
                 |> Result.bind (List.traverseResultM Track.applyTags)
+                |> Result.bind (fun _ -> cleanup titlesFilePath)
                 |> Result.map (fun _ -> handleOutput "Operation finished successfully")
     }
+    |> Result.teeError (fun _ -> cleanup titlesFilePath |> ignore)
     |> Result.mapError (List.map error2String >> handleErrors)
