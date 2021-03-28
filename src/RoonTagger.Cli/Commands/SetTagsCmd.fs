@@ -41,9 +41,6 @@ let extractTags (opts: ParseResults<SetTagsArgs>) =
 
 let handleCmd (opts: ParseResults<SetTagsArgs>) =
 
-    printfn "DEBUG: opts: %A" opts
-    printfn ""
-
     let tags = extractTags opts
 
     opts.GetResult SetTagsArgs.Files

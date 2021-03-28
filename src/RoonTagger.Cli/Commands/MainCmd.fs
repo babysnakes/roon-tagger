@@ -1,5 +1,6 @@
 module RoonTagger.Cli.Commands.Main
 
+open System
 open Argu
 open RoonTagger.Cli
 open RoonTagger.Cli.Arguments
@@ -19,6 +20,13 @@ let (|VersionCmd|SetTagsCmd|EditTitlesCmd|ViewCmd|NoCmd|) (opts: ParseResults<Ma
         NoCmd
 
 let handleCmd (opts: ParseResults<MainArgs>) =
+    Console.WriteLine("") 
+
+    if (opts.Contains Verbose) then
+        Console.WriteLine($"DEBUG: args: {opts}")
+        Console.WriteLine("")
+
+
     match opts with
     | VersionCmd -> infoMessage $"{Info.Name}: {Info.Version}" |> Ok
     | SetTagsCmd args -> SetTags.handleCmd args

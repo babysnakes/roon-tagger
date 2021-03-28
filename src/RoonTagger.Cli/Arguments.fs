@@ -38,6 +38,7 @@ type ViewArgs =
 [<HelpFlags([|"-h"; "--help"|])>]
 type MainArgs =
     | Version
+    | [<AltCommandLine("-v"); Inherit >]Verbose
     | [<CliPrefix(CliPrefix.None)>] Set_Tags of ParseResults<SetTagsArgs>
     | [<CliPrefix(CliPrefix.None)>] Edit_Titles of ParseResults<EditTitlesArgs>
     | [<CliPrefix(CliPrefix.None)>] View of ParseResults<ViewArgs>
@@ -46,6 +47,7 @@ type MainArgs =
         member s.Usage =
             match s with
             | Version -> "print version and exit."
+            | Verbose -> "Print some debug data (use multiple times for more verbosity)."
             | Set_Tags _ -> "set tags"
             | Edit_Titles _ -> "Edit the titles of the provided files as a text file"
             | View _ -> "View metadata of the provided file"

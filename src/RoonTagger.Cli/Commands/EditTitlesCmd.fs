@@ -55,8 +55,7 @@ let cleanup path =
 
 let prompt filePath =
     let message =
-        [ ""
-          $"Titles are saved to: '{filePath}' ordered by track number. Please edit the file without deleting/adding lines and without modifying the order of the lines."
+        [ $"Titles are saved to: '{filePath}' ordered by track number. Please edit the file without deleting/adding lines and without modifying the order of the lines."
           ""
           "ENTER to continue (after you edited the file), CTRL+c to cancel: " ]
         |> String.concat "\n"
