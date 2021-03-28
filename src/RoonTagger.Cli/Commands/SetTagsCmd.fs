@@ -46,7 +46,6 @@ let handleCmd (opts: ParseResults<SetTagsArgs>) =
     opts.GetResult SetTagsArgs.Files
     |> List.traverseResultA Track.load
     >>= List.traverseResultM (fun f -> Track.setTags f tags)
-    |> Result.map List.concat
     >>= List.traverseResultM Track.applyTags
     |> Result.map (fun _ -> handleOutput "Operation finished successfully")
     |> Result.mapError (List.map error2String >> handleErrors)

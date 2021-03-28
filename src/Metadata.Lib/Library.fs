@@ -26,8 +26,10 @@ module Track =
         |> Result.map (fun _ -> track)
 
     /// Sets (replaces if needed) the tags in the track.
-    let setTags (track: AudioTrack) (tags: RoonTag list) =
-        tags |> List.traverseResultA (setTag track)
+    let setTags (track: AudioTrack) (tags: RoonTag list) : Result<AudioTrack, MetadataErrors list> =
+        tags
+        |> List.traverseResultA (setTag track)
+        |> Result.map (fun _ -> track)
 
     let applyTags (track: AudioTrack) =
         match track.Track with
