@@ -35,6 +35,8 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
 
     match tag with
     | TagName.Title -> comment.Title
+    | TagName.Album -> comment.Album
+    | TagName.Artist -> comment.Artist
     | TagName.Work -> comment.[WorkTag]
     | TagName.Movement -> comment.[MovementTag]
     | TagName.Section -> comment.[SectionTag]

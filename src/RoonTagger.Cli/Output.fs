@@ -8,9 +8,9 @@ let error2String (err: MetadataErrors) : string =
     | FileDoesNotExist err -> err
     | InvalidFileFormat err -> err
     | UnexpectedError err -> sprintf "Unexpected error: %s" err
+    | FileSaveError err -> $"Error saving file: {err}"
     | UnsupportedTagOperation _
-    | UnsupportedTagForFormat _
-    | FileSaveError _ -> "TODO: ERROR"
+    | UnsupportedTagForFormat -> "TODO: Error"
 
 let handleErrors (errs: string list) =
     AnsiConsole.MarkupLine("[red]Errors:[/]")

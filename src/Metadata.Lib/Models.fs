@@ -32,16 +32,18 @@ type RoonTag =
 
 type TagName =
     | Title = 0
-    | Work = 1
-    | Movement = 2
-    | Section = 3
-    | MovementIndex = 4
-    | MovementCount = 5
-    | ImportDate = 6
-    | OriginalReleaseDate = 7
-    | Year = 8
-    | Credit = 9
-    | TrackNumber = 10
+    | Album = 1
+    | Artist = 2
+    | Work = 3
+    | Movement = 4
+    | Section = 5
+    | MovementIndex = 6
+    | MovementCount = 7
+    | ImportDate = 8
+    | OriginalReleaseDate = 9
+    | Year = 10
+    | Credit = 11
+    | TrackNumber = 12
 
 type MetadataErrors =
     | FileDoesNotExist of string

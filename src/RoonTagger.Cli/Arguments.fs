@@ -27,11 +27,20 @@ type EditTitlesArgs =
             match s with
             | Files _ -> "Files to edit"
 
+type ViewArgs =
+    | [<MainCommand; ExactlyOnce; Mandatory>] File of file:string
+
+    interface IArgParserTemplate with
+        member s.Usage = 
+            match s with
+            | File _ -> "File to view"
+
 [<HelpFlags([|"-h"; "--help"|])>]
 type MainArgs =
     | Version
     | [<CliPrefix(CliPrefix.None)>] Set_Tags of ParseResults<SetTagsArgs>
     | [<CliPrefix(CliPrefix.None)>] Edit_Titles of ParseResults<EditTitlesArgs>
+    | [<CliPrefix(CliPrefix.None)>] View of ParseResults<ViewArgs>
 
     interface IArgParserTemplate with
         member s.Usage =
@@ -39,6 +48,7 @@ type MainArgs =
             | Version -> "print version and exit."
             | Set_Tags _ -> "set tags"
             | Edit_Titles _ -> "Edit the titles of the provided files as a text file"
+            | View _ -> "View metadata of the provided file"
 
 let parseFiles files =
     match files with
