@@ -40,13 +40,18 @@ let extractTags (opts: ParseResults<SetTagsArgs>) =
     |> List.map Option.get // safe as we filtered out the None tags.
 
 let handleCmd (opts: ParseResults<SetTagsArgs>) =
+    result {
+        let tags = extractTags opts
+        let files = opts.GetResult SetTagsArgs.Files
+        let! tracks = List.traverseResultA Track.load files
 
-    let tags = extractTags opts
+        do!
+            List.traverseResultA (fun t -> Track.setTags t tags) tracks
+            |> Result.map ignore
+            |> Result.mapError List.concat
 
-    opts.GetResult SetTagsArgs.Files
-    |> List.traverseResultA Track.load
-    >>= List.traverseResultM (fun f -> Track.setTags f tags)
-    >>= List.traverseResultM Track.applyTags
-    |> Result.map (fun _ -> handleOutput "Operation finished successfully")
+        return!
+            List.traverseResultM (fun t -> Track.applyTags t) tracks
+            |> Result.map (fun _ -> handleOutput "Operation handled successfully")
+    }
     |> Result.mapError (List.map error2String >> handleErrors)
-    
