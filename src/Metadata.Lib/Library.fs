@@ -70,24 +70,16 @@ module Track =
     /// multiple entries. Note, it *does not* check the validity of Personnel.
     let addCredits (track: AudioTrack) (credits: Personnel list) =
         let current = getTagStringValue track TagName.Credit
-
-        let toAdd =
-            List.map (fun (Personnel p) -> p) credits
-
-        let newValue =
-            List.append current toAdd |> List.distinct
+        let toAdd = List.map (fun (Personnel p) -> p) credits
+        let newValue = List.append current toAdd |> List.distinct
 
         match track.Track with
         | Flac file -> Flac.setRaw file Flac.CreditTag newValue
 
     let deleteCredits (track: AudioTrack) (credits: Personnel list) : Result<unit, MetadataErrors list> =
         let current = getTagStringValue track TagName.Credit
-
-        let toDelete =
-            List.map (fun (Personnel p) -> p) credits
-
-        let invalidDeletes =
-            List.filter (fun s -> List.contains s current |> not) toDelete
+        let toDelete = List.map (fun (Personnel p) -> p) credits
+        let invalidDeletes = List.filter (fun s -> List.contains s current |> not) toDelete
 
         if List.length invalidDeletes > 0 then
             invalidDeletes

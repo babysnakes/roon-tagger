@@ -49,9 +49,7 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         print "Release Date" ord
         print "Year" year
 
-        let panel =
-            PanelExtensions.Header(Panel(grid), $"Info: {fileName} ")
-
+        let panel = PanelExtensions.Header(Panel(grid), $"Info: {fileName} ")
         AnsiConsole.Render(panel)
     }
     |> Result.mapError (fun err -> handleErrors [ error2String err ])

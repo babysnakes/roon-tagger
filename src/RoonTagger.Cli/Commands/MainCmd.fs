@@ -22,7 +22,7 @@ let (|VersionCmd|SetTagsCmd|EditTitlesCmd|ViewCmd|CreditsCmd|NoCmd|) (opts: Pars
         NoCmd
 
 let handleCmd (opts: ParseResults<MainArgs>) =
-    Console.WriteLine("") 
+    Console.WriteLine("")
 
     if (opts.Contains Verbose) then
         Console.WriteLine($"DEBUG: args: {opts}")

@@ -9,8 +9,7 @@ open TestsUtils
 
 module ``Track operations`` =
 
-    let loadTrackSuccess =
-        getResourcePath >> Track.load >> Result.unwrap
+    let loadTrackSuccess = getResourcePath >> Track.load >> Result.unwrap
 
     let loadTrackError =
         getResourcePath
@@ -83,9 +82,7 @@ module ``Track operations`` =
             [ ("Musician A", [ "Guitar"; "Voice" ])
               ("Musician B", [ "Violin" ]) ]
 
-        let res =
-            Track.mkPersonnel testData |> Result.unwrap
-
+        let res = Track.mkPersonnel testData |> Result.unwrap
         res |> should haveLength 3
 
         res
@@ -108,9 +105,7 @@ module ``Track operations`` =
               Personnel "The Orchestra - Orchestra" ]
         |> ignore
 
-        let p =
-            Track.getTagStringValue track TagName.Credit
-
+        let p = Track.getTagStringValue track TagName.Credit
         p |> should contain "First Last - Cello"
         p |> should contain "The Orchestra - Orchestra"
         p |> should haveLength 5
@@ -126,9 +121,7 @@ module ``Track operations`` =
               Personnel "Musician C - Double Bass" ]
         |> ignore
 
-        let p =
-            Track.getTagStringValue track TagName.Credit
-
+        let p = Track.getTagStringValue track TagName.Credit
         p |> should haveLength 4
         p |> should contain "Musician A - Guitar"
         p |> should contain "Musician C - Double Bass"

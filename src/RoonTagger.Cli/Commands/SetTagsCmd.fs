@@ -29,8 +29,7 @@ let extractTags (opts: ParseResults<SetTagsArgs>) =
         else
             None
 
-    let yearTag =
-        opts.TryGetResult Year |> Option.map Metadata.Year
+    let yearTag = opts.TryGetResult Year |> Option.map Metadata.Year
 
     [ titleTag
       importDateTag

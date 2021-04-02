@@ -42,5 +42,5 @@ type MetadataErrors =
     | UnexpectedError of string
     | UnsupportedTagOperation of string
     | UnsupportedTagForFormat
-    | DeletingNonExistingPersonnel of track:AudioTrack * value:string
+    | DeletingNonExistingPersonnel of track: AudioTrack * value: string
     | FileSaveError of string

@@ -1,0 +1,2 @@
+[*.fs]
+fsharp_max_value_binding_width = 80

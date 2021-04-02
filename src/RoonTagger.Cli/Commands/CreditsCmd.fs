@@ -24,10 +24,7 @@ let handleCmd (args: ParseResults<CreditsArgs>) : Result<unit, unit> =
     result {
         let files = args.GetResult CreditsArgs.Files
         let! tracks = List.traverseResultA Track.load files
-
-        let delCredits =
-            args.GetResults Del |> List.map Personnel
-
+        let delCredits = args.GetResults Del |> List.map Personnel
         let! addCredits = extractAddCredits args |> Track.mkPersonnel
 
         do!
