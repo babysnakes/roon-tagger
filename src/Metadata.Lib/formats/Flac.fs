@@ -28,7 +28,11 @@ let setTag (track: FlacFile) (tag: RoonTag) =
     | Year year -> Ok(replace YearTag $"%d{year}")
     | MovementIndex _
     | MovementCount _ -> Error UnsupportedTagForFormat
-    | Credit credit -> Error(UnsupportedTagOperation "Credit tag does not support *set* operation, only add/delete.")
+    | Credit _ -> Error(UnsupportedTagOperation "Credit tag does not support *set* operation, only add/delete.")
+
+let setRaw (track: FlacFile) key (values: string list) =
+    let comment = track.VorbisComment
+    comment.Replace(key, VorbisCommentValues values)
 
 let getTagStringValue (track: FlacFile) (tag: TagName) =
     let comment = track.VorbisComment

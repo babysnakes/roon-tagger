@@ -7,16 +7,7 @@ type TrackFormat = Flac of FlacFile
 
 type AudioTrack = { Path: string; Track: TrackFormat }
 
-type Personnel =
-    | Custom of string
-    | Guitar of string
-    | Cello of string
-    | Violin of string
-    | Viola of string
-    | DoubleBass of string
-    | ElectricBass of string
-    | Orchestra of string
-// ...
+type Personnel = Personnel of String
 
 type RoonTag =
     | Title of string
@@ -51,4 +42,5 @@ type MetadataErrors =
     | UnexpectedError of string
     | UnsupportedTagOperation of string
     | UnsupportedTagForFormat
+    | DeletingNonExistingPersonnel of track:AudioTrack * value:string
     | FileSaveError of string

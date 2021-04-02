@@ -3,6 +3,7 @@
 open FlacLibSharp
 open FsToolkit.ErrorHandling
 open RoonTagger.Metadata.Formats
+open RoonTagger.Metadata.Utils
 
 module Track =
 
@@ -50,3 +51,51 @@ module Track =
         |> function
         | [] -> [ "" ]
         | l -> l
+
+    /// Converts "shortcut" list of name and list of roles to correctly
+    /// formatted `Personnel` tags. Fails if any of the roles are not valid
+    /// (Todo: Not implemented yet).
+    let mkPersonnel (credits: (string * string list) list) =
+        let mkSingle credit : Result<Personnel list, MetadataErrors> =
+            let name, roles = credit
+            // Todo: Validate role
+            let make r = $"{name} - {r}"
+            roles |> List.map make |> List.map Personnel |> Ok
+
+        credits
+        |> List.traverseResultA mkSingle
+        |> Result.map List.concat
+
+    /// Adds the provided credits to the existing ones in the track. Merges
+    /// multiple entries.
+    let addCredits (track: AudioTrack) (credits: Personnel list) =
+        let current = getTagStringValue track TagName.Credit
+
+        let toAdd =
+            List.map (fun (Personnel p) -> p) credits
+
+        let newValue =
+            List.append current toAdd |> List.distinct
+
+        match track.Track with
+        | Flac file -> Flac.setRaw file Flac.CreditTag newValue
+
+    let deleteCredits (track: AudioTrack) (credits: Personnel list) : Result<unit, MetadataErrors list> =
+        let current = getTagStringValue track TagName.Credit
+
+        let toDelete =
+            List.map (fun (Personnel p) -> p) credits
+
+        let invalidDeletes =
+            List.filter (fun s -> List.contains s current |> not) toDelete
+
+        if List.length invalidDeletes > 0 then
+            invalidDeletes
+            |> List.map (fun s -> DeletingNonExistingPersonnel(track, s))
+            |> Error
+        else
+            let calculated = List.removeByValues toDelete current
+
+            match track.Track with
+            | Flac file -> Flac.setRaw file Flac.CreditTag calculated
+            |> Ok
