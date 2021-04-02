@@ -19,7 +19,10 @@ let conditionallyPrint (grid: Grid) (head: string) (value: string list) =
 
 // Ugly .....
 let printCredits (grid: Grid) (credits: string list) =
-    let sp = credits |> List.map (fun s -> s.Split(" - ", 2) |> List.ofArray)
+    let sp =
+        credits
+        |> List.map (fun s -> s.Split(" - ", 2) |> List.ofArray)
+
     let cs, other = List.partition (fun l -> List.length l = 2) sp
     let credits = cs |> List.map (fun l -> (l.[1], l.[0]))
     let byRole = credits |> List.groupBy fst
@@ -27,11 +30,13 @@ let printCredits (grid: Grid) (credits: string list) =
     if not (List.isEmpty sp) then
         grid.AddEmptyRow() |> ignore
         grid.AddRow("[bold]Credits:[/]") |> ignore
+
         for cs in byRole do
             grid.AddRow("", $"[bold]{cs |> fst}[/]") |> ignore
+
             for c in cs |> snd do
                 grid.AddRow("", $"  * {c |> snd}") |> ignore
-    
+
 
 let handleCmd (args: ParseResults<ViewArgs>) =
     result {
