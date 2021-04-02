@@ -8,6 +8,7 @@
     <Compile Include="Info.fs" />
     <Compile Include="Output.fs" />
     <Compile Include="Commands\ViewCmd.fs" />
+    <Compile Include="Commands\CreditsCmd.fs" />
     <Compile Include="Commands\EditTitlesCmd.fs" />
     <Compile Include="Commands\SetTagsCmd.fs" />
     <Compile Include="Commands\MainCmd.fs" />

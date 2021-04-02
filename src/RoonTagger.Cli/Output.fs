@@ -8,6 +8,7 @@ let error2String (err: MetadataErrors) : string =
     | FileDoesNotExist err -> err
     | InvalidFileFormat err -> err
     | UnexpectedError err -> sprintf "Unexpected error: %s" err
+    | DeletingNonExistingPersonnel (track, err) -> $"'{track.Path}': Trying to delete non existing credit: {err}"
     | FileSaveError err -> $"Error saving file: {err}"
     | UnsupportedTagOperation _
     | UnsupportedTagForFormat -> "TODO: Error"
@@ -22,10 +23,7 @@ let handleErrors (errs: string list) =
     grid.AddColumn(GridColumn()) |> ignore
 
     errs
-    |> List.iter
-        (fun err ->
-            grid.AddRow("  [red]*[/]", err)
-            |> ignore)
+    |> List.iter (fun err -> grid.AddRow("  [red]*[/]", err) |> ignore)
 
     AnsiConsole.Render(grid)
 

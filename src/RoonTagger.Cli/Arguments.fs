@@ -35,12 +35,25 @@ type ViewArgs =
             match s with
             | File _ -> "File to view"
 
+type CreditsArgs =
+    | Add of name:string * roles:string
+    | Del of credit:string
+    | [<MainCommand; ExactlyOnce; Last; Mandatory>] Files of file:string list
+
+    interface IArgParserTemplate with
+        member s.Usage =
+            match s with
+            | Add _ -> "Adds the provided credit. A credit consists of a name and a comma separated list of roles. If required specify multiple times."
+            | Del _ -> "Deletes the provided credit. Fails if credit does not exist (use multiple times if needed)"
+            | Files _ -> "The files to apply the credits to"
+
 [<HelpFlags([|"-h"; "--help"|])>]
 type MainArgs =
     | Version
     | [<AltCommandLine("-v"); Inherit >]Verbose
     | [<CliPrefix(CliPrefix.None)>] Set_Tags of ParseResults<SetTagsArgs>
     | [<CliPrefix(CliPrefix.None)>] Edit_Titles of ParseResults<EditTitlesArgs>
+    | [<CliPrefix(CliPrefix.None)>] Credits of ParseResults<CreditsArgs>
     | [<CliPrefix(CliPrefix.None)>] View of ParseResults<ViewArgs>
 
     interface IArgParserTemplate with
@@ -50,6 +63,7 @@ type MainArgs =
             | Verbose -> "Print some debug data (use multiple times for more verbosity)."
             | Set_Tags _ -> "set tags"
             | Edit_Titles _ -> "Edit the titles of the provided files as a text file"
+            | Credits _ -> "Add/Delete credit entries"
             | View _ -> "View metadata of the provided file"
 
 let parseFiles files =

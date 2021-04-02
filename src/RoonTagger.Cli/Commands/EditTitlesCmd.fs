@@ -86,7 +86,7 @@ let applyTitles (tracks: AudioTrack list) (titles: string list) =
 let handleCmd (args: ParseResults<EditTitlesArgs>) : Result<unit, unit> =
     result {
         let! tracks =
-            getTracks (args.GetResult Files)
+            getTracks (args.GetResult EditTitlesArgs.Files)
             |> Result.bind sortTrackByTrackNumber
 
         let titles = extractTitles tracks

@@ -55,7 +55,7 @@ module Track =
     /// Converts "shortcut" list of name and list of roles to correctly
     /// formatted `Personnel` tags. Fails if any of the roles are not valid
     /// (Todo: Not implemented yet).
-    let mkPersonnel (credits: (string * string list) list) =
+    let mkPersonnel (credits: (string * string list) list) : Result<Personnel list, MetadataErrors list> =
         let mkSingle credit : Result<Personnel list, MetadataErrors> =
             let name, roles = credit
             // Todo: Validate role
@@ -67,7 +67,7 @@ module Track =
         |> Result.map List.concat
 
     /// Adds the provided credits to the existing ones in the track. Merges
-    /// multiple entries.
+    /// multiple entries. Note, it *does not* check the validity of Personnel.
     let addCredits (track: AudioTrack) (credits: Personnel list) =
         let current = getTagStringValue track TagName.Credit
 
