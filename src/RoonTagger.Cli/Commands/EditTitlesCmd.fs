@@ -7,6 +7,7 @@ open FsToolkit.ErrorHandling.Operator.Result
 open Spectre.Console
 open RoonTagger.Metadata
 open RoonTagger.Cli.Arguments
+open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 
 let private titlesFilePath =
@@ -26,8 +27,7 @@ let sortTrackByTrackNumber (tracks: AudioTrack list) =
         let! tns =
             try
                 tnsString |> List.map int |> Ok
-            with :? System.FormatException ->
-                Error [ UnexpectedError "Couldn't parse track number. Does all tracks have valid track numbers?" ]
+            with :? System.FormatException -> Error [ MissingOrInvalidTag TagName.TrackNumber |> MError ]
 
         return
             List.zip tracks tns
@@ -43,7 +43,9 @@ let writeTitlesFile (lines: string list) path =
     try
         File.WriteAllLines(path, lines)
         Ok path
-    with ex -> [ UnexpectedError ex.Message ] |> Error
+    with ex ->
+        [ CliIOError $"Error reading titles file: {ex.Message}" ]
+        |> Error
 
 let cleanup path =
     try
@@ -51,7 +53,7 @@ let cleanup path =
             File.Delete path
 
         Ok()
-    with ex -> Error [ UnexpectedError ex.Message ]
+    with ex -> Error [ CliIOError $"Error deleting titles file: {ex.Message}" ]
 
 let prompt filePath =
     let message =
@@ -67,26 +69,32 @@ let prompt filePath =
 let readTitles filePath =
     try
         File.ReadAllLines(filePath) |> List.ofArray |> Ok
-    with ex -> [ UnexpectedError ex.Message ] |> Error
+    with ex ->
+        [ CliIOError $"Error reading titles file: {ex.Message}" ]
+        |> Error
 
 let applyTitles (tracks: AudioTrack list) (titles: string list) =
     let applyTrack (track, title) =
         Track.setTag track (RoonTag.Title title)
+        |> Result.mapError MError
 
     try
         List.zip tracks titles |> Ok
-    with :? System.ArgumentException ->
-        [ UnexpectedError "the number of tracks does not match the number of titles. Did you delete or add a title?" ]
-        |> Error
+    with :? System.ArgumentException -> [ TitlesCountError ] |> Error
     |> Result.bind (
         List.traverseResultM applyTrack
         >> Result.mapError (fun err -> [ err ])
     )
 
 let handleCmd (args: ParseResults<EditTitlesArgs>) : Result<unit, unit> =
+    let applyTags =
+        Track.applyTags
+        >> Result.mapError (List.map MError)
+
     result {
         let! tracks =
             getTracks (args.GetResult EditTitlesArgs.Files)
+            |> Result.mapError (List.map MError)
             |> Result.bind sortTrackByTrackNumber
 
         let titles = extractTitles tracks
@@ -100,9 +108,9 @@ let handleCmd (args: ParseResults<EditTitlesArgs>) : Result<unit, unit> =
         else
             do!
                 applyTitles tracks newTitles
-                |> Result.bind (List.traverseResultM Track.applyTags)
+                |> Result.bind (List.traverseResultM applyTags)
                 |> Result.bind (fun _ -> cleanup titlesFilePath)
                 |> Result.map (fun _ -> handleOutput "Operation finished successfully")
     }
     |> Result.teeError (fun _ -> cleanup titlesFilePath |> ignore)
-    |> Result.mapError (List.map error2String >> handleErrors)
+    |> Result.mapError (List.map cliError2string >> handleErrors)

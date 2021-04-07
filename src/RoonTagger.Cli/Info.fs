@@ -1,4 +1,14 @@
-module RoonTagger.Cli.Info
+namespace RoonTagger.Cli
 
-let Name = "roon-tagger"
-let Version = "0.1.0-alpha2"
+open RoonTagger.Metadata
+
+module Info =
+    let Name = "roon-tagger"
+    let Version = "0.1.0-alpha2"
+
+module Models =
+
+    type CliErrors =
+        | MError of MetadataErrors
+        | CliIOError of string
+        | TitlesCountError
