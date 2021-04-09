@@ -20,6 +20,7 @@ let cliError2string (err: CliErrors) : string =
     | MError err -> error2String err
     | CliIOError message -> $"File error: {message}"
     | TitlesCountError -> "The number of tracks does not match the number of titles. Did you delete or add a title?"
+    | ConfigurationParseError err -> $"Error parsing configuration: {err}"
 
 let handleErrors (errs: string list) =
     AnsiConsole.MarkupLine("[red]Errors:[/]")

@@ -4,8 +4,9 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Arguments.fs" />
     <Compile Include="Info.fs" />
+    <Compile Include="Configuration.fs" />
+    <Compile Include="Arguments.fs" />
     <Compile Include="Output.fs" />
     <Compile Include="Commands\ViewCmd.fs" />
     <Compile Include="Commands\CreditsCmd.fs" />
@@ -19,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Argu" Version="6.1.1" />
+    <PackageReference Include="FSharp.Json" Version="0.4.0" />
     <PackageReference Include="FsToolkit.ErrorHandling" Version="2.1.2" />
     <PackageReference Include="Spectre.Console" Version="0.38.0" />
   </ItemGroup>

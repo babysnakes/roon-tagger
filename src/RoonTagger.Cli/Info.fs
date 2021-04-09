@@ -12,3 +12,4 @@ module Models =
         | MError of MetadataErrors
         | CliIOError of string
         | TitlesCountError
+        | ConfigurationParseError of string
