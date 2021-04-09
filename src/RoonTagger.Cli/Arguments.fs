@@ -28,11 +28,13 @@ type EditTitlesArgs =
             | Files _ -> "Files to edit"
 
 type ViewArgs =
+    | Raw_Credits
     | [<MainCommand; ExactlyOnce; Mandatory>] File of file: string
 
     interface IArgParserTemplate with
         member s.Usage =
             match s with
+            | Raw_Credits -> "Print un-formatted credits (good for selecting credit for deletion)"
             | File _ -> "File to view"
 
 type CreditsArgs =

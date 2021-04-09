@@ -17,7 +17,14 @@ let conditionallyPrint (grid: Grid) (head: string) (value: string list) =
         grid.AddRow($"[b]{head}[/]", processedValue |> String.concat ", ")
         |> ignore
 
-// Ugly .....
+let printRawCredits (grid: Grid) (credits: string list) =
+    if not (List.isEmpty credits) then
+        grid.AddEmptyRow() |> ignore
+        grid.AddRow("[bold]Credits:[/]") |> ignore
+
+        for c in (List.sort credits) do
+            grid.AddRow("", c) |> ignore
+
 let printCredits (grid: Grid) (credits: string list) =
     let sp =
         credits
@@ -70,7 +77,10 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         print "Import Date" importDate
         print "Release Date" ord
         print "Year" year
-        printCredits grid credits
+        if args.Contains Raw_Credits then
+            printRawCredits grid credits
+        else
+            printCredits grid credits
 
         let panel = PanelExtensions.Header(Panel(grid), $"Info: {fileName} ")
         AnsiConsole.Render(panel)
