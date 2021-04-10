@@ -50,6 +50,21 @@ type CreditsArgs =
             | Del _ -> "Deletes the provided credit. Fails if credit does not exist (use multiple times if needed)"
             | Files _ -> "The files to apply the credits to"
 
+type ConfigureArgs =
+    | Log_File of logFile: string
+    | Log_Level of Configuration.LogLevel
+    | Editor_Command of cmd: string * args: string
+    | Show
+
+    interface IArgParserTemplate with
+        member s.Usage =
+            match s with
+            | Log_File _ -> "Customize output log file."
+            | Log_Level _ -> "Customize default log level."
+            | Editor_Command _ ->
+                "Configure editor for editing titles file (cmd and optional args). Editor must run in the foreground and must accept file to edit as last argument."
+            | Show -> "Show current configuration and exit."
+
 [<HelpFlags([| "-h"; "--help" |])>]
 type MainArgs =
     | Version
@@ -57,6 +72,7 @@ type MainArgs =
     | [<CliPrefix(CliPrefix.None)>] Set_Tags of ParseResults<SetTagsArgs>
     | [<CliPrefix(CliPrefix.None)>] Edit_Titles of ParseResults<EditTitlesArgs>
     | [<CliPrefix(CliPrefix.None)>] Credits of ParseResults<CreditsArgs>
+    | [<CliPrefix(CliPrefix.None)>] Configure of ParseResults<ConfigureArgs>
     | [<CliPrefix(CliPrefix.None)>] View of ParseResults<ViewArgs>
 
     interface IArgParserTemplate with
@@ -67,6 +83,7 @@ type MainArgs =
             | Set_Tags _ -> "set tags"
             | Edit_Titles _ -> "Edit the titles of the provided files as a text file"
             | Credits _ -> "Add/Delete credit entries"
+            | Configure _ -> $"Configure {Info.Name}"
             | View _ -> "View metadata of the provided file"
 
 let parseFiles files =

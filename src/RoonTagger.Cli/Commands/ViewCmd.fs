@@ -77,6 +77,7 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         print "Import Date" importDate
         print "Release Date" ord
         print "Year" year
+
         if args.Contains Raw_Credits then
             printRawCredits grid credits
         else

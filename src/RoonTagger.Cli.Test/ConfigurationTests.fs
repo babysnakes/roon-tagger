@@ -11,18 +11,15 @@ module ConfigurationTests =
 
     let tmpDirectory = "test-tmp-dir"
     let configPath = getConfigFilePath tmpDirectory "config" ConfigurationVersion.V1
-    let config1 = { Editor = None; Log = None }
+    let config1 = loadConfigWithDefault "some-file" |> Result.unwrap
 
     let config2 =
-        { Editor =
-              Some
-                  { Cmd = "cmd"
-                    Arguments = [ "arg1"; "arg2" ] }
-          Log = None }
+        { Editor = Some { Cmd = "cmd"; Arguments = "arg1 arg2" }
+          Log = config1.Log }
 
     let config3 =
         { Editor = None
-          Log = Some { File = "file"; Level = LogLevel.Info } }
+          Log = { File = "file"; Level = LogLevel.Info } }
 
     [<OneTimeSetUp>]
     let setup () =

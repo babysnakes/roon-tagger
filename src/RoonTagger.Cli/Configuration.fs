@@ -8,16 +8,17 @@ open RoonTagger.Cli
 open RoonTagger.Cli.Models
 
 type LogLevel =
+    | None = 0
     | Info = 1
     | Debug = 2
     | Trace = 3
 
-type EditorCommandV1 = { Cmd: string; Arguments: string list }
+type EditorCommandV1 = { Cmd: string; Arguments: string }
 type LogConfigV1 = { File: string; Level: LogLevel }
 
 type ConfigurationV1 =
     { Editor: EditorCommandV1 option
-      Log: LogConfigV1 option }
+      Log: LogConfigV1 }
 
 type ConfigurationVersion =
     | V1 = 0
@@ -49,6 +50,17 @@ let loadConfig (path: string) : Result<ConfigurationV1 option, CliErrors> =
     with
     | :? JsonDeserializationError as ex -> Error(ConfigurationParseError ex.Message)
     | ex -> Error(CliIOError $"Error reading configuration file: {ex.Message}")
+
+/// Returns saved config or default config.
+let loadConfigWithDefault (path: string) : Result<ConfigurationV1, CliErrors> =
+    let defaultConfig =
+        { Editor = None
+          Log =
+              { File = $"{Info.Name}.log"
+                Level = LogLevel.None } }
+
+    loadConfig path
+    |> Result.map (Option.defaultValue defaultConfig)
 
 /// Serialize the configuration to the specified path with one backup.
 let saveConfig (config: ConfigurationV1) (path: string) : Result<unit, CliErrors> =
