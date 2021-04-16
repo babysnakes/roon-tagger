@@ -49,6 +49,9 @@ type LoggingTests() =
             logger.IsEnabled level |> should equal enabled
 
     [<Test>]
-    member this.``Test log level calculation with logging disabled`` () =
-        setupLogger { File = "file.log"; Level = LogLevel.None } 0
+    member this.``Test log level calculation with logging disabled``() =
+        setupLogger
+            { File = "file.log"
+              Level = LogLevel.None }
+            0
         |> should equal None
