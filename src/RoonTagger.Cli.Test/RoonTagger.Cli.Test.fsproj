@@ -11,6 +11,7 @@
     <PackageReference Include="FsUnit" Version="4.0.4" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LoggingTests.fs" />
     <Compile Include="ConfigurationTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

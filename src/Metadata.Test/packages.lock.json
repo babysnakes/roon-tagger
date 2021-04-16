@@ -225,6 +225,11 @@
           "Microsoft.NETCore.Targets": "1.1.0"
         }
       },
+      "Serilog": {
+        "type": "Transitive",
+        "resolved": "2.10.0",
+        "contentHash": "+QX0hmf37a0/OZLxM3wL7V6/ADvC1XihXN4Kq/p6d8lCPfgkRdiuhbWlMaFjR9Av0dy5F0+MBeDmDdRZN/YwQA=="
+      },
       "System.AppContext": {
         "type": "Transitive",
         "resolved": "4.1.0",
@@ -821,7 +826,8 @@
           "FParsec": "1.1.1",
           "FSharp.Core": "5.0.0",
           "FlacLibSharp": "3.2.1",
-          "FsToolkit.ErrorHandling": "2.1.2"
+          "FsToolkit.ErrorHandling": "2.1.2",
+          "Serilog": "2.10.0"
         }
       }
     }
