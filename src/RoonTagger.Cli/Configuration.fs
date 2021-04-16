@@ -7,6 +7,8 @@ open FsToolkit.ErrorHandling
 open RoonTagger.Cli
 open RoonTagger.Cli.Models
 
+let log = Serilog.Log.Logger
+
 type LogLevel =
     | None = 0
     | Info = 1
@@ -48,8 +50,12 @@ let loadConfig (path: string) : Result<ConfigurationV1 option, CliErrors> =
         |> Option.map (fun j -> Json.deserialize<ConfigurationV1> j)
         |> Ok
     with
-    | :? JsonDeserializationError as ex -> Error(ConfigurationParseError ex.Message)
-    | ex -> Error(CliIOError $"Error reading configuration file: {ex.Message}")
+    | :? JsonDeserializationError as ex ->
+        log.Error("Loading configuration: {Ex}", ex)
+        Error(ConfigurationParseError ex.Message)
+    | ex ->
+        log.Error("Loading configuration: {Ex}", ex)
+        Error(CliIOError $"Error reading configuration file: {ex.Message}")
 
 /// Returns saved config or default config.
 let loadConfigWithDefault (path: string) : Result<ConfigurationV1, CliErrors> =
@@ -71,7 +77,9 @@ let saveConfig (config: ConfigurationV1) (path: string) : Result<unit, CliErrors
         do!
             try
                 Directory.CreateDirectory dirName |> ignore |> Ok
-            with ex -> Error(CliIOError $"Error creating config directory: {ex.Message}")
+            with ex ->
+                log.Error("Create configuration directory: {Ex}", ex)
+                Error(CliIOError $"Error creating config directory: {ex.Message}")
 
         do!
             try
@@ -79,10 +87,14 @@ let saveConfig (config: ConfigurationV1) (path: string) : Result<unit, CliErrors
                     File.Copy(path, path + ".bak", true) |> Ok
                 else
                     Ok()
-            with ex -> Error(CliIOError $"Error backing up old config: {ex.Message}")
+            with ex ->
+                log.Error("Backing up configuration: {Ex}", ex)
+                Error(CliIOError $"Error backing up old config: {ex.Message}")
 
         do!
             try
                 File.WriteAllText(path, contents) |> Ok
-            with ex -> Error(CliIOError $"Error saving configuration: {ex.Message}")
+            with ex ->
+                log.Error("Saving configuration: {Ex}", ex)
+                Error(CliIOError $"Error saving configuration: {ex.Message}")
     }

@@ -10,6 +10,8 @@ open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 
+let log = Serilog.Log.Logger
+
 let private titlesFilePath =
     let fileName = "roon-tagger-edit-titles.txt"
     let currentDir = Directory.GetCurrentDirectory()
@@ -44,7 +46,9 @@ let writeTitlesFile (lines: string list) path =
         File.WriteAllLines(path, lines)
         Ok path
     with ex ->
-        [ CliIOError $"Error reading titles file: {ex.Message}" ]
+        log.Error("Writing titles file: {Ex}", ex)
+
+        [ CliIOError $"Error writing titles file: {ex.Message}" ]
         |> Error
 
 let cleanup path =
@@ -53,7 +57,9 @@ let cleanup path =
             File.Delete path
 
         Ok()
-    with ex -> Error [ CliIOError $"Error deleting titles file: {ex.Message}" ]
+    with ex ->
+        log.Error("Cleanup titles file: {Ex}", ex)
+        Error [ CliIOError $"Error deleting titles file: {ex.Message}" ]
 
 let prompt filePath =
     let message =
@@ -70,6 +76,8 @@ let readTitles filePath =
     try
         File.ReadAllLines(filePath) |> List.ofArray |> Ok
     with ex ->
+        log.Error("Reading titles file: {Ex}", ex)
+
         [ CliIOError $"Error reading titles file: {ex.Message}" ]
         |> Error
 

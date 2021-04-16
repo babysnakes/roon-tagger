@@ -12,6 +12,8 @@ let MovementTag = "PART"
 let SectionTag = "SECTION"
 let CreditTag = "PERSONNEL"
 
+let log = Serilog.Log.Logger
+
 let setTag (track: FlacFile) (tag: RoonTag) =
     let comment = track.VorbisComment
 
@@ -55,4 +57,6 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
 let applyChanges (track: FlacFile) =
     try
         track.Save() |> Ok
-    with ex -> Error [ FileSaveError ex.Message ]
+    with ex ->
+        log.Error("Saving track: {Ex}", ex)
+        Error [ FileSaveError ex.Message ]
