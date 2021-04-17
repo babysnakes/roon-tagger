@@ -129,7 +129,7 @@ let handleCmd (args: ParseResults<EditTitlesArgs>) (config: ConfigurationV1) : R
 
         match editMethod with
         | EditAsync -> prompt path
-        | EditDirectly -> 
+        | EditDirectly ->
             let editorCmd = config.Editor.Value
             editTitlesWithEditor editorCmd path
 

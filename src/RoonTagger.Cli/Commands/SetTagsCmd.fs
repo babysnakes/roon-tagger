@@ -9,9 +9,7 @@ open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Output
 
 let extractTags (opts: ParseResults<SetTagsArgs>) =
-    let titleTag =
-        opts.TryGetResult Title
-        |> Option.map Metadata.Title
+    let titleTag = opts.TryGetResult Title |> Option.map Metadata.Title
 
     let importDateTag =
         if (opts.Contains Import_Date) then

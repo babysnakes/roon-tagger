@@ -8,6 +8,7 @@ let log = Serilog.Log.Logger
 /// Tries to search cmd in path.
 let searchInPath (cmd: string) =
     log.Debug("Searching for '{Cmd}' in PATH ...", cmd)
+
     match (Environment.GetEnvironmentVariable "PATH" |> Option.ofObj) with
     | None -> cmd
     | Some path ->

@@ -10,11 +10,7 @@ open TestsUtils
 module ``Track operations`` =
 
     let loadTrackSuccess = getResourcePath >> Track.load >> Result.unwrap
-
-    let loadTrackError =
-        getResourcePath
-        >> Track.load
-        >> Result.unwrapError
+    let loadTrackError = getResourcePath >> Track.load >> Result.unwrapError
 
     [<Test>]
     let ``Loading missing file return FileDoesNotExist error`` () =
@@ -35,9 +31,7 @@ module ``Track operations`` =
         let track = "empty.flac" |> loadTrackSuccess
         let import = ImportDate sampleDate
         let originalRelease = OriginalReleaseDate sampleDate
-
-        Track.setTags track [ import; originalRelease ]
-        |> ignore
+        Track.setTags track [ import; originalRelease ] |> ignore
 
         (Track.getTagStringValue track TagName.ImportDate).[0]
         |> should equal "2021-05-21"
@@ -65,9 +59,7 @@ module ``Track operations`` =
     [<Test>]
     let ``getTagStringValue returns empty list on nonexisting tags`` () =
         let track = "empty.flac" |> loadTrackSuccess
-
-        Track.getTagStringValue track TagName.Movement
-        |> should haveLength 0
+        Track.getTagStringValue track TagName.Movement |> should haveLength 0
 
     [<Test>]
     let ``safeGetTagStringValue will return at least one empty element in nonexisting tags`` () =
@@ -84,15 +76,9 @@ module ``Track operations`` =
 
         let res = Track.mkPersonnel testData |> Result.unwrap
         res |> should haveLength 3
-
-        res
-        |> should contain (Personnel "Musician A - Guitar")
-
-        res
-        |> should contain (Personnel "Musician A - Voice")
-
-        res
-        |> should contain (Personnel "Musician B - Violin")
+        res |> should contain (Personnel "Musician A - Guitar")
+        res |> should contain (Personnel "Musician A - Voice")
+        res |> should contain (Personnel "Musician B - Violin")
 
     [<Test>]
     let ``addCredits should append provided credits to existing ones`` () =

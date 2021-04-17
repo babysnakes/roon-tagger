@@ -33,10 +33,7 @@ let handleCmd (args: ParseResults<CreditsArgs>) : Result<unit, unit> =
             |> Result.map ignore
             |> Result.mapError List.concat
 
-        do
-            tracks
-            |> List.map (fun t -> Track.addCredits t addCredits)
-            |> ignore
+        do tracks |> List.map (fun t -> Track.addCredits t addCredits) |> ignore
 
         do!
             tracks

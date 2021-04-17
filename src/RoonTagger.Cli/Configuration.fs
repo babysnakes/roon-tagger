@@ -65,8 +65,7 @@ let loadConfigWithDefault (path: string) : Result<ConfigurationV1, CliErrors> =
               { File = $"{Info.Name}.log"
                 Level = LogLevel.None } }
 
-    loadConfig path
-    |> Result.map (Option.defaultValue defaultConfig)
+    loadConfig path |> Result.map (Option.defaultValue defaultConfig)
 
 /// Serialize the configuration to the specified path with one backup.
 let saveConfig (config: ConfigurationV1) (path: string) : Result<unit, CliErrors> =

@@ -25,10 +25,7 @@ let cliError2string (err: CliErrors) : string =
 let handleErrors (errs: string list) =
     AnsiConsole.MarkupLine("[red]Errors:[/]")
     let grid = Grid()
-
-    grid.AddColumn(GridColumn() |> ColumnExtensions.NoWrap)
-    |> ignore
-
+    grid.AddColumn(GridColumn() |> ColumnExtensions.NoWrap) |> ignore
     grid.AddColumn(GridColumn()) |> ignore
 
     errs

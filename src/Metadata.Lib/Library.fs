@@ -19,12 +19,8 @@ module Track =
             log.Error("Loading track: {Err}", err)
             Error(FileDoesNotExist err.Message)
         | :? Exceptions.FlacLibSharpInvalidFormatException as err ->
-            Error(
-                log.Error("Loading track '{FileName}': {Err}", fileName, err)
-
-                sprintf "Not a valid FLAC file: '%s'" fileName
-                |> InvalidFileFormat
-            )
+            log.Error("Loading track '{FileName}': {Err}", fileName, err)
+            Error(sprintf "Not a valid FLAC file: '%s'" fileName |> InvalidFileFormat)
         | err ->
             log.Error("Loading track '{FileName}': {Err}", fileName, err)
             Error(UnexpectedError err.Message)
@@ -71,9 +67,7 @@ module Track =
             let make r = $"{name} - {r}"
             roles |> List.map make |> List.map Personnel |> Ok
 
-        credits
-        |> List.traverseResultA mkSingle
-        |> Result.map List.concat
+        credits |> List.traverseResultA mkSingle |> Result.map List.concat
 
     /// Adds the provided credits to the existing ones in the track. Merges
     /// multiple entries. Note, it *does not* check the validity of Personnel.

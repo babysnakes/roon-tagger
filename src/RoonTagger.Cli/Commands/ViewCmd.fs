@@ -9,9 +9,7 @@ open RoonTagger.Cli.Output
 open RoonTagger.Metadata
 
 let conditionallyPrint (grid: Grid) (head: string) (value: string list) =
-    let processedValue =
-        value
-        |> List.filter (fun s -> String.IsNullOrEmpty(s) |> not)
+    let processedValue = value |> List.filter (fun s -> String.IsNullOrEmpty(s) |> not)
 
     if not (List.isEmpty processedValue) then
         grid.AddRow($"[b]{head}[/]", processedValue |> String.concat ", ")
@@ -26,10 +24,7 @@ let printRawCredits (grid: Grid) (credits: string list) =
             grid.AddRow("", c) |> ignore
 
 let printCredits (grid: Grid) (credits: string list) =
-    let sp =
-        credits
-        |> List.map (fun s -> s.Split(" - ", 2) |> List.ofArray)
-
+    let sp = credits |> List.map (fun s -> s.Split(" - ", 2) |> List.ofArray)
     let cs, other = List.partition (fun l -> List.length l = 2) sp
     let credits = cs |> List.map (fun l -> (l.[1], l.[0]))
     let byRole = credits |> List.groupBy fst
@@ -62,10 +57,7 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         let print = conditionallyPrint grid
         let fileName = track.Path |> IO.Path.GetFileName
 
-        grid.AddColumn(
-            GridColumn().PadRight(4)
-            |> ColumnExtensions.NoWrap
-        )
+        grid.AddColumn(GridColumn().PadRight(4) |> ColumnExtensions.NoWrap)
         |> ignore
 
         grid.AddColumn(GridColumn()) |> ignore

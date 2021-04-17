@@ -23,8 +23,7 @@ module ConfigurationTests =
 
     [<OneTimeSetUp>]
     let setup () =
-        IO.Directory.CreateDirectory tmpDirectory
-        |> ignore
+        IO.Directory.CreateDirectory tmpDirectory |> ignore
 
     [<OneTimeTearDown>]
     let tearDown () =
@@ -40,11 +39,7 @@ module ConfigurationTests =
     let ``Configuration saves and reloads the configuration successfully`` () =
         for c in [ config1; config2 ] do
             saveConfig c configPath |> Result.unwrap
-
-            loadConfig configPath
-            |> Result.unwrap
-            |> Option.get
-            |> should equal c
+            loadConfig configPath |> Result.unwrap |> Option.get |> should equal c
 
     [<Test>]
     let ``Config backup is created`` () =
