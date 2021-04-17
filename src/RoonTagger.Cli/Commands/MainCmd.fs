@@ -56,7 +56,7 @@ let handleCmd (opts: ParseResults<MainArgs>) =
         match opts with
         | VersionCmd _ -> return infoMessage $"{Info.Name}: {Info.Version}" |> Ok
         | SetTagsCmd args -> return SetTags.handleCmd args
-        | EditTitlesCmd args -> return EditTitles.handleCmd args
+        | EditTitlesCmd args -> return EditTitles.handleCmd args config
         | ViewCmd args -> return View.handleCmd args
         | CreditsCmd args -> return Credits.handleCmd args
         | ConfigureCmd args -> return Configure.handleCmd args configFile

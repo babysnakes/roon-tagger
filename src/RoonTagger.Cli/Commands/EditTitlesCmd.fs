@@ -7,6 +7,8 @@ open FsToolkit.ErrorHandling.Operator.Result
 open Spectre.Console
 open RoonTagger.Metadata
 open RoonTagger.Cli.Arguments
+open RoonTagger.Cli.Configuration
+open RoonTagger.Cli.ProcessRunner
 open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 
@@ -31,10 +33,7 @@ let sortTrackByTrackNumber (tracks: AudioTrack list) =
                 tnsString |> List.map int |> Ok
             with :? System.FormatException -> Error [ MissingOrInvalidTag TagName.TrackNumber |> MError ]
 
-        return
-            List.zip tracks tns
-            |> List.sortBy snd
-            |> List.map fst
+        return List.zip tracks tns |> List.sortBy snd |> List.map fst
     }
 
 let extractTitles =
@@ -48,8 +47,7 @@ let writeTitlesFile (lines: string list) path =
     with ex ->
         log.Error("Writing titles file: {Ex}", ex)
 
-        [ CliIOError $"Error writing titles file: {ex.Message}" ]
-        |> Error
+        [ CliIOError $"Error writing titles file: {ex.Message}" ] |> Error
 
 let cleanup path =
     try
@@ -61,6 +59,23 @@ let cleanup path =
         log.Error("Cleanup titles file: {Ex}", ex)
         Error [ CliIOError $"Error deleting titles file: {ex.Message}" ]
 
+type EditMethod =
+    | EditDirectly
+    | EditAsync
+    override this.ToString() =
+        match this with
+        | EditDirectly -> "Edit directly with configured text editor"
+        | EditAsync -> "Save a file and wait for me to edit it"
+
+let selectEditMethod (config: ConfigurationV1) =
+    match config.Editor with
+    | Some _ ->
+        let prompt = SelectionPrompt<EditMethod>()
+        prompt.Title <- "\nSelect a method (up/down arrow) for editing the tracks titles:"
+        prompt.AddChoices([ EditDirectly; EditAsync ]) |> ignore
+        AnsiConsole.Prompt prompt
+    | None -> EditAsync
+
 let prompt filePath =
     let message =
         [ $"Titles are saved to: '{filePath}' ordered by track number. Please edit the file without deleting/adding lines and without modifying the order of the lines."
@@ -68,9 +83,16 @@ let prompt filePath =
           "ENTER to continue (after you edited the file), CTRL+c to cancel: " ]
         |> String.concat "\n"
 
-    AnsiConsole.Markup(message)
-    System.Console.Read() |> ignore
-    AnsiConsole.MarkupLine("")
+    let prompt = TextPrompt<string>(message)
+    prompt.AllowEmpty <- true
+    AnsiConsole.Prompt prompt |> ignore
+    AnsiConsole.WriteLine ""
+
+let editTitlesWithEditor editorCommand path =
+    let cmd = editorCommand.Cmd |> searchInPath
+    let args = (editorCommand.Arguments + " " + path).Trim()
+    runCmd cmd args
+
 
 let readTitles filePath =
     try
@@ -78,13 +100,11 @@ let readTitles filePath =
     with ex ->
         log.Error("Reading titles file: {Ex}", ex)
 
-        [ CliIOError $"Error reading titles file: {ex.Message}" ]
-        |> Error
+        [ CliIOError $"Error reading titles file: {ex.Message}" ] |> Error
 
 let applyTitles (tracks: AudioTrack list) (titles: string list) =
     let applyTrack (track, title) =
-        Track.setTag track (RoonTag.Title title)
-        |> Result.mapError MError
+        Track.setTag track (RoonTag.Title title) |> Result.mapError MError
 
     try
         List.zip tracks titles |> Ok
@@ -94,10 +114,8 @@ let applyTitles (tracks: AudioTrack list) (titles: string list) =
         >> Result.mapError (fun err -> [ err ])
     )
 
-let handleCmd (args: ParseResults<EditTitlesArgs>) : Result<unit, unit> =
-    let applyTags =
-        Track.applyTags
-        >> Result.mapError (List.map MError)
+let handleCmd (args: ParseResults<EditTitlesArgs>) (config: ConfigurationV1) : Result<unit, unit> =
+    let applyTags = Track.applyTags >> Result.mapError (List.map MError)
 
     result {
         let! tracks =
@@ -107,7 +125,14 @@ let handleCmd (args: ParseResults<EditTitlesArgs>) : Result<unit, unit> =
 
         let titles = extractTitles tracks
         let! path = writeTitlesFile titles titlesFilePath
-        do prompt path
+        let editMethod = selectEditMethod config
+
+        match editMethod with
+        | EditAsync -> prompt path
+        | EditDirectly -> 
+            let editorCmd = config.Editor.Value
+            editTitlesWithEditor editorCmd path
+
         let! newTitles = readTitles path
 
         if titles = newTitles then
