@@ -8,15 +8,12 @@ open RoonTagger.Cli.Info
 open RoonTagger.Cli.Output
 
 let extractEditorConfig (args: ParseResults<ConfigureArgs>) (defaultCmd: EditorCommandV1 option) =
-    if args.Contains Editor_Command then
-        args.TryGetResult Editor_Command
-        |> Option.map (fun (cmd, arguments) -> { Cmd = cmd; Arguments = arguments })
-    else
-        defaultCmd
+    args.TryGetResult Editor_Command
+    |> Option.map (fun (cmd, arguments) -> { Cmd = cmd; Arguments = arguments })
+    |> Option.orElse defaultCmd
 
-let updateConfig (args: ParseResults<ConfigureArgs>) (configPath: string) =
+let updateConfig (args: ParseResults<ConfigureArgs>) (config: ConfigurationV1) (configPath: string) =
     result {
-        let! config = loadConfigWithDefault configPath
         let lc = config.Log
         let logFile = args.GetResult(Log_File, defaultValue = lc.File)
         let logLevel = args.GetResult(Log_Level, defaultValue = lc.Level)
@@ -33,20 +30,9 @@ let updateConfig (args: ParseResults<ConfigureArgs>) (configPath: string) =
 
     }
 
-let showConfig configPath =
-    result {
-        let! config = loadConfigWithDefault configPath
-        let! savedConfig = loadConfig configPath
-
-        if savedConfig |> Option.isNone then
-            infoMessage "No configuration file found, showing default configuration.\n"
-
-        printfn "%A" config
-    }
-
-let handleCmd (args: ParseResults<ConfigureArgs>) (configPath: string) =
+let handleCmd (args: ParseResults<ConfigureArgs>) (config: ConfigurationV1) (configPath: string) =
     (if args.Contains Show then
-         showConfig configPath
+         printfn "%A" config |> Ok
      else
-         updateConfig args configPath)
+         updateConfig args config configPath)
     |> Result.mapError (fun err -> handleErrors [ cliError2string err ])

@@ -59,6 +59,6 @@ let handleCmd (opts: ParseResults<MainArgs>) =
         | EditTitlesCmd args -> return EditTitles.handleCmd args config
         | ViewCmd args -> return View.handleCmd args
         | CreditsCmd args -> return Credits.handleCmd args
-        | ConfigureCmd args -> return Configure.handleCmd args configFile
+        | ConfigureCmd args -> return Configure.handleCmd args config configFile
         | _ -> return handleOutput "Move along, nothing to see here..." |> Ok
     }
