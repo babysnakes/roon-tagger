@@ -40,18 +40,19 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
     let comment = track.VorbisComment
 
     match tag with
-    | TagName.Title -> comment.Title
-    | TagName.Album -> comment.Album
-    | TagName.Artist -> comment.Artist
-    | TagName.Work -> comment.[WorkTag]
-    | TagName.Movement -> comment.[MovementTag]
-    | TagName.Section -> comment.[SectionTag]
-    | TagName.ImportDate -> comment.[ImportDateTag]
-    | TagName.OriginalReleaseDate -> comment.[OriginalReleaseDateTag]
-    | TagName.Year -> comment.[YearTag]
-    | TagName.Credit -> comment.[CreditTag]
-    | TagName.TrackNumber -> comment.TrackNumber
-    | _ -> VorbisCommentValues()
+    | TitleTag -> comment.Title
+    | AlbumTag -> comment.Album
+    | ArtistTag -> comment.Artist
+    | WorkTag -> comment.[WorkTag]
+    | MovementTag -> comment.[MovementTag]
+    | SectionTag -> comment.[SectionTag]
+    | ImportDateTag -> comment.[ImportDateTag]
+    | OriginalReleaseDateTag -> comment.[OriginalReleaseDateTag]
+    | YearTag -> comment.[YearTag]
+    | CreditTag -> comment.[CreditTag]
+    | TrackNumberTag -> comment.TrackNumber
+    | MovementIndexTag
+    | MovementCountTag -> VorbisCommentValues()
     |> List.ofSeq
 
 let applyChanges (track: FlacFile) =

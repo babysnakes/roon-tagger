@@ -33,10 +33,10 @@ module ``Track operations`` =
         let originalRelease = OriginalReleaseDate sampleDate
         Track.setTags track [ import; originalRelease ] |> ignore
 
-        (Track.getTagStringValue track TagName.ImportDate).[0]
+        (Track.getTagStringValue track ImportDateTag).[0]
         |> should equal "2021-05-21"
 
-        (Track.getTagStringValue track TagName.OriginalReleaseDate).[0]
+        (Track.getTagStringValue track OriginalReleaseDateTag).[0]
         |> should equal "2021-05-21"
 
     [<Test>]
@@ -45,7 +45,7 @@ module ``Track operations`` =
 
         Track.setTags track [ Year 2012 ] |> ignore
 
-        (Track.getTagStringValue track TagName.Year).[0]
+        (Track.getTagStringValue track YearTag).[0]
         |> should equal "2012"
 
     [<Test>]
@@ -59,13 +59,13 @@ module ``Track operations`` =
     [<Test>]
     let ``getTagStringValue returns empty list on nonexisting tags`` () =
         let track = "empty.flac" |> loadTrackSuccess
-        Track.getTagStringValue track TagName.Movement |> should haveLength 0
+        Track.getTagStringValue track MovementTag |> should haveLength 0
 
     [<Test>]
     let ``safeGetTagStringValue will return at least one empty element in nonexisting tags`` () =
         let track = "empty.flac" |> loadTrackSuccess
 
-        Track.safeGetTagStringValue track TagName.Movement
+        Track.safeGetTagStringValue track MovementTag
         |> should equal [ "" ]
 
     [<Test>]
@@ -91,7 +91,7 @@ module ``Track operations`` =
               Personnel "The Orchestra - Orchestra" ]
         |> ignore
 
-        let p = Track.getTagStringValue track TagName.Credit
+        let p = Track.getTagStringValue track CreditTag
         p |> should contain "First Last - Cello"
         p |> should contain "The Orchestra - Orchestra"
         p |> should haveLength 5
@@ -107,7 +107,7 @@ module ``Track operations`` =
               Personnel "Musician C - Double Bass" ]
         |> ignore
 
-        let p = Track.getTagStringValue track TagName.Credit
+        let p = Track.getTagStringValue track CreditTag
         p |> should haveLength 4
         p |> should contain "Musician A - Guitar"
         p |> should contain "Musician C - Double Bass"
@@ -124,7 +124,7 @@ module ``Track operations`` =
               Personnel existingValue2 ]
         |> ignore
 
-        Track.getTagStringValue track TagName.Credit
+        Track.getTagStringValue track CreditTag
         |> should equal [ "Musician B - Viola" ]
 
 

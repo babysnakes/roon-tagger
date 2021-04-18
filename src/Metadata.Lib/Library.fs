@@ -72,7 +72,7 @@ module Track =
     /// Adds the provided credits to the existing ones in the track. Merges
     /// multiple entries. Note, it *does not* check the validity of Personnel.
     let addCredits (track: AudioTrack) (credits: Personnel list) =
-        let current = getTagStringValue track TagName.Credit
+        let current = getTagStringValue track CreditTag
         let toAdd = List.map (fun (Personnel p) -> p) credits
         let newValue = List.append current toAdd |> List.distinct
 
@@ -80,7 +80,7 @@ module Track =
         | Flac file -> Flac.setRaw file Flac.CreditTag newValue
 
     let deleteCredits (track: AudioTrack) (credits: Personnel list) : Result<unit, MetadataErrors list> =
-        let current = getTagStringValue track TagName.Credit
+        let current = getTagStringValue track CreditTag
         let toDelete = List.map (fun (Personnel p) -> p) credits
         let invalidDeletes = List.filter (fun s -> List.contains s current |> not) toDelete
 

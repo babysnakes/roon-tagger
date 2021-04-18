@@ -44,14 +44,14 @@ let handleCmd (args: ParseResults<ViewArgs>) =
     result {
         let! track = args.GetResult File |> Track.load
         let getValue = Track.getTagStringValue track
-        let album = getValue TagName.Album
-        let artist = getValue TagName.Artist
-        let title = getValue TagName.Title
-        let tn = getValue TagName.TrackNumber
-        let importDate = getValue TagName.ImportDate
-        let ord = getValue TagName.OriginalReleaseDate
-        let year = getValue TagName.Year
-        let credits = getValue TagName.Credit
+        let album = getValue AlbumTag
+        let artist = getValue ArtistTag
+        let title = getValue TitleTag
+        let tn = getValue TrackNumberTag
+        let importDate = getValue ImportDateTag
+        let ord = getValue OriginalReleaseDateTag
+        let year = getValue YearTag
+        let credits = getValue CreditTag
 
         let grid = Grid()
         let print = conditionallyPrint grid

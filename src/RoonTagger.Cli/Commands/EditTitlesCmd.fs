@@ -25,19 +25,19 @@ let sortTrackByTrackNumber (tracks: AudioTrack list) =
     result {
         let tnsString =
             tracks
-            |> List.map (fun t -> Track.safeGetTagStringValue t TagName.TrackNumber)
+            |> List.map (fun t -> Track.safeGetTagStringValue t TrackNumberTag)
             |> List.map List.head
 
         let! tns =
             try
                 tnsString |> List.map int |> Ok
-            with :? System.FormatException -> Error [ MissingOrInvalidTag TagName.TrackNumber |> MError ]
+            with :? System.FormatException -> Error [ MissingOrInvalidTag TrackNumberTag |> MError ]
 
         return List.zip tracks tns |> List.sortBy snd |> List.map fst
     }
 
 let extractTitles =
-    List.map (fun t -> Track.safeGetTagStringValue t TagName.Title)
+    List.map (fun t -> Track.safeGetTagStringValue t TitleTag)
     >> List.map List.head
 
 let writeTitlesFile (lines: string list) path =

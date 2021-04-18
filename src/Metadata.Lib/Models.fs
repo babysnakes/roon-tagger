@@ -22,19 +22,19 @@ type RoonTag =
     | Credit of Personnel
 
 type TagName =
-    | Title = 0
-    | Album = 1
-    | Artist = 2
-    | Work = 3
-    | Movement = 4
-    | Section = 5
-    | MovementIndex = 6
-    | MovementCount = 7
-    | ImportDate = 8
-    | OriginalReleaseDate = 9
-    | Year = 10
-    | Credit = 11
-    | TrackNumber = 12
+    | TitleTag
+    | AlbumTag
+    | ArtistTag
+    | WorkTag
+    | MovementTag
+    | SectionTag
+    | MovementIndexTag
+    | MovementCountTag
+    | ImportDateTag
+    | OriginalReleaseDateTag
+    | YearTag
+    | CreditTag
+    | TrackNumberTag
 
 type MetadataErrors =
     | FileDoesNotExist of string
