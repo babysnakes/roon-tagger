@@ -35,6 +35,7 @@ type TagName =
     | YearTag
     | CreditTag
     | TrackNumberTag
+    | DiscNumberTag
 
 type MetadataErrors =
     | FileDoesNotExist of string

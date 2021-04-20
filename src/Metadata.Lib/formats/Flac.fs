@@ -11,6 +11,7 @@ let WorkTag = "WORK"
 let MovementTag = "PART"
 let SectionTag = "SECTION"
 let CreditTag = "PERSONNEL"
+let DiskNumberTag = "DISCNUMBER"
 
 let log = Serilog.Log.Logger
 
@@ -51,6 +52,7 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
     | YearTag -> comment.[YearTag]
     | CreditTag -> comment.[CreditTag]
     | TrackNumberTag -> comment.TrackNumber
+    | DiscNumberTag -> comment.[DiskNumberTag]
     | MovementIndexTag
     | MovementCountTag -> VorbisCommentValues()
     |> List.ofSeq

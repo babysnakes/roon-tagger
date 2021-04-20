@@ -9,6 +9,7 @@ open RoonTagger.Metadata
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Configuration
 open RoonTagger.Cli.ProcessRunner
+open RoonTagger.Cli.MetadataHelpers
 open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 
@@ -20,21 +21,6 @@ let private titlesFilePath =
     Path.Combine(currentDir, fileName)
 
 let getTracks = List.traverseResultA Track.load
-
-let sortTrackByTrackNumber (tracks: AudioTrack list) =
-    result {
-        let tnsString =
-            tracks
-            |> List.map (fun t -> Track.safeGetTagStringValue t TrackNumberTag)
-            |> List.map List.head
-
-        let! tns =
-            try
-                tnsString |> List.map int |> Ok
-            with :? System.FormatException -> Error [ MissingOrInvalidTag TrackNumberTag |> MError ]
-
-        return List.zip tracks tns |> List.sortBy snd |> List.map fst
-    }
 
 let extractTitles =
     List.map (fun t -> Track.safeGetTagStringValue t TitleTag)
@@ -121,7 +107,7 @@ let handleCmd (args: ParseResults<EditTitlesArgs>) (config: ConfigurationV1) : R
         let! tracks =
             getTracks (args.GetResult EditTitlesArgs.Files)
             |> Result.mapError (List.map MError)
-            |> Result.bind sortTrackByTrackNumber
+            |> Result.bind sortTracks
 
         let titles = extractTitles tracks
         let! path = writeTitlesFile titles titlesFilePath

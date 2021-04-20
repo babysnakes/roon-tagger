@@ -9,6 +9,7 @@
     <Compile Include="Arguments.fs" />
     <Compile Include="Output.fs" />
     <Compile Include="ProcessRunner.fs" />
+    <Compile Include="MetadataHelpers.fs" />
     <Compile Include="Commands\ConfigureCmd.fs" />
     <Compile Include="Commands\ViewCmd.fs" />
     <Compile Include="Commands\CreditsCmd.fs" />
