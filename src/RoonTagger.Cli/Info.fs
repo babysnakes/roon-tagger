@@ -4,7 +4,7 @@ open RoonTagger.Metadata
 
 module Info =
     let Name = "roon-tagger"
-    let Version = "0.1.0-alpha2"
+    let Version = "0.1.0-alpha3"
 
 module Models =
 
