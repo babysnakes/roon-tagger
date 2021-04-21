@@ -4,16 +4,44 @@ open Argu
 open FsToolkit.ErrorHandling
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Configuration
-open RoonTagger.Cli.Info
+open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 
+let resetEditor (config: ConfigurationV1) (configPath: string) =
+    result {
+        let newConfig = { config with Editor = None }
+
+        return!
+            saveConfig newConfig configPath
+            |> Result.map (fun _ -> handleOutput "Editor reset successfully")
+    }
+
 let extractEditorConfig (args: ParseResults<ConfigureArgs>) (defaultCmd: EditorCommandV1 option) =
-    args.TryGetResult Editor_Command
-    |> Option.map (fun (cmd, arguments) -> { Cmd = cmd; Arguments = arguments })
+    let editorWithArgsParser (cmd, arguments) = { Cmd = cmd; Arguments = arguments }
+    let editorParser cmd = { Cmd = cmd; Arguments = "" }
+
+    let editorWithoutArgs () =
+        args.TryGetResult Editor |> Option.map editorParser
+
+    args.TryGetResult Editor_With_Args
+    |> Option.map editorWithArgsParser
+    |> Option.orElse (editorWithoutArgs ())
     |> Option.orElse defaultCmd
+
+let checkArgsValidity (args: ParseResults<ConfigureArgs>) =
+    match (args.Contains Reset_Editor, args.Contains Editor_With_Args, args.Contains Editor) with
+    | true, true, _
+    | true, _, true ->
+        CliArgumentsError "Providing reset editor with configure editor in the same invocation is forbidden."
+        |> Error
+    | false, true, true ->
+        CliArgumentsError "Providing two different editor configurations in the same invocation is forbidden."
+        |> Error
+    | _, _, _ -> Ok()
 
 let updateConfig (args: ParseResults<ConfigureArgs>) (config: ConfigurationV1) (configPath: string) =
     result {
+        do! checkArgsValidity args
         let lc = config.Log
         let logFile = args.GetResult(Log_File, defaultValue = lc.File)
         let logLevel = args.GetResult(Log_Level, defaultValue = lc.Level)
@@ -33,6 +61,8 @@ let updateConfig (args: ParseResults<ConfigureArgs>) (config: ConfigurationV1) (
 let handleCmd (args: ParseResults<ConfigureArgs>) (config: ConfigurationV1) (configPath: string) =
     (if args.Contains Show then
          printfn "%A" config |> Ok
+     elif args.Contains Reset_Editor then
+         resetEditor config configPath
      else
          updateConfig args config configPath)
     |> Result.mapError (fun err -> handleErrors [ cliError2string err ])

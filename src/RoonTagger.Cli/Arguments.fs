@@ -53,7 +53,9 @@ type CreditsArgs =
 type ConfigureArgs =
     | Log_File of logFile: string
     | Log_Level of Configuration.LogLevel
-    | Editor_Command of cmd: string * args: string
+    | Editor of cmd: string
+    | Editor_With_Args of cmd: string * args: string
+    | Reset_Editor
     | Show
 
     interface IArgParserTemplate with
@@ -61,8 +63,11 @@ type ConfigureArgs =
             match s with
             | Log_File _ -> "Customize output log file."
             | Log_Level _ -> "Customize default log level."
-            | Editor_Command _ ->
-                "Configure editor for editing titles file (cmd and optional args). Editor must run in the foreground and must accept file to edit as last argument."
+            | Editor _ ->
+                "Configure an editor for editing titles file (executable that accepts the file as it's single argument). Editor should run in the foreground."
+            | Editor_With_Args _ ->
+                "Configure an editor for editing titles file (as a pair of executable and args-as-string). Editor must run in the foreground and must accept file to edit as last argument (example parameters: code '-n -w')."
+            | Reset_Editor -> "Delete the editor configuration."
             | Show -> "Show current configuration and exit."
 
 [<HelpFlags([| "-h"; "--help" |])>]

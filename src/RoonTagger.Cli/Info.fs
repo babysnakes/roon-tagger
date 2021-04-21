@@ -13,3 +13,4 @@ module Models =
         | CliIOError of string
         | TitlesCountError
         | ConfigurationParseError of string
+        | CliArgumentsError of string
