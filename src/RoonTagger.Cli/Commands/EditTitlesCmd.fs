@@ -66,7 +66,7 @@ let prompt filePath =
     let message =
         [ $"Titles are saved to: '{filePath}' ordered by track number. Please edit the file without deleting/adding lines and without modifying the order of the lines."
           ""
-          "ENTER to continue (after you edited the file), CTRL+c to cancel: " ]
+          "ENTER to continue after you edited the file (To cancel just press ENTER without editing the file): " ]
         |> String.concat "\n"
 
     let prompt = TextPrompt<string>(message)
