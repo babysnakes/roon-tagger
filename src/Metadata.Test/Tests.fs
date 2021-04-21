@@ -45,8 +45,7 @@ module ``Track operations`` =
 
         Track.setTags track [ Year 2012 ] |> ignore
 
-        (Track.getTagStringValue track YearTag).[0]
-        |> should equal "2012"
+        (Track.getTagStringValue track YearTag).[0] |> should equal "2012"
 
     [<Test>]
     let ``Setting credits is forbidden`` () =
@@ -65,8 +64,7 @@ module ``Track operations`` =
     let ``safeGetTagStringValue will return at least one empty element in nonexisting tags`` () =
         let track = "empty.flac" |> loadTrackSuccess
 
-        Track.safeGetTagStringValue track MovementTag
-        |> should equal [ "" ]
+        Track.safeGetTagStringValue track MovementTag |> should equal [ "" ]
 
     [<Test>]
     let ``mkPersonnel should correctly convert Personnel to strings`` () =

@@ -27,8 +27,8 @@ module MetadataHelpersTests =
               "disc2track2.flac" ]
             |> List.map loadTrackSuccess
             |> List.map (fun i -> i.Path)
-        
-        before 
+
+        before
         |> List.map loadTrackSuccess
         |> sortTracks
         |> Result.unwrap
@@ -48,8 +48,8 @@ module MetadataHelpersTests =
               "track3.flac" ]
             |> List.map loadTrackSuccess
             |> List.map (fun i -> i.Path)
-        
-        before 
+
+        before
         |> List.map loadTrackSuccess
         |> sortTracks
         |> Result.unwrap
