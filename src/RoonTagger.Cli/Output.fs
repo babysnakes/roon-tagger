@@ -12,6 +12,7 @@ let error2String (err: MetadataErrors) : string =
     | DeletingNonExistingPersonnel (track, err) -> $"'{track.Path}': Trying to delete non existing credit: {err}"
     | FileSaveError err -> $"Error saving file: {err}"
     | MissingOrInvalidTag tag -> $"Missing or invalid tag: {tag.ToString()}"
+    | UnsupportedRole role -> $"Role '{role}' is not a valid role according to Roon's wiki."
     | UnsupportedTagOperation _
     | UnsupportedTagForFormat -> "TODO: Error"
 

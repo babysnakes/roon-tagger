@@ -6,6 +6,7 @@ open FsToolkit.ErrorHandling
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Output
 open RoonTagger.Metadata
+open RoonTagger.Metadata.Utils
 
 let extractAddCredits (opts: ParseResults<CreditsArgs>) =
 
@@ -22,10 +23,19 @@ let extractAddCredits (opts: ParseResults<CreditsArgs>) =
 
 let handleCmd (args: ParseResults<CreditsArgs>) : Result<unit, unit> =
     result {
+        let! validator =
+            if args.Contains Skip_Validation then
+                Roles None |> Ok
+            else
+                loadSupportedRoles ()
+                |> Result.map Some
+                |> Result.map Roles
+                |> Result.mapError List.ofItem
+
         let files = args.GetResult CreditsArgs.Files
         let! tracks = List.traverseResultA Track.load files
         let delCredits = args.GetResults Del |> List.map Personnel
-        let! addCredits = extractAddCredits args |> Track.mkPersonnel
+        let! addCredits = extractAddCredits args |> Track.mkPersonnel validator
 
         do!
             tracks

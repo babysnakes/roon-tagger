@@ -72,11 +72,36 @@ module ``Track operations`` =
             [ ("Musician A", [ "Guitar"; "Voice" ])
               ("Musician B", [ "Violin" ]) ]
 
-        let res = Track.mkPersonnel testData |> Result.unwrap
+        let emptyValidator = None |> Roles
+        let res = Track.mkPersonnel emptyValidator testData |> Result.unwrap
         res |> should haveLength 3
         res |> should contain (Personnel "Musician A - Guitar")
         res |> should contain (Personnel "Musician A - Voice")
         res |> should contain (Personnel "Musician B - Violin")
+
+    [<Test>]
+    let ``mkPersonnel should reject invalid roles if validator is Some`` () =
+        let validator = Some [ "Guitar"; "Cello" ] |> Roles
+
+        let testData =
+            [ ("Musician A", [ "Guitar"; "NOSUCH1" ])
+              ("Musician B", [ "NOSUCH2" ]) ]
+
+        let errors = Track.mkPersonnel validator testData |> Result.unwrapError
+        errors |> should haveLength 2
+
+    [<Test>]
+    let ``mkPersonnel should accept invalid roles if validator is None`` () =
+        let validator = None |> Roles
+
+        let testData =
+            [ ("Musician A", [ "Guitar"; "NOSUCH1" ])
+              ("Musician B", [ "NOSUCH2" ]) ]
+
+        let res = Track.mkPersonnel validator testData |> Result.unwrap
+        res |> should contain (Personnel "Musician A - NOSUCH1")
+        res |> should contain (Personnel "Musician B - NOSUCH2")
+        res |> should haveLength 3
 
     [<Test>]
     let ``addCredits should append provided credits to existing ones`` () =

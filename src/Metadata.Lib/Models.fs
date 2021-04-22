@@ -46,3 +46,4 @@ type MetadataErrors =
     | DeletingNonExistingPersonnel of track: AudioTrack * value: string
     | FileSaveError of string
     | MissingOrInvalidTag of TagName
+    | UnsupportedRole of string

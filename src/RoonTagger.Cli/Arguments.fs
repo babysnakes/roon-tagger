@@ -40,6 +40,7 @@ type ViewArgs =
 type CreditsArgs =
     | Add of name: string * roles: string
     | Del of credit: string
+    | Skip_Validation
     | [<MainCommand; ExactlyOnce; Last; Mandatory>] Files of file: string list
 
     interface IArgParserTemplate with
@@ -48,6 +49,8 @@ type CreditsArgs =
             | Add _ ->
                 "Adds the provided credit. A credit consists of a name and a comma separated list of roles. If required specify multiple times."
             | Del _ -> "Deletes the provided credit. Fails if credit does not exist (use multiple times if needed)"
+            | Skip_Validation ->
+                "Do not perform role validation. Note that this might not show in Roon if the role is invalid."
             | Files _ -> "The files to apply the credits to"
 
 type ConfigureArgs =

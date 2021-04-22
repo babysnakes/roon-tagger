@@ -4,8 +4,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ExtractRoles.fsx" />
-    <Compile Include="Utils.fs" />
     <Compile Include="Models.fs" />
+    <Compile Include="Utils.fs" />
     <Compile Include="formats/Flac.fs" />
     <Compile Include="Library.fs" />
     <None Include="Resources/**">

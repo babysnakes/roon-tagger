@@ -6,6 +6,24 @@ open FsToolkit.ErrorHandling
 open RoonTagger.Metadata.Formats
 open RoonTagger.Metadata.Utils
 
+/// Accepts a list of valid roles for validating. To skip validation provide None
+type RoleValidator =
+    | Roles of string list option
+
+    /// Validates the provided role against `Roles` (if not None)
+    member rv.validate(role: string) : Result<unit, MetadataErrors> =
+        match rv with
+        | Roles None -> Ok()
+        | Roles (Some roles) ->
+            if roles |> List.contains role then
+                Ok()
+            else
+                UnsupportedRole role |> Error
+
+    /// Validates the provided roles against `Roles` (if not None)
+    member rv.validateMany(roles: string list) =
+        roles |> List.traverseResultA rv.validate
+
 module Track =
 
     let log = Log.Logger
@@ -58,16 +76,20 @@ module Track =
         | l -> l
 
     /// Converts "shortcut" list of name and list of roles to correctly
-    /// formatted `Personnel` tags. Fails if any of the roles are not valid
-    /// (Todo: Not implemented yet).
-    let mkPersonnel (credits: (string * string list) list) : Result<Personnel list, MetadataErrors list> =
-        let mkSingle credit : Result<Personnel list, MetadataErrors> =
-            let name, roles = credit
-            // Todo: Validate role
-            let make r = $"{name} - {r}"
-            roles |> List.map make |> List.map Personnel |> Ok
+    /// formatted `Personnel` tags. Fails if any of the roles fail validation.
+    let mkPersonnel (validator: RoleValidator) (credits: (string * string list) list) =
+        let mkSingle credit : Result<Personnel list, MetadataErrors list> =
+            result {
+                let name, roles = credit
+                let make r = $"{name} - {r}"
+                do! validator.validateMany roles |> Result.map ignore
+                return roles |> List.map make |> List.map Personnel
+            }
 
-        credits |> List.traverseResultA mkSingle |> Result.map List.concat
+        credits
+        |> List.traverseResultA mkSingle
+        |> Result.map List.concat
+        |> Result.mapError List.concat
 
     /// Adds the provided credits to the existing ones in the track. Merges
     /// multiple entries. Note, it *does not* check the validity of Personnel.
