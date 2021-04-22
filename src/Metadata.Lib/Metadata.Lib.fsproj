@@ -3,15 +3,19 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Utils.fs"/>
-    <Compile Include="Models.fs"/>
-    <Compile Include="formats/Flac.fs"/>
-    <Compile Include="Library.fs"/>
+    <Compile Include="ExtractRoles.fsx" />
+    <Compile Include="Utils.fs" />
+    <Compile Include="Models.fs" />
+    <Compile Include="formats/Flac.fs" />
+    <Compile Include="Library.fs" />
+    <None Include="Resources/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FlacLibSharp" Version="3.2.1"/>
-    <PackageReference Include="FParsec" Version="1.1.1"/>
-    <PackageReference Include="FsToolkit.ErrorHandling" Version="2.1.2"/>
-    <PackageReference Include="Serilog" Version="2.10.0"/>
+    <PackageReference Include="FlacLibSharp" Version="3.2.1" />
+    <PackageReference Include="FParsec" Version="1.1.1" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="2.1.2" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
   </ItemGroup>
 </Project>
