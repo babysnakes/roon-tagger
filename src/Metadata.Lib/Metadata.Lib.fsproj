@@ -7,7 +7,9 @@
     <Compile Include="Models.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="formats/Flac.fs" />
-    <Compile Include="Library.fs" />
+    <Compile Include="RoleValidator.fs" />
+    <Compile Include="Track.fs" />
+    <Compile Include="TrackHelpers.fs" />
     <None Include="Resources/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

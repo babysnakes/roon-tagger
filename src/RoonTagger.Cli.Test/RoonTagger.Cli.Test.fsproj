@@ -13,7 +13,6 @@
   <ItemGroup>
     <Compile Include="LoggingTests.fs" />
     <Compile Include="ConfigurationTests.fs" />
-    <Compile Include="MetadataHelpersTests.fs" />
     <Compile Include="Program.fs" />
     <None Include="Resources/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

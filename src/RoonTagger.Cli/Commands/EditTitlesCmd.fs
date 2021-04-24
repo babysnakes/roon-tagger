@@ -6,10 +6,10 @@ open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
 open Spectre.Console
 open RoonTagger.Metadata
+open RoonTagger.Metadata.TrackHelpers
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Configuration
 open RoonTagger.Cli.ProcessRunner
-open RoonTagger.Cli.MetadataHelpers
 open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 
@@ -106,8 +106,8 @@ let handleCmd (args: ParseResults<EditTitlesArgs>) (config: ConfigurationV1) : R
     result {
         let! tracks =
             getTracks (args.GetResult EditTitlesArgs.Files)
-            |> Result.mapError (List.map MError)
             |> Result.bind sortTracks
+            |> Result.mapError (List.map MError)
 
         let titles = extractTitles tracks
         let! path = writeTitlesFile titles titlesFilePath

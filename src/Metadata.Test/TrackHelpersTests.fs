@@ -1,7 +1,7 @@
 namespace RoonTagger.Cli.Test
 
-open RoonTagger.Cli.MetadataHelpers
 open RoonTagger.Metadata
+open RoonTagger.Metadata.TrackHelpers
 open TestsUtils
 open NUnit.Framework
 open FsUnit
