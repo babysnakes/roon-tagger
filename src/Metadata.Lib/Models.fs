@@ -47,3 +47,4 @@ type MetadataErrors =
     | FileSaveError of string
     | MissingOrInvalidTag of TagName
     | UnsupportedRole of string
+    | DuplicateTrackNumberForDisc

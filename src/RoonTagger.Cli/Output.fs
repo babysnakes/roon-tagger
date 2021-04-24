@@ -13,6 +13,7 @@ let error2String (err: MetadataErrors) : string =
     | FileSaveError err -> $"Error saving file: {err}"
     | MissingOrInvalidTag tag -> $"Missing or invalid tag: {tag.ToString()}"
     | UnsupportedRole role -> $"Role '{role}' is not a valid role according to Roon's wiki."
+    | DuplicateTrackNumberForDisc -> "There's a duplicate track number on the same disc number (or no disc number)"
     | UnsupportedTagOperation _
     | UnsupportedTagForFormat -> "TODO: Error"
 

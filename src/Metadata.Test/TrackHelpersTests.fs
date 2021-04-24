@@ -55,3 +55,16 @@ module MetadataHelpersTests =
         |> Result.unwrap
         |> List.map (fun i -> i.Path)
         |> should equal expected
+
+    [<Test>]
+    let ``sort tracks fails if there are duplicate track and disc numbers`` () =
+        let tracks =
+            [ "track2.flac"
+              "another-track1.flac"
+              "track1.flac" ]
+
+        tracks
+        |> List.map loadTrackSuccess
+        |> sortTracks
+        |> Result.unwrapError
+        |> should contain DuplicateTrackNumberForDisc
