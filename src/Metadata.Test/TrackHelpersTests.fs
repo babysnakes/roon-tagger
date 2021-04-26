@@ -9,6 +9,7 @@ open FsUnit
 module MetadataHelpersTests =
 
     let loadTrackSuccess = getResourcePath >> Track.load >> Result.unwrap
+    let createOrderedTracks = List.map loadTrackSuccess >> OrderedTracks.Create
 
     [<Test>]
     let ``sort tracks by tracks and cd number`` () =
@@ -68,3 +69,45 @@ module MetadataHelpersTests =
         |> sortTracks
         |> Result.unwrapError
         |> should contain DuplicateTrackNumberForDisc
+
+    [<Test>]
+    let ``Ordered tracks when missing file in a sequence should fail`` () =
+        let result = [ "track1.flac"; "track3.flac" ] |> createOrderedTracks
+        result |> Result.unwrapError |> should equal [ UnOrderedTracks ]
+
+    [<Test>]
+    let ``Ordered tracks fails on duplicate track numbers`` () =
+        let result = [ "track1.flac"; "track1.flac" ] |> createOrderedTracks
+
+        result
+        |> Result.unwrapError
+        |> should equal [ DuplicateTrackNumberForDisc ]
+
+    [<Test>]
+    let ``Ordered tracks when missing missing first file on second disc should fail`` () =
+        let result =
+            [ "disc1track1.flac"
+              "disc1track2.flac"
+              "disc1track3.flac"
+              "disc2track2.flac" ]
+            |> createOrderedTracks
+
+        result |> Result.unwrapError |> should equal [ UnOrderedTracks ]
+
+    [<Test>]
+    let ``Ordered tracks when provided single track is valid`` () =
+        let result = [ "track3.flac" ] |> createOrderedTracks
+        result |> Result.unwrap |> should be (ofCase <@ OrderedTracks @>)
+
+    let ``Ordered tracks sorts the provided tracks`` () =
+        let result =
+            [ "disc1track2.flac"
+              "disc1track1.flac"
+              "disc1track3.flac" ]
+            |> createOrderedTracks
+            |> Result.unwrap
+
+        let (OrderedTracks tracks) = result
+        tracks.[0].Path |> should endWith "disc1track1.flac"
+        tracks.[1].Path |> should endWith "disc1track2.flac"
+        tracks.[2].Path |> should endWith "disc1track3.flac"
