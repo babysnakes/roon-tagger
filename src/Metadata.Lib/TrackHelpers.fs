@@ -78,7 +78,7 @@ type OrderedTracks =
             return!
                 if ordered then
                     log.Debug("Tracks are ordered")
-                    OrderedTracks tracks |> Ok
+                    OrderedTracks sorted |> Ok
                 else
                     log.Debug("Tracks are NOT ordered")
                     Error [ UnOrderedTracks ]

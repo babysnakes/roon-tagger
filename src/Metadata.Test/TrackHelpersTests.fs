@@ -1,4 +1,4 @@
-namespace RoonTagger.Cli.Test
+namespace Metadata.Test
 
 open RoonTagger.Metadata
 open RoonTagger.Metadata.TrackHelpers
@@ -84,7 +84,7 @@ module MetadataHelpersTests =
         |> should equal [ DuplicateTrackNumberForDisc ]
 
     [<Test>]
-    let ``Ordered tracks when missing missing first file on second disc should fail`` () =
+    let ``Ordered tracks when missing first file on second disc should fail`` () =
         let result =
             [ "disc1track1.flac"
               "disc1track2.flac"
@@ -99,6 +99,7 @@ module MetadataHelpersTests =
         let result = [ "track3.flac" ] |> createOrderedTracks
         result |> Result.unwrap |> should be (ofCase <@ OrderedTracks @>)
 
+    [<Test>]
     let ``Ordered tracks sorts the provided tracks`` () =
         let result =
             [ "disc1track2.flac"
