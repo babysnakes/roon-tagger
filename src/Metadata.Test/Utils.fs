@@ -1,5 +1,6 @@
 module TestsUtils
 
+open FParsec.CharParsers
 open System
 open RoonTagger.Metadata
 
@@ -15,6 +16,11 @@ let extractFlac (file: AudioTrack) =
     match file.Track with
     | Flac file -> file
 
+/// Extract the match value of ParserResult
+let inline unwrapParserResult (pr: ParserResult<_, _>) =
+    match pr with
+    | Success (result, _, _) -> result
+    | Failure (msg, _, _) -> failwith $"Trying to unwrap failure: {msg}"
 
 [<RequireQualifiedAccess>]
 module Result =

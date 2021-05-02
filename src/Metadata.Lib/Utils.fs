@@ -35,3 +35,13 @@ module List =
         List.foldBack folder lst []
 
     let ofItem (value: 'T) : 'T list = [ value ]
+
+    let groupByConsecutively (fKey: 'T -> 'key) (lst: 'T list) : ('key * 'T list) list =
+        let loop (item: 'T) (state: ('key * 'T list) list) : ('key * 'T list) list =
+            let key = fKey item
+
+            match state with
+            | (k, items) :: rest when k = key -> (k, (item :: items)) :: rest
+            | items -> (key, [ item ]) :: items
+
+        List.foldBack loop lst []

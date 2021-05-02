@@ -1,4 +1,4 @@
-namespace RoonTagger.Cli.Test
+namespace Metadata.Test
 
 open NUnit.Framework
 open FsUnit

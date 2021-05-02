@@ -10,6 +10,7 @@
     <Compile Include="RoleValidator.fs" />
     <Compile Include="Track.fs" />
     <Compile Include="TrackHelpers.fs" />
+    <Compile Include="WorkMovement.fs" />
     <None Include="Resources/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

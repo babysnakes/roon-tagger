@@ -6,7 +6,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Utils.fs" />
+    <Compile Include="MovementParserTests.fs" />
+    <Compile Include="WorkMovementTests.fs" />
     <Compile Include="TrackHelpersTests.fs" />
+    <Compile Include="UtilsTests.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
     <None Include="Resources/**">

@@ -112,3 +112,8 @@ module MetadataHelpersTests =
         tracks.[0].Path |> should endWith "disc1track1.flac"
         tracks.[1].Path |> should endWith "disc1track2.flac"
         tracks.[2].Path |> should endWith "disc1track3.flac"
+
+    [<Test>]
+    let ``setWorkMovement should successfully save flac data`` () =
+        let track = loadTrackSuccess "empty.flac"
+        setWorkMovement track "The work" "the movement" 0 0 |> Result.unwrap
