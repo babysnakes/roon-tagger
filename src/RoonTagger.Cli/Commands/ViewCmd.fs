@@ -47,6 +47,9 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         let album = getValue AlbumTag
         let artist = getValue ArtistTag
         let title = getValue TitleTag
+        let work = getValue WorkTag
+        let movement = getValue MovementTag
+        let movementIndex = getValue MovementIndexTag
         let tn = getValue TrackNumberTag
         let dn = getValue DiscNumberTag
         let importDate = getValue ImportDateTag
@@ -66,6 +69,9 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         print "Album" album
         print "Artist" artist
         print "Title" title
+        print "Work" work
+        print "Movement" movement
+        print "Movement Index" movementIndex
         print "Track Number" tn
         print "Disc Number" dn
         print "Import Date" importDate
