@@ -30,6 +30,6 @@ let searchInPath (cmd: string) =
     else
         find cmd
 
-let runCmd (cmd: string) (args: string) =
+let runCmd (cmd: string) (args: string list) =
     let proc = Diagnostics.Process.Start(cmd, args)
     proc.WaitForExit()

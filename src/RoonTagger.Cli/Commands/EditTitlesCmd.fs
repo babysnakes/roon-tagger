@@ -77,7 +77,7 @@ let prompt filePath =
 
 let editTitlesWithEditor editorCommand path =
     let cmd = editorCommand.Cmd |> searchInPath
-    let args = (editorCommand.Arguments + " " + path).Trim()
+    let args = editorCommand.Arguments @ [ path ]
     runCmd cmd args
 
 

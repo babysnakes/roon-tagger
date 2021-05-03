@@ -77,7 +77,7 @@ type ConfigureArgs =
             | Editor _ ->
                 "Configure an editor for editing titles file (executable that accepts the file as it's single argument). Editor should run in the foreground."
             | Editor_With_Args _ ->
-                "Configure an editor for editing titles file (as a pair of executable and args-as-string). Editor must run in the foreground and must accept file to edit as last argument (example parameters: code '-n -w')."
+                "Configure an editor for editing titles file as a pair of executable and args (separated by comma, surrounded with quotes). Editor must run in the foreground and must accept file to edit as last argument (example: code.com '-n,-w')."
             | Reset_Editor -> "Delete the editor configuration."
             | Show -> "Show current configuration and exit."
 

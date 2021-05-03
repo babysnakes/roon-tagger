@@ -6,6 +6,21 @@ open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Configuration
 open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
+open System
+
+let extractEditorWithArgs (args: ParseResults<ConfigureArgs>) =
+    let parseEditor (cmd: string, argsAsStrings: string) =
+        let args = argsAsStrings.Split(",") |> List.ofArray
+
+        if List.exists String.IsNullOrWhiteSpace args then
+            failwith $"Arguments contains empty or space only arguments: ({argsAsStrings})"
+
+        (cmd, args)
+
+    args.PostProcessResults(<@ Editor_With_Args @>, parseEditor)
+    |> function
+    | [] -> None
+    | lst -> Some(lst |> List.last)
 
 let resetEditor (config: ConfigurationV1) (configPath: string) =
     result {
@@ -18,12 +33,12 @@ let resetEditor (config: ConfigurationV1) (configPath: string) =
 
 let extractEditorConfig (args: ParseResults<ConfigureArgs>) (defaultCmd: EditorCommandV1 option) =
     let editorWithArgsParser (cmd, arguments) = { Cmd = cmd; Arguments = arguments }
-    let editorParser cmd = { Cmd = cmd; Arguments = "" }
+    let editorParser cmd = { Cmd = cmd; Arguments = [] }
 
     let editorWithoutArgs () =
         args.TryGetResult Editor |> Option.map editorParser
 
-    args.TryGetResult Editor_With_Args
+    extractEditorWithArgs args
     |> Option.map editorWithArgsParser
     |> Option.orElse (editorWithoutArgs ())
     |> Option.orElse defaultCmd

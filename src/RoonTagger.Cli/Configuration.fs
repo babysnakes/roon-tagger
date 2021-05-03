@@ -15,7 +15,7 @@ type LogLevel =
     | Debug = 2
     | Trace = 3
 
-type EditorCommandV1 = { Cmd: string; Arguments: string }
+type EditorCommandV1 = { Cmd: string; Arguments: string list }
 type LogConfigV1 = { File: string; Level: LogLevel }
 
 type ConfigurationV1 =
