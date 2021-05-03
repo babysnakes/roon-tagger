@@ -14,7 +14,7 @@ module ConfigurationTests =
     let config1 = loadConfigWithDefault "some-file" |> Result.unwrap
 
     let config2 =
-        { Editor = Some { Cmd = "cmd"; Arguments = "arg1 arg2" }
+        { Editor = Some { Cmd = "cmd"; Arguments = ["arg1"; "arg2"] }
           Log = config1.Log }
 
     let config3 =
