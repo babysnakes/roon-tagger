@@ -16,6 +16,7 @@ let (|EditTitlesCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Edit_
 let (|ViewCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult View
 let (|CreditsCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Credits
 let (|ConfigureCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Configure
+let (|ExtractWorksCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Extract_Works
 
 let setupLogger (lc: LogConfigV1) (overrides: int) =
     let level =
@@ -60,5 +61,6 @@ let handleCmd (opts: ParseResults<MainArgs>) =
         | ViewCmd args -> return View.handleCmd args
         | CreditsCmd args -> return Credits.handleCmd args
         | ConfigureCmd args -> return Configure.handleCmd args config configFile
+        | ExtractWorksCmd args -> return ExtractWorks.handleCmd args
         | _ -> return handleOutput "Move along, nothing to see here..." |> Ok
     }

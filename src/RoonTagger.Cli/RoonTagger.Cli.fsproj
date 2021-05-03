@@ -10,6 +10,7 @@
     <Compile Include="Output.fs" />
     <Compile Include="ProcessRunner.fs" />
     <Compile Include="Commands\ConfigureCmd.fs" />
+    <Compile Include="Commands\ExtractWorkCmd.fs" />
     <Compile Include="Commands\ViewCmd.fs" />
     <Compile Include="Commands\CreditsCmd.fs" />
     <Compile Include="Commands\EditTitlesCmd.fs" />

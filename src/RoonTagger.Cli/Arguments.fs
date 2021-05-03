@@ -27,6 +27,14 @@ type EditTitlesArgs =
             match s with
             | Files _ -> "Files to edit"
 
+type ExtractWorksArgs =
+    | [<MainCommand; ExactlyOnce; Last; Mandatory>] Files of file: string list
+
+    interface IArgParserTemplate with
+        member s.Usage =
+            match s with
+            | Files _ -> "Files to extract works from"
+
 type ViewArgs =
     | Raw_Credits
     | [<MainCommand; ExactlyOnce; Mandatory>] File of file: string
@@ -82,6 +90,7 @@ type MainArgs =
     | [<CliPrefix(CliPrefix.None)>] Credits of ParseResults<CreditsArgs>
     | [<CliPrefix(CliPrefix.None)>] Configure of ParseResults<ConfigureArgs>
     | [<CliPrefix(CliPrefix.None)>] View of ParseResults<ViewArgs>
+    | [<CliPrefix(CliPrefix.None)>] Extract_Works of ParseResults<ExtractWorksArgs>
 
     interface IArgParserTemplate with
         member s.Usage =
@@ -93,6 +102,7 @@ type MainArgs =
             | Credits _ -> "Add/Delete credit entries"
             | Configure _ -> $"Configure {Info.Name}"
             | View _ -> "View metadata of the provided file"
+            | Extract_Works _ -> "Try to identify and save work/movements from the provided files."
 
 let parseFiles files =
     match files with
