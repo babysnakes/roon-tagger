@@ -6,6 +6,7 @@ open FsToolkit.ErrorHandling
 open RoonTagger.Cli
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Commands
+open Spectre.Console
 
 [<EntryPoint>]
 let main argv =
@@ -20,9 +21,13 @@ let main argv =
     let parser =
         ArgumentParser.Create<MainArgs>(programName = Info.Name, errorHandler = errorHandler)
 
-    parser.Parse argv
-    |> Main.handleCmd
-    |> Result.tee (fun _ -> Console.WriteLine("")) // Add an empty line for a little space
-    |> function
-    | Ok _ -> 0
-    | _ -> 1
+    try
+        parser.Parse argv
+        |> Main.handleCmd
+        |> Result.tee (fun _ -> Console.WriteLine("")) // Add an empty line for a little space
+        |> function
+        | Ok _ -> 0
+        | _ -> 1
+    with ex ->
+        AnsiConsole.WriteException(ex)
+        1
