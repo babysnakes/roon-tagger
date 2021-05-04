@@ -96,7 +96,7 @@ type Work =
     | Work of string * AudioTrack list
 
     /// Tries to create a Work from the provided work name and tracks. Validates the input.
-    static member Create (workName: string) (OrderedTracks tracks) =
+    static member Create (workName: string) (ConsecutiveTracks tracks) =
 
         let processTrack (track: AudioTrack) =
             let w, mvmt = track |> splitTitle2WorkMovement
@@ -133,14 +133,14 @@ type Work =
         |> Result.map (fun _ -> Work(workName, processed |> List.map fst))
 
 /// Searches the provided tracks for possible works.
-let extractWorks (OrderedTracks tracks) =
+let extractWorks (ConsecutiveTracks tracks) =
     tracks
     |> List.groupByConsecutively workFromTitle
     |> List.filter (fun (title, tracks) -> title.IsSome && tracks |> List.length > 1)
     |> List.traverseResultM
         (fun (titleOpt, tracks) ->
             let title = titleOpt |> Option.get
-            OrderedTracks.Create tracks |> Result.bind (Work.Create title))
+            ConsecutiveTracks.Create tracks |> Result.bind (Work.Create title))
 
 /// Applies (saves) the work data
 let applyWork (Work (_, tracks)) =

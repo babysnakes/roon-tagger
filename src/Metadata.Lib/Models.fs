@@ -48,4 +48,4 @@ type MetadataErrors =
     | MissingOrInvalidTag of TagName
     | UnsupportedRole of string
     | DuplicateTrackNumberForDisc
-    | UnOrderedTracks
+    | NonConsecutiveTracks

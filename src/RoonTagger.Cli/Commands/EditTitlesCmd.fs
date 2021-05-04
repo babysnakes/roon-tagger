@@ -22,7 +22,7 @@ let private titlesFilePath =
 
 let getTracks = List.traverseResultA Track.load
 
-let extractTitles (OrderedTracks tracks) =
+let extractTitles (ConsecutiveTracks tracks) =
     tracks
     |> List.map (fun t -> Track.safeGetTagStringValue t TitleTag)
     |> List.map List.head
@@ -89,7 +89,7 @@ let readTitles filePath =
 
         [ CliIOError $"Error reading titles file: {ex.Message}" ] |> Error
 
-let applyTitles (OrderedTracks tracks) (titles: string list) =
+let applyTitles (ConsecutiveTracks tracks) (titles: string list) =
     let applyTrack (track, title) =
         Track.setTag track (RoonTag.Title title) |> Result.mapError MError
 
@@ -107,7 +107,7 @@ let handleCmd (args: ParseResults<EditTitlesArgs>) (config: ConfigurationV1) : R
     result {
         let! tracks =
             getTracks (args.GetResult EditTitlesArgs.Files)
-            |> Result.bind OrderedTracks.Create
+            |> Result.bind ConsecutiveTracks.Create
             |> Result.mapError (List.map MError)
 
         let titles = extractTitles tracks

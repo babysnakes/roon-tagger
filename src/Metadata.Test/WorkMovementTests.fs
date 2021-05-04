@@ -42,7 +42,7 @@ module ``Work and Movements Tests`` =
               mkTrackWithTitle "track3.flac" "My work name: Second movement"
               mkTrackWithTitle "track4.flac" "My work name: Third movement" ]
 
-        let rslt = OrderedTracks.Create data |> Result.bind extractWorks |> Result.unwrap
+        let rslt = ConsecutiveTracks.Create data |> Result.bind extractWorks |> Result.unwrap
 
         rslt |> should haveLength 1
         let (Work (w, ts)) = rslt |> List.head
@@ -61,7 +61,7 @@ module ``Work and Movements Tests`` =
               mkTrackWithTitle "disc2track1.flac" $"{workTitle}: Third movement"
               mkTrackWithTitle "disc2track2.flac" $"{workTitle}: Fourth movement" ]
 
-        let rslt = OrderedTracks.Create data |> Result.bind extractWorks |> Result.unwrap
+        let rslt = ConsecutiveTracks.Create data |> Result.bind extractWorks |> Result.unwrap
 
         rslt |> should haveLength 1
         let (Work (w, ts)) = rslt |> List.head
@@ -79,7 +79,7 @@ module ``Work and Movements Tests`` =
               mkTrackWithTitle "disc2track1.flac" $"{workTitle}: Third movement"
               mkTrackWithTitle "disc2track2.flac" $"{workTitle}: Fourth movement" ]
 
-        let rslt = OrderedTracks.Create data |> Result.bind extractWorks |> Result.unwrap
+        let rslt = ConsecutiveTracks.Create data |> Result.bind extractWorks |> Result.unwrap
 
         rslt |> should haveLength 2
         let (Work (w1, ts1)) = rslt.[0]
@@ -98,7 +98,7 @@ module ``Work and Movements Tests`` =
               mkTrackWithTitle "disc1track2.flac" $"{workTitle}: II. Second movement" ]
 
         let (Work (w, ts)) =
-            OrderedTracks.Create data
+            ConsecutiveTracks.Create data
             |> Result.bind (Work.Create workTitle)
             |> Result.unwrap
 
@@ -115,7 +115,7 @@ module ``Work and Movements Tests`` =
               mkTrackWithTitle "disc1track2.flac" $"{workTitle}: Second movement" ]
 
         let (Work (w, ts)) =
-            OrderedTracks.Create data
+            ConsecutiveTracks.Create data
             |> Result.bind (Work.Create workTitle)
             |> Result.unwrap
 

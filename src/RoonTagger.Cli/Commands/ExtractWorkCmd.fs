@@ -32,8 +32,8 @@ let handleCmd (args: ParseResults<ExtractWorksArgs>) : Result<unit, unit> =
     result {
         let files = args.GetResult ExtractWorksArgs.Files
         let! tracks = List.traverseResultA Track.load files
-        let! orderedTracks = tracks |> OrderedTracks.Create
-        let! works = extractWorks orderedTracks
+        let! consecutiveTracks = tracks |> ConsecutiveTracks.Create
+        let! works = extractWorks consecutiveTracks
         printWorks works
 
         if AnsiConsole.Confirm("Save these works/movements?", false) then

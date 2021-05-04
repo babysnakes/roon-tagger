@@ -9,7 +9,7 @@ open FsUnit
 module MetadataHelpersTests =
 
     let loadTrackSuccess = getResourcePath >> Track.load >> Result.unwrap
-    let createOrderedTracks = List.map loadTrackSuccess >> OrderedTracks.Create
+    let createConsecutiveTracks = List.map loadTrackSuccess >> ConsecutiveTracks.Create
 
     [<Test>]
     let ``sort tracks by tracks and cd number`` () =
@@ -71,44 +71,44 @@ module MetadataHelpersTests =
         |> should contain DuplicateTrackNumberForDisc
 
     [<Test>]
-    let ``Ordered tracks when missing file in a sequence should fail`` () =
-        let result = [ "track1.flac"; "track3.flac" ] |> createOrderedTracks
-        result |> Result.unwrapError |> should equal [ UnOrderedTracks ]
+    let ``Consecutive tracks when missing file in a sequence should fail`` () =
+        let result = [ "track1.flac"; "track3.flac" ] |> createConsecutiveTracks
+        result |> Result.unwrapError |> should equal [ NonConsecutiveTracks ]
 
     [<Test>]
-    let ``Ordered tracks fails on duplicate track numbers`` () =
-        let result = [ "track1.flac"; "track1.flac" ] |> createOrderedTracks
+    let ``Consecutive tracks fails on duplicate track numbers`` () =
+        let result = [ "track1.flac"; "track1.flac" ] |> createConsecutiveTracks
 
         result
         |> Result.unwrapError
         |> should equal [ DuplicateTrackNumberForDisc ]
 
     [<Test>]
-    let ``Ordered tracks when missing first file on second disc should fail`` () =
+    let ``Consecutive tracks when missing first file on second disc should fail`` () =
         let result =
             [ "disc1track1.flac"
               "disc1track2.flac"
               "disc1track3.flac"
               "disc2track2.flac" ]
-            |> createOrderedTracks
+            |> createConsecutiveTracks
 
-        result |> Result.unwrapError |> should equal [ UnOrderedTracks ]
-
-    [<Test>]
-    let ``Ordered tracks when provided single track is valid`` () =
-        let result = [ "track3.flac" ] |> createOrderedTracks
-        result |> Result.unwrap |> should be (ofCase <@ OrderedTracks @>)
+        result |> Result.unwrapError |> should equal [ NonConsecutiveTracks ]
 
     [<Test>]
-    let ``Ordered tracks sorts the provided tracks`` () =
+    let ``Consecutive tracks when provided single track is valid`` () =
+        let result = [ "track3.flac" ] |> createConsecutiveTracks
+        result |> Result.unwrap |> should be (ofCase <@ ConsecutiveTracks @>)
+
+    [<Test>]
+    let ``Consecutive tracks sorts the provided tracks`` () =
         let result =
             [ "disc1track2.flac"
               "disc1track1.flac"
               "disc1track3.flac" ]
-            |> createOrderedTracks
+            |> createConsecutiveTracks
             |> Result.unwrap
 
-        let (OrderedTracks tracks) = result
+        let (ConsecutiveTracks tracks) = result
         tracks.[0].Path |> should endWith "disc1track1.flac"
         tracks.[1].Path |> should endWith "disc1track2.flac"
         tracks.[2].Path |> should endWith "disc1track3.flac"
