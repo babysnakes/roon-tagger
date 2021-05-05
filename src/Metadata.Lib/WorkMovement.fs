@@ -4,6 +4,8 @@ open FsToolkit.ErrorHandling
 open TrackHelpers
 open RoonTagger.Metadata.Utils
 
+let log = Serilog.Log.Logger
+
 /// Splits the track's title to work and optional movement.
 let splitTitle2WorkMovement (track: AudioTrack) =
     let title = Track.safeGetTagStringValue track TitleTag |> List.head
@@ -76,18 +78,22 @@ module MovementParser =
         .>>. (movementName >>% REST)
 
     /// Get the layout of the movement for comparison
-    let parseLayout =
-        run titleLayout
-        >> function
-        | Success (r, _, _) -> r
+    let parseLayout movement =
+        run titleLayout movement
+        |> function
+        | Success (r, _, _) -> 
+            log.Verbose("Parsing layout of '{Movement}' returned: {R}", movement, r)
+            r
         | Failure (msg, _, _) ->
             failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
 
     /// Extract the movement name (remove prefixes)
-    let parseMovement =
-        run title
-        >> function
-        | Success (s, _, _) -> s
+    let parseMovement movement =
+        run title movement
+        |> function
+        | Success (s, _, _) ->
+            log.Verbose("Parsing title of '{Movement}' returned: {S}", movement, s)
+            s
         | Failure (msg, _, _) ->
             failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
 
@@ -136,12 +142,19 @@ type Work =
 let extractWorks (ConsecutiveTracks tracks) =
     tracks
     |> List.groupByConsecutively workFromTitle
+    |> List.map (fun pair ->
+        log.Debug("Found possible work: %A{Pair}", pair)
+        pair)
     |> List.filter (fun (title, tracks) -> title.IsSome && tracks |> List.length > 1)
+    |> List.map (fun pair ->
+        log.Verbose("Filtered work: %A{Pair}", pair)
+        pair)
     |> List.traverseResultM
         (fun (titleOpt, tracks) ->
             let title = titleOpt |> Option.get
             ConsecutiveTracks.Create tracks |> Result.bind (Work.Create title))
 
 /// Applies (saves) the work data
-let applyWork (Work (_, tracks)) =
+let applyWork (Work (name, tracks)) =
+    log.Information("Saving metadata of work: '{Name}'", name)
     tracks |> List.traverseResultM Track.applyTags |> Result.map ignore

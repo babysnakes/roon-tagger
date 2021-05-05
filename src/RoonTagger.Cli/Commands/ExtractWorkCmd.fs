@@ -9,6 +9,8 @@ open RoonTagger.Metadata.WorkMovement
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Output
 
+let log = Serilog.Log.Logger
+
 let printWork (Work (name, tracks)) =
     let grid = Grid()
     let firstColumn = GridColumn()
@@ -34,6 +36,7 @@ let handleCmd (args: ParseResults<ExtractWorksArgs>) : Result<unit, unit> =
         let! tracks = List.traverseResultA Track.load files
         let! consecutiveTracks = tracks |> ConsecutiveTracks.Create
         let! works = extractWorks consecutiveTracks
+        log.Debug("Extracted works: %A{Works}", works)
         printWorks works
 
         if AnsiConsole.Confirm("Save these works/movements?", false) then
