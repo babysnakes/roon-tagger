@@ -17,6 +17,9 @@
     <Compile Include="Commands\SetTagsCmd.fs" />
     <Compile Include="Commands\MainCmd.fs" />
     <Compile Include="Program.fs" />
+    <None Include="Resources/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Metadata.Lib\Metadata.Lib.fsproj" />
