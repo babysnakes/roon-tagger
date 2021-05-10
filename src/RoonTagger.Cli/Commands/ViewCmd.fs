@@ -12,7 +12,8 @@ let conditionallyPrint (grid: Grid) (head: string) (value: string list) =
     let processedValue = value |> List.filter (fun s -> String.IsNullOrEmpty(s) |> not)
 
     if not (List.isEmpty processedValue) then
-        grid.AddRow($"[b]{head}[/]", processedValue |> String.concat ", ")
+        let v = processedValue |> String.concat ", "
+        grid.AddRow($"[b]{head.EscapeMarkup()}[/]", v.EscapeMarkup())
         |> ignore
 
 let printRawCredits (grid: Grid) (credits: string list) =
