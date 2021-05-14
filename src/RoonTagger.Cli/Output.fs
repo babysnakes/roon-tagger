@@ -22,7 +22,7 @@ let cliError2string (err: CliErrors) : string =
     match err with
     | MError err -> error2String err
     | CliIOError message -> $"File error: {message}"
-    | TitlesCountError -> "The number of tracks does not match the number of titles. Did you delete or add a title?"
+    | TagsCountError -> "The number of tracks does not match the number of titles. Did you delete or add a title?"
     | ConfigurationParseError err -> $"Error parsing configuration: {err}"
     | CliArgumentsError message -> $"Error parsing parameters: {message}"
 

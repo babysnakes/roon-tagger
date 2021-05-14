@@ -11,6 +11,6 @@ module Models =
     type CliErrors =
         | MError of MetadataErrors
         | CliIOError of string
-        | TitlesCountError
+        | TagsCountError
         | ConfigurationParseError of string
         | CliArgumentsError of string
