@@ -35,6 +35,15 @@
           "FSharp.Core": "4.6.2"
         }
       },
+      "Roman-Numerals": {
+        "type": "Direct",
+        "requested": "[1.0.3, )",
+        "resolved": "1.0.3",
+        "contentHash": "Ab5bgDbkT/13tH6MBR/eck1QB2dloMCXIJNYCspCqhfuZRkTCJ53qfyVfj2LXQQQP5wB3QLss988I5eZrDLccQ==",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        }
+      },
       "Serilog": {
         "type": "Direct",
         "requested": "[2.10.0, )",

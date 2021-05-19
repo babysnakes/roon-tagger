@@ -216,6 +216,14 @@
         "resolved": "5.0.0",
         "contentHash": "c5JVjuVAm4f7E9Vj+v09Z9s2ZsqFDjBpcsyS3M9xRo0bEdm/LVZSzLxxNvfvAwRiiE8nwe1h2G4OwiwlzFKXlA=="
       },
+      "Roman-Numerals": {
+        "type": "Transitive",
+        "resolved": "1.0.3",
+        "contentHash": "Ab5bgDbkT/13tH6MBR/eck1QB2dloMCXIJNYCspCqhfuZRkTCJ53qfyVfj2LXQQQP5wB3QLss988I5eZrDLccQ==",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        }
+      },
       "runtime.native.System": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -827,6 +835,7 @@
           "FSharp.Core": "5.0.0",
           "FlacLibSharp": "3.2.1",
           "FsToolkit.ErrorHandling": "2.1.2",
+          "Roman-Numerals": "1.0.3",
           "Serilog": "2.10.0"
         }
       }

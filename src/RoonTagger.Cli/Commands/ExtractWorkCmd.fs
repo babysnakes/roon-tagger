@@ -160,10 +160,11 @@ let handleCmd (args: ParseResults<ExtractWorksArgs>) (config: ConfigurationV1) :
         input |> Result.mapError (List.map MError)
 
     result {
+        let addRomans = args.Contains Add_Roman_Numerals
         let files = args.GetResult ExtractWorksArgs.Files
         let! tracks = List.traverseResultA Track.load files |> toCliErrors
         let! consecutiveTracks = tracks |> ConsecutiveTracks.Create |> toCliErrors
-        let! works = extractWorks consecutiveTracks |> toCliErrors
+        let! works = extractWorks consecutiveTracks addRomans |> toCliErrors
         log.Debug("Extracted works: %A{Works}", works)
         printWorks works
 

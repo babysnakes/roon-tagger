@@ -1,6 +1,7 @@
 module RoonTagger.Metadata.WorkMovement
 
 open FsToolkit.ErrorHandling
+open RomanNumerals
 open TrackHelpers
 open RoonTagger.Metadata.Utils
 
@@ -102,7 +103,16 @@ type Work =
     | Work of string * ConsecutiveTracks
 
     /// Tries to create a Work from the provided work name and tracks. Validates the input.
-    static member Create (workName: string) (ConsecutiveTracks tracks as cTracks) =
+    static member Create (workName: string) addRomans (ConsecutiveTracks tracks as cTracks) =
+
+        let finalizeMovementName idx name =
+            let prefix =
+                if addRomans then
+                    Convert.ToRomanNumerals(idx + 1) + ". "
+                else
+                    ""
+
+            prefix + name
 
         let processTrack (track: AudioTrack) =
             let w, mvmt = track |> splitTitle2WorkMovement
@@ -127,10 +137,12 @@ type Work =
         let workSetterFn =
             if constantLayout then
                 fun idx movement ->
-                    let newMvmt = MovementParser.parseMovement movement
+                    let newMvmt = MovementParser.parseMovement movement |> finalizeMovementName idx
                     setWorkMovement tracks.[idx] workName newMvmt (idx + 1) count
             else
-                fun idx mvmt -> setWorkMovement tracks.[idx] workName mvmt (idx + 1) count
+                fun idx mvmt ->
+                    let newMovement = finalizeMovementName idx mvmt
+                    setWorkMovement tracks.[idx] workName newMovement (idx + 1) count
 
         movements
         |> List.mapi workSetterFn
@@ -138,7 +150,7 @@ type Work =
         |> Result.map (fun _ -> Work(workName, cTracks))
 
 /// Searches the provided tracks for possible works.
-let extractWorks (ConsecutiveTracks tracks) =
+let extractWorks (ConsecutiveTracks tracks) addRomans =
     tracks
     |> List.groupByConsecutively workFromTitle
     |> List.map
@@ -153,7 +165,9 @@ let extractWorks (ConsecutiveTracks tracks) =
     |> List.traverseResultM
         (fun (titleOpt, tracks) ->
             let title = titleOpt |> Option.get
-            ConsecutiveTracks.Create tracks |> Result.bind (Work.Create title))
+
+            ConsecutiveTracks.Create tracks
+            |> Result.bind (Work.Create title addRomans))
 
 /// Applies (saves) the work data
 let applyWork (Work (name, (ConsecutiveTracks tracks))) =

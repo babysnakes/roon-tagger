@@ -28,11 +28,14 @@ type EditTitlesArgs =
             | Files _ -> "Files to edit"
 
 type ExtractWorksArgs =
+    | [<AltCommandLine("-R")>] Add_Roman_Numerals
     | [<MainCommand; ExactlyOnce; Last; Mandatory>] Files of file: string list
 
     interface IArgParserTemplate with
         member s.Usage =
             match s with
+            | Add_Roman_Numerals ->
+                "Starts each movement with it's corresponding roman numeral (e.g. movement 'Prelude' will become 'I. Prelude')."
             | Files _ -> "Files to extract works from"
 
 type ViewArgs =

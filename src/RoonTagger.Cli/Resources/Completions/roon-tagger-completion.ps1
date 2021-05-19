@@ -73,6 +73,7 @@ Register-ArgumentCompleter -Native -CommandName 'roon-tagger' -ScriptBlock {
             break
         }
         'roon-tagger;extract-works' {
+            [CompletionResult]::new('--add-roman-numerals', 'add-roman-numerals', [CompletionResultType]::ParameterName, 'Adds Roman numerals to movement names')
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
             break

@@ -10,6 +10,8 @@ open TestsUtils
 module ``Work and Movements Tests`` =
 
     let loadTrackSuccess = getResourcePath >> Track.load >> Result.unwrap
+    let extractWorksNoRomans tracks = extractWorks tracks false
+    let extractWorksWithRomans tracks = extractWorks tracks true
 
     let mkTrackWithTitle (file: string) (title: string) =
         let track = loadTrackSuccess file
@@ -44,7 +46,7 @@ module ``Work and Movements Tests`` =
 
         let rslt =
             ConsecutiveTracks.Create data
-            |> Result.bind extractWorks
+            |> Result.bind extractWorksNoRomans
             |> Result.unwrap
 
         rslt |> should haveLength 1
@@ -66,7 +68,7 @@ module ``Work and Movements Tests`` =
 
         let rslt =
             ConsecutiveTracks.Create data
-            |> Result.bind extractWorks
+            |> Result.bind extractWorksNoRomans
             |> Result.unwrap
 
         rslt |> should haveLength 1
@@ -87,7 +89,7 @@ module ``Work and Movements Tests`` =
 
         let rslt =
             ConsecutiveTracks.Create data
-            |> Result.bind extractWorks
+            |> Result.bind extractWorksNoRomans
             |> Result.unwrap
 
         rslt |> should haveLength 2
@@ -99,6 +101,26 @@ module ``Work and Movements Tests`` =
         ts2 |> should haveLength 2
 
     [<Test>]
+    let ``extractTracks respects addRomans parameter`` () =
+        let workTitle = "My work title"
+
+        let data =
+            [ mkTrackWithTitle "disc1track1.flac" $"{workTitle}: First movement"
+              mkTrackWithTitle "disc1track2.flac" $"{workTitle}: Second movement" ]
+
+        let rslt =
+            ConsecutiveTracks.Create data
+            |> Result.bind extractWorksWithRomans
+            |> Result.unwrap
+
+        rslt |> should haveLength 1
+        let (Work (w, ConsecutiveTracks ts)) = rslt.[0]
+
+        w |> should equal workTitle
+        ts.[0] |> extractMovement |> should equal "I. First movement"
+        ts.[1] |> extractMovement |> should equal "II. Second movement"
+
+    [<Test>]
     let ``Work.Create should parse movement names with consistent num prefix`` () =
         let workTitle = "My work title"
 
@@ -108,12 +130,46 @@ module ``Work and Movements Tests`` =
 
         let (Work (w, ConsecutiveTracks ts)) =
             ConsecutiveTracks.Create data
-            |> Result.bind (Work.Create workTitle)
+            |> Result.bind (Work.Create workTitle false)
             |> Result.unwrap
 
         w |> should equal workTitle
         ts.[0] |> extractMovement |> should equal "First movement"
         ts.[1] |> extractMovement |> should equal "Second movement"
+
+    [<Test>]
+    let ``Work.Create should add roman numerals if requested`` () =
+        let workTitle = "My work title"
+
+        let data =
+            [ mkTrackWithTitle "disc1track1.flac" $"{workTitle}: First movement"
+              mkTrackWithTitle "disc1track2.flac" $"{workTitle}: Second movement" ]
+
+        let (Work (w, ConsecutiveTracks ts)) =
+            ConsecutiveTracks.Create data
+            |> Result.bind (Work.Create workTitle true)
+            |> Result.unwrap
+
+        w |> should equal workTitle
+        ts.[0] |> extractMovement |> should equal "I. First movement"
+        ts.[1] |> extractMovement |> should equal "II. Second movement"
+
+    [<Test>]
+    let ``Work.Create should add roman numerals if requested (on non-constant layout)`` () =
+        let workTitle = "My work title"
+
+        let data =
+            [ mkTrackWithTitle "disc1track1.flac" $"{workTitle}: 1. First movement"
+              mkTrackWithTitle "disc1track2.flac" $"{workTitle}: Second movement" ]
+
+        let (Work (w, ConsecutiveTracks ts)) =
+            ConsecutiveTracks.Create data
+            |> Result.bind (Work.Create workTitle true)
+            |> Result.unwrap
+
+        w |> should equal workTitle
+        ts.[0] |> extractMovement |> should equal "I. 1. First movement"
+        ts.[1] |> extractMovement |> should equal "II. Second movement"
 
     [<Test>]
     let ``Work.Create should not extract num prefix from title if layout is not consistent`` () =
@@ -125,7 +181,7 @@ module ``Work and Movements Tests`` =
 
         let (Work (w, ConsecutiveTracks ts)) =
             ConsecutiveTracks.Create data
-            |> Result.bind (Work.Create workTitle)
+            |> Result.bind (Work.Create workTitle false)
             |> Result.unwrap
 
         w |> should equal workTitle
