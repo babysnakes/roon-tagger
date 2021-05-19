@@ -42,10 +42,13 @@ module ``Work and Movements Tests`` =
               mkTrackWithTitle "track3.flac" "My work name: Second movement"
               mkTrackWithTitle "track4.flac" "My work name: Third movement" ]
 
-        let rslt = ConsecutiveTracks.Create data |> Result.bind extractWorks |> Result.unwrap
+        let rslt =
+            ConsecutiveTracks.Create data
+            |> Result.bind extractWorks
+            |> Result.unwrap
 
         rslt |> should haveLength 1
-        let (Work (w, ts)) = rslt |> List.head
+        let (Work (w, ConsecutiveTracks ts)) = rslt |> List.head
         w |> should equal "My work name"
         ts |> should haveLength 3
         ts |> List.head |> extractMovement |> should equal "First movement"
@@ -61,10 +64,13 @@ module ``Work and Movements Tests`` =
               mkTrackWithTitle "disc2track1.flac" $"{workTitle}: Third movement"
               mkTrackWithTitle "disc2track2.flac" $"{workTitle}: Fourth movement" ]
 
-        let rslt = ConsecutiveTracks.Create data |> Result.bind extractWorks |> Result.unwrap
+        let rslt =
+            ConsecutiveTracks.Create data
+            |> Result.bind extractWorks
+            |> Result.unwrap
 
         rslt |> should haveLength 1
-        let (Work (w, ts)) = rslt |> List.head
+        let (Work (w, ConsecutiveTracks ts)) = rslt |> List.head
         w |> should equal workTitle
         ts |> should haveLength 4
 
@@ -79,11 +85,14 @@ module ``Work and Movements Tests`` =
               mkTrackWithTitle "disc2track1.flac" $"{workTitle}: Third movement"
               mkTrackWithTitle "disc2track2.flac" $"{workTitle}: Fourth movement" ]
 
-        let rslt = ConsecutiveTracks.Create data |> Result.bind extractWorks |> Result.unwrap
+        let rslt =
+            ConsecutiveTracks.Create data
+            |> Result.bind extractWorks
+            |> Result.unwrap
 
         rslt |> should haveLength 2
-        let (Work (w1, ts1)) = rslt.[0]
-        let (Work (w2, ts2)) = rslt.[1]
+        let (Work (w1, ConsecutiveTracks ts1)) = rslt.[0]
+        let (Work (w2, ConsecutiveTracks ts2)) = rslt.[1]
         w1 |> should equal workTitle
         w2 |> should equal workTitle
         ts1 |> should haveLength 2
@@ -97,7 +106,7 @@ module ``Work and Movements Tests`` =
             [ mkTrackWithTitle "disc1track1.flac" $"{workTitle}: I. First movement"
               mkTrackWithTitle "disc1track2.flac" $"{workTitle}: II. Second movement" ]
 
-        let (Work (w, ts)) =
+        let (Work (w, ConsecutiveTracks ts)) =
             ConsecutiveTracks.Create data
             |> Result.bind (Work.Create workTitle)
             |> Result.unwrap
@@ -114,7 +123,7 @@ module ``Work and Movements Tests`` =
             [ mkTrackWithTitle "disc1track1.flac" $"{workTitle}: No 1. First movement"
               mkTrackWithTitle "disc1track2.flac" $"{workTitle}: Second movement" ]
 
-        let (Work (w, ts)) =
+        let (Work (w, ConsecutiveTracks ts)) =
             ConsecutiveTracks.Create data
             |> Result.bind (Work.Create workTitle)
             |> Result.unwrap

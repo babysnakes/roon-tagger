@@ -81,7 +81,7 @@ module MovementParser =
     let parseLayout movement =
         run titleLayout movement
         |> function
-        | Success (r, _, _) -> 
+        | Success (r, _, _) ->
             log.Verbose("Parsing layout of '{Movement}' returned: {R}", movement, r)
             r
         | Failure (msg, _, _) ->
@@ -99,10 +99,10 @@ module MovementParser =
 
 /// An already parsed work (not applied). Only use `Create` to initialize
 type Work =
-    | Work of string * AudioTrack list
+    | Work of string * ConsecutiveTracks
 
     /// Tries to create a Work from the provided work name and tracks. Validates the input.
-    static member Create (workName: string) (ConsecutiveTracks tracks) =
+    static member Create (workName: string) (ConsecutiveTracks tracks as cTracks) =
 
         let processTrack (track: AudioTrack) =
             let w, mvmt = track |> splitTitle2WorkMovement
@@ -113,48 +113,49 @@ type Work =
                     + $"provided work: {workName}, extracted work: {w}, movement: {mvmt}"
                 )
 
-            (track, mvmt |> Option.get)
+            mvmt |> Option.get
 
-        let processed = tracks |> List.map processTrack
-        let count = processed |> List.length
-        let layout = processed |> List.head |> snd |> MovementParser.parseLayout
+        let movements = tracks |> List.map processTrack
+        let count = movements |> List.length
+        let layout = movements |> List.head |> MovementParser.parseLayout
 
         let constantLayout =
-            processed
-            |> List.map snd
+            movements
             |> List.map MovementParser.parseLayout
             |> List.forall ((=) layout)
 
         let workSetterFn =
             if constantLayout then
-                fun idx (track, movement) ->
+                fun idx movement ->
                     let newMvmt = MovementParser.parseMovement movement
-                    setWorkMovement track workName newMvmt (idx + 1) count
+                    setWorkMovement tracks.[idx] workName newMvmt (idx + 1) count
             else
-                fun idx (t, mvmt) -> setWorkMovement t workName mvmt (idx + 1) count
+                fun idx mvmt -> setWorkMovement tracks.[idx] workName mvmt (idx + 1) count
 
-        processed
+        movements
         |> List.mapi workSetterFn
         |> List.sequenceResultA
-        |> Result.map (fun _ -> Work(workName, processed |> List.map fst))
+        |> Result.map (fun _ -> Work(workName, cTracks))
 
 /// Searches the provided tracks for possible works.
 let extractWorks (ConsecutiveTracks tracks) =
     tracks
     |> List.groupByConsecutively workFromTitle
-    |> List.map (fun pair ->
-        log.Debug("Found possible work: %A{Pair}", pair)
-        pair)
+    |> List.map
+        (fun pair ->
+            log.Debug("Found possible work: %A{Pair}", pair)
+            pair)
     |> List.filter (fun (title, tracks) -> title.IsSome && tracks |> List.length > 1)
-    |> List.map (fun pair ->
-        log.Verbose("Filtered work: %A{Pair}", pair)
-        pair)
+    |> List.map
+        (fun pair ->
+            log.Verbose("Filtered work: %A{Pair}", pair)
+            pair)
     |> List.traverseResultM
         (fun (titleOpt, tracks) ->
             let title = titleOpt |> Option.get
             ConsecutiveTracks.Create tracks |> Result.bind (Work.Create title))
 
 /// Applies (saves) the work data
-let applyWork (Work (name, tracks)) =
+let applyWork (Work (name, (ConsecutiveTracks tracks))) =
     log.Information("Saving metadata of work: '{Name}'", name)
     tracks |> List.traverseResultM Track.applyTags |> Result.map ignore

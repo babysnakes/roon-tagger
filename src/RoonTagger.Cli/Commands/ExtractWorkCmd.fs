@@ -5,13 +5,44 @@ open FsToolkit.ErrorHandling
 open Spectre.Console
 open RoonTagger.Metadata
 open RoonTagger.Metadata.TrackHelpers
+open RoonTagger.Metadata.Utils
 open RoonTagger.Metadata.WorkMovement
 open RoonTagger.Cli.Arguments
+open RoonTagger.Cli.Configuration
+open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
+open RoonTagger.Cli.TagsInFile
 
 let log = Serilog.Log.Logger
 
-let printWork (Work (name, tracks)) =
+type WorksPromptResponse =
+    | Save
+    | Cancel
+    | EditWorks
+
+    override this.ToString() =
+        match this with
+        | Save -> "Save all works"
+        | Cancel -> "Cancel"
+        | EditWorks -> "Edit each work individually"
+
+type WorkPromptResponse =
+    | SaveWork
+    | DeleteWork
+    | ViewWork
+    | EditWorkName
+    | EditMovements
+
+    override this.ToString() =
+        match this with
+        | SaveWork -> "Save this work"
+        | DeleteWork -> "Ignore this work (don't save this work)"
+        | ViewWork -> "View this work again"
+        | EditWorkName -> "Edit work name"
+        | EditMovements -> "Edit movements in a file"
+
+let printWork (Work (name, ConsecutiveTracks tracks)) =
+    log.Debug("Printing work '{Name}' with tracks: {Tracks}", name, tracks)
     let grid = Grid()
     let firstColumn = GridColumn()
     firstColumn.NoWrap |> ignore
@@ -30,21 +61,133 @@ let printWork (Work (name, tracks)) =
 
 let printWorks = List.iter printWork
 
-let handleCmd (args: ParseResults<ExtractWorksArgs>) : Result<unit, unit> =
+let applyMovements = applyValues (fun t -> RoonTag.Movement t)
+
+let promptWorksOperation () =
+    let prompt = SelectionPrompt<WorksPromptResponse>()
+    prompt.Title <- "Check works above and use up/down to select operation below:"
+    prompt.AddChoices([ Save; EditWorks; Cancel ]) |> ignore
+    AnsiConsole.Prompt prompt
+
+type WorkProcessor =
+    { Config: ConfigurationV1 }
+
+    member this.editMovements(ConsecutiveTracks tracks as cTracks) : Result<unit, CliErrors list> =
+        let movementsFilePath = constructTagsFilePath "movements"
+        log.Debug("Movement file path is '{MovementsFilePath}'", movementsFilePath)
+
+        result {
+            let movements =
+                tracks
+                |> List.map (fun t -> Track.safeGetTagStringValue t MovementTag |> List.head)
+
+            log.Verbose("Extracted movements: {Movements}", movements)
+
+            let! path = writeValues movements movementsFilePath
+
+            selectEditMethod this.Config "movements"
+            |> function
+            | EditAsync ->
+                log.Verbose("User selected to edit movements async")
+                prompt path "Movements"
+            | EditDirectly ->
+                log.Verbose("User selected to edit movements directly")
+                editTagsWithEditor this.Config.Editor.Value path
+
+            let! newMovements = readValues path
+            log.Verbose("Edited movements: {NewMovements}", newMovements)
+
+            if movements = newMovements then
+                do! cleanup path
+            else
+                do! applyMovements cTracks newMovements |> Result.map ignore
+                do! cleanup path
+        }
+        |> Result.teeError (fun _ -> cleanup movementsFilePath |> ignore)
+
+    member _.promptWorkOperation(Work (workName, _)) =
+        let prompt = SelectionPrompt<WorkPromptResponse>()
+        prompt.Title <- $"[yellow]{workName.EscapeMarkup()}:[/]"
+
+        prompt.AddChoices(
+            [ ViewWork
+              SaveWork
+              EditWorkName
+              EditMovements
+              DeleteWork ]
+        )
+        |> ignore
+
+        AnsiConsole.Prompt(prompt)
+
+    member this.handleSingleWork(work: Work) : Result<string, CliErrors list> =
+
+        let rec loop (Work (name, cTracks) as work) =
+            let (ConsecutiveTracks tracks) = cTracks
+
+            match (this.promptWorkOperation work) with
+            | SaveWork ->
+                log.Debug("Applying work: {Name}", name)
+
+                applyWork work
+                |> Result.mapError (List.map MError)
+                |> Result.map (fun _ -> $"Work [yellow]{name.EscapeMarkup()}[/] saved successfully")
+            | DeleteWork ->
+                log.Debug("Ignoring work: {Name}", name)
+                Ok $"Work [yellow]{name.EscapeMarkup()}[/] ignored"
+            | ViewWork ->
+                log.Debug("Viewing work: {Name}", name)
+                AnsiConsole.Render(Rule($"[yellow] * {name.EscapeMarkup()}[/]"))
+                printWork work
+                loop work
+            | EditWorkName ->
+                let prompt = TextPrompt("New Work Name")
+                prompt.DefaultValue(name) |> ignore
+                let response = AnsiConsole.Prompt(prompt)
+                log.Debug("Rename work '{Name}' to '{Response}'", name, response)
+                loop (Work(response, cTracks))
+            | EditMovements ->
+                log.Debug("Editing movements of: '{Name}'", name)
+
+                match (this.editMovements cTracks) with
+                | Ok _ -> loop (Work(name, cTracks))
+                | Error err -> Error err
+
+        loop work
+
+let handleCmd (args: ParseResults<ExtractWorksArgs>) (config: ConfigurationV1) : Result<unit, unit> =
+    let inline toCliErrors input =
+        input |> Result.mapError (List.map MError)
+
     result {
         let files = args.GetResult ExtractWorksArgs.Files
-        let! tracks = List.traverseResultA Track.load files
-        let! consecutiveTracks = tracks |> ConsecutiveTracks.Create
-        let! works = extractWorks consecutiveTracks
+        let! tracks = List.traverseResultA Track.load files |> toCliErrors
+        let! consecutiveTracks = tracks |> ConsecutiveTracks.Create |> toCliErrors
+        let! works = extractWorks consecutiveTracks |> toCliErrors
         log.Debug("Extracted works: %A{Works}", works)
         printWorks works
 
-        if AnsiConsole.Confirm("Save these works/movements?", false) then
-            do! works |> List.traverseResultM applyWork |> Result.map ignore
+        match (promptWorksOperation ()) with
+        | Save ->
+            do!
+                works
+                |> List.traverseResultM applyWork
+                |> Result.map ignore
+                |> toCliErrors
+
             AnsiConsole.WriteLine()
             handleOutput "Works Saved Successfully"
-        else
+        | EditWorks ->
+            AnsiConsole.WriteLine()
+            let wProcessor = { Config = config }
+
+            do!
+                works
+                |> List.traverseResultM wProcessor.handleSingleWork
+                |> Result.map (List.map handleOutput)
+                |> Result.map ignore
+        | Cancel ->
             AnsiConsole.WriteLine()
             infoMessage "Operation cancelled"
     }
-    |> Result.mapError (List.map error2String >> handleErrors)
+    |> Result.mapError (List.map cliError2string >> handleErrors)

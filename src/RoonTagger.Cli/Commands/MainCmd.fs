@@ -61,6 +61,6 @@ let handleCmd (opts: ParseResults<MainArgs>) =
         | ViewCmd args -> return View.handleCmd args
         | CreditsCmd args -> return Credits.handleCmd args
         | ConfigureCmd args -> return Configure.handleCmd args config configFile
-        | ExtractWorksCmd args -> return ExtractWorks.handleCmd args
+        | ExtractWorksCmd args -> return ExtractWorks.handleCmd args config
         | _ -> return handleOutput "Move along, nothing to see here..." |> Ok
     }

@@ -13,6 +13,7 @@ let conditionallyPrint (grid: Grid) (head: string) (value: string list) =
 
     if not (List.isEmpty processedValue) then
         let v = processedValue |> String.concat ", "
+
         grid.AddRow($"[b]{head.EscapeMarkup()}[/]", v.EscapeMarkup())
         |> ignore
 
