@@ -58,8 +58,8 @@ Register-ArgumentCompleter -Native -CommandName 'roon-tagger' -ScriptBlock {
         'roon-tagger;configure' {
             [CompletionResult]::new('--log-file', 'log-file', [CompletionResultType]::ParameterName, 'Default log file')
             [CompletionResult]::new('--log-level', 'log-level', [CompletionResultType]::ParameterName, 'Default log level')
-            [CompletionResult]::new('--editor', 'editor', [CompletionResultType]::ParameterName, 'Editor to use for editing titles (without arguments)')
-            [CompletionResult]::new('--editor-with-args', 'editor-with-args', [CompletionResultType]::ParameterName, 'Editor to use for editing titles (with arguments)')
+            [CompletionResult]::new('--editor', 'editor', [CompletionResultType]::ParameterName, 'Editor to use for editing tags file (without arguments)')
+            [CompletionResult]::new('--editor-with-args', 'editor-with-args', [CompletionResultType]::ParameterName, 'Editor to use for editing tags file (with arguments)')
             [CompletionResult]::new('--reset-editor', 'reset-editor', [CompletionResultType]::ParameterName, 'Reset the editor configuration')
             [CompletionResult]::new('--show', 'show', [CompletionResultType]::ParameterName, 'Show current configuration')
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
