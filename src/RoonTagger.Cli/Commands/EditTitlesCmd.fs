@@ -15,12 +15,11 @@ let log = Serilog.Log.Logger
 
 let getTracks = List.traverseResultA Track.load
 
-let applyTitles = applyValues (fun t -> RoonTag.Title t)
+let applyTitles = applyValues RoonTag.Title
 
 let extractTitles (ConsecutiveTracks tracks) =
     tracks
-    |> List.map (fun t -> Track.safeGetTagStringValue t TitleTag)
-    |> List.map List.head
+    |> List.map (fun t -> Track.safeGetTagStringValue t TitleTag |> List.head)
 
 let handleCmd (args: ParseResults<EditTitlesArgs>) (config: ConfigurationV1) : Result<unit, unit> =
     let applyTags = Track.applyTags >> Result.mapError (List.map MError)
