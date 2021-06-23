@@ -88,6 +88,7 @@ type ConfigureArgs =
 type MainArgs =
     | Version
     | [<AltCommandLine("-v"); Inherit>] Verbose
+    | [<Inherit>]Long_Help
     | [<CliPrefix(CliPrefix.None)>] Set_Tags of ParseResults<SetTagsArgs>
     | [<CliPrefix(CliPrefix.None)>] Edit_Titles of ParseResults<EditTitlesArgs>
     | [<CliPrefix(CliPrefix.None)>] Credits of ParseResults<CreditsArgs>
@@ -100,6 +101,7 @@ type MainArgs =
             match s with
             | Version -> "print version and exit."
             | Verbose -> "Print some debug data (use multiple times for more verbosity)."
+            | Long_Help -> "Print detailed help message."
             | Set_Tags _ -> "set tags"
             | Edit_Titles _ -> "Edit the titles of the provided files as a text file"
             | Credits _ -> "Add/Delete credit entries"
