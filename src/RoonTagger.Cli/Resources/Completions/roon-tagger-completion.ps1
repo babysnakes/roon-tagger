@@ -10,7 +10,6 @@ Register-ArgumentCompleter -Native -CommandName 'roon-tagger' -ScriptBlock {
         'roon-tagger'
         for ($i = 1; $i -lt $commandElements.Count; $i++) {
             $element = $commandElements[$i]
-            write-output $element | Out-File -Append out.txt
             if ($element -isnot [StringConstantExpressionAst] -or
                 $element.StringConstantType -ne [StringConstantType]::BareWord -or
                 $element.Value.StartsWith('-')) {
