@@ -48,7 +48,7 @@ let handleCmd (opts: ParseResults<SetTagsArgs>) =
             |> Result.mapError List.concat
 
         return!
-            List.traverseResultM (fun t -> Track.applyTags t) tracks
+            List.traverseResultM Track.applyTags tracks
             |> Result.map (fun _ -> handleOutput "Operation handled successfully")
     }
     |> Result.mapError (List.map error2String >> handleErrors)

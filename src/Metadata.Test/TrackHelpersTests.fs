@@ -9,6 +9,7 @@ open FsUnit
 module MetadataHelpersTests =
 
     let loadTrackSuccess = getResourcePath >> Track.load >> Result.unwrap
+    let loadTracksPath = loadTrackSuccess >> (fun i -> i.Path)
     let createConsecutiveTracks = List.map loadTrackSuccess >> ConsecutiveTracks.Create
 
     [<Test>]
@@ -26,8 +27,7 @@ module MetadataHelpersTests =
               "disc1track3.flac"
               "disc2track1.flac"
               "disc2track2.flac" ]
-            |> List.map loadTrackSuccess
-            |> List.map (fun i -> i.Path)
+            |> List.map loadTracksPath
 
         before
         |> List.map loadTrackSuccess
@@ -47,8 +47,7 @@ module MetadataHelpersTests =
             [ "track1.flac"
               "track2.flac"
               "track3.flac" ]
-            |> List.map loadTrackSuccess
-            |> List.map (fun i -> i.Path)
+            |> List.map loadTracksPath
 
         before
         |> List.map loadTrackSuccess

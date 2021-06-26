@@ -4,11 +4,13 @@ open System
 open Argu
 
 type SetTagsArgs =
+    // fsharplint:disable unionCasesNames
     | [<Unique>] Title of title: string
     | [<AltCommandLine("-I")>] Import_Date of date: string
     | [<AltCommandLine("-R")>] Release_Date of date: string
     | Year of int
     | [<MainCommand; ExactlyOnce; Last; Mandatory>] Files of file: string list
+    // fsharplint:enable unionCasesNames
 
     interface IArgParserTemplate with
         member s.Usage =
@@ -28,8 +30,10 @@ type EditTitlesArgs =
             | Files _ -> "Files to edit"
 
 type ExtractWorksArgs =
+    // fsharplint:disable unionCasesNames
     | [<AltCommandLine("-R")>] Add_Roman_Numerals
     | [<MainCommand; ExactlyOnce; Last; Mandatory>] Files of file: string list
+    // fsharplint:enable unionCasesNames
 
     interface IArgParserTemplate with
         member s.Usage =
@@ -39,8 +43,10 @@ type ExtractWorksArgs =
             | Files _ -> "Files to extract works from"
 
 type ViewArgs =
+    // fsharplint:disable unionCasesNames
     | Raw_Credits
     | [<MainCommand; ExactlyOnce; Mandatory>] File of file: string
+    // fsharplint:enable unionCasesNames
 
     interface IArgParserTemplate with
         member s.Usage =
@@ -49,10 +55,12 @@ type ViewArgs =
             | File _ -> "File to view"
 
 type CreditsArgs =
+    // fsharplint:disable unionCasesNames
     | Add of name: string * roles: string
     | Del of credit: string
     | Skip_Validation
     | [<MainCommand; ExactlyOnce; Last; Mandatory>] Files of file: string list
+    // fsharplint:enable unionCasesNames
 
     interface IArgParserTemplate with
         member s.Usage =
@@ -65,12 +73,14 @@ type CreditsArgs =
             | Files _ -> "The files to apply the credits to"
 
 type ConfigureArgs =
+    // fsharplint:disable unionCasesNames
     | Log_File of logFile: string
     | Log_Level of Configuration.LogLevel
     | Editor of cmd: string
     | Editor_With_Args of cmd: string * args: string
     | Reset_Editor
     | Show
+    // fsharplint:enable unionCasesNames
 
     interface IArgParserTemplate with
         member s.Usage =
@@ -86,6 +96,7 @@ type ConfigureArgs =
 
 [<HelpFlags([| "-h"; "--help" |])>]
 type MainArgs =
+    // fsharplint:disable unionCasesNames
     | Version
     | [<AltCommandLine("-v"); Inherit>] Verbose
     | [<Inherit>]Long_Help
@@ -95,6 +106,7 @@ type MainArgs =
     | [<CliPrefix(CliPrefix.None)>] Configure of ParseResults<ConfigureArgs>
     | [<CliPrefix(CliPrefix.None)>] View of ParseResults<ViewArgs>
     | [<CliPrefix(CliPrefix.None)>] Extract_Works of ParseResults<ExtractWorksArgs>
+    // fsharplint:enable unionCasesNames
 
     interface IArgParserTemplate with
         member s.Usage =

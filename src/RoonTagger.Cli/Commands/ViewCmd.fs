@@ -9,7 +9,7 @@ open RoonTagger.Cli.Output
 open RoonTagger.Metadata
 
 let conditionallyPrint (grid: Grid) (head: string) (value: string list) =
-    let processedValue = value |> List.filter (fun s -> String.IsNullOrEmpty(s) |> not)
+    let processedValue = value |> List.filter (String.IsNullOrEmpty >> not)
 
     if not (List.isEmpty processedValue) then
         let v = processedValue |> String.concat ", "

@@ -64,8 +64,8 @@ module Track =
             result {
                 let name, roles = credit
                 let make r = $"{name} - {r}"
-                do! validator.validateMany roles |> Result.map ignore
-                return roles |> List.map make |> List.map Personnel
+                do! validator.ValidateMany roles |> Result.map ignore
+                return roles |> List.map (make >> Personnel)
             }
 
         credits
@@ -88,13 +88,13 @@ module Track =
         let toDelete = List.map (fun (Personnel p) -> p) credits
         let invalidDeletes = List.filter (fun s -> List.contains s current |> not) toDelete
 
-        if List.length invalidDeletes > 0 then
-            invalidDeletes
-            |> List.map (fun s -> DeletingNonExistingPersonnel(track, s))
-            |> Error
-        else
+        if List.isEmpty invalidDeletes then
             let calculated = List.removeByValues toDelete current
 
             match track.Track with
             | Flac file -> Flac.setRaw file Flac.CreditTag calculated
             |> Ok
+        else
+            invalidDeletes
+            |> List.map (fun s -> DeletingNonExistingPersonnel(track, s))
+            |> Error

@@ -8,7 +8,7 @@ type RoleValidator =
     | Roles of string list option
 
     /// Validates the provided role against `Roles` (if not None)
-    member rv.validate(role: string) : Result<unit, MetadataErrors> =
+    member rv.Validate(role: string) : Result<unit, MetadataErrors> =
         match rv with
         | Roles None -> Ok()
         | Roles (Some roles) ->
@@ -18,5 +18,5 @@ type RoleValidator =
                 UnsupportedRole role |> Error
 
     /// Validates the provided roles against `Roles` (if not None)
-    member rv.validateMany(roles: string list) =
-        roles |> List.traverseResultA rv.validate
+    member rv.ValidateMany(roles: string list) =
+        roles |> List.traverseResultA rv.Validate

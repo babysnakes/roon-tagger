@@ -9,7 +9,7 @@ open RoonTagger.Cli.Configuration
 [<TestFixture>]
 type LoggingTests() =
 
-    static member loggingEnabledInput() =
+    static member LoggingEnabledInput() =
         [ let defaultLC =
               { File = "file.log"
                 Level = LogLevel.None }
@@ -38,7 +38,7 @@ type LoggingTests() =
           (defaultLC, 3, [ (LogEventLevel.Verbose, true) ])
           (defaultLC, 5, [ (LogEventLevel.Verbose, true) ]) ]
 
-    [<TestCaseSource(nameof (LoggingTests.loggingEnabledInput))>]
+    [<TestCaseSource(nameof (LoggingTests.LoggingEnabledInput))>]
     member this.``Test log level calculation with logging enabled``
         ((lc: LogConfigV1, overrides: int, testCases: (LogEventLevel * bool) list))
         =

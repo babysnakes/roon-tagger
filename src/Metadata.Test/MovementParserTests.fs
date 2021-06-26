@@ -10,7 +10,7 @@ open RoonTagger.Metadata.WorkMovement.MovementParser
 [<TestFixture>]
 type MovementParserTests() =
 
-    static member simpleParsingData() =
+    static member SimpleParsingData() =
         [ (suffix, ".", DOT)
           (suffix, ":", COLON)
           (roman, "xii", ROMAN)
@@ -19,7 +19,7 @@ type MovementParserTests() =
           (no, "No ", NO)
           (idx, "4", IDX) ]
 
-    static member matchingTitlesTestData() =
+    static member MatchingTitlesTestData() =
         [ ("Obvious match", "No. 1: title one", "No. 2: title two", true)
           ("'No' case is not enforced", "no. 1: title one", "No. 2: title two", true)
           ("Roman case doesn't matter", "II: title one", "xi: title two", true)
@@ -27,7 +27,7 @@ type MovementParserTests() =
           ("Dot following 'no' should be consistent", "no 1: title one", "no. 2: title two", false)
           ("colon/dot should be consistent", "I. title one", "I: title two", false) ]
 
-    static member extractTitleTestData() =
+    static member ExtractTitleTestData() =
         [ ("II: The title", "The title")
           ("no index title", "no index title")
           ("2 digit as first char in title", "2 digit as first char in title")
@@ -37,14 +37,14 @@ type MovementParserTests() =
           ("1I title one", "1I title one")
           ("I1 title one", "I1 title one") ]
 
-    [<TestCaseSource(nameof (MovementParserTests.simpleParsingData))>]
+    [<TestCaseSource(nameof (MovementParserTests.SimpleParsingData))>]
     member this.``Simple parsing should apply``((testParser, data, expected)) =
         run testParser data
         |> function
         | Success (res, _, _) when res = expected -> ()
         | x -> Assert.Fail($"Unexpected result '%A{x}', expected '{expected}'")
 
-    [<TestCaseSource(nameof (MovementParserTests.matchingTitlesTestData))>]
+    [<TestCaseSource(nameof (MovementParserTests.MatchingTitlesTestData))>]
     member this.``Matching layout tests``((_description, title1, title2, shouldMatch)) =
         let r1 = run titleLayout title1 |> unwrapParserResult
         let r2 = run titleLayout title2 |> unwrapParserResult
@@ -54,7 +54,7 @@ type MovementParserTests() =
         else
             r1 |> should not' (equal r2)
 
-    [<TestCaseSource(nameof (MovementParserTests.extractTitleTestData))>]
+    [<TestCaseSource(nameof (MovementParserTests.ExtractTitleTestData))>]
     member this.``Extract title test``((testData, expected)) =
         let result = run title testData |> unwrapParserResult
         result |> should equal expected

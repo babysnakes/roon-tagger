@@ -61,7 +61,7 @@ let printWork (Work (name, ConsecutiveTracks tracks)) =
 
 let printWorks = List.iter printWork
 
-let applyMovements = applyValues (fun t -> RoonTag.Movement t)
+let applyMovements = applyValues RoonTag.Movement
 
 let promptWorksOperation () =
     let prompt = SelectionPrompt<WorksPromptResponse>()
@@ -72,7 +72,7 @@ let promptWorksOperation () =
 type WorkProcessor =
     { Config: ConfigurationV1 }
 
-    member this.editMovements(ConsecutiveTracks tracks as cTracks) : Result<unit, CliErrors list> =
+    member this.EditMovements(ConsecutiveTracks tracks as cTracks) : Result<unit, CliErrors list> =
         let movementsFilePath = constructTagsFilePath "movements"
         log.Debug("Movement file path is '{MovementsFilePath}'", movementsFilePath)
 
@@ -105,7 +105,7 @@ type WorkProcessor =
         }
         |> Result.teeError (fun _ -> cleanup movementsFilePath |> ignore)
 
-    member _.promptWorkOperation(Work (workName, _)) =
+    member _.PromptWorkOperation(Work (workName, _)) =
         let prompt = SelectionPrompt<WorkPromptResponse>()
         prompt.Title <- $"[yellow]{workName.EscapeMarkup()}:[/]"
 
@@ -120,12 +120,12 @@ type WorkProcessor =
 
         AnsiConsole.Prompt(prompt)
 
-    member this.handleSingleWork(work: Work) : Result<string, CliErrors list> =
+    member this.HandleSingleWork(work: Work) : Result<string, CliErrors list> =
 
         let rec loop (Work (name, cTracks) as work) =
             let (ConsecutiveTracks tracks) = cTracks
 
-            match (this.promptWorkOperation work) with
+            match (this.PromptWorkOperation work) with
             | SaveWork ->
                 log.Debug("Applying work: {Name}", name)
 
@@ -149,7 +149,7 @@ type WorkProcessor =
             | EditMovements ->
                 log.Debug("Editing movements of: '{Name}'", name)
 
-                match (this.editMovements cTracks) with
+                match (this.EditMovements cTracks) with
                 | Ok _ -> loop (Work(name, cTracks))
                 | Error err -> Error err
 
@@ -184,7 +184,7 @@ let handleCmd (args: ParseResults<ExtractWorksArgs>) (config: ConfigurationV1) :
 
             do!
                 works
-                |> List.traverseResultM wProcessor.handleSingleWork
+                |> List.traverseResultM wProcessor.HandleSingleWork
                 |> Result.map (List.map handleOutput)
                 |> Result.map ignore
         | Cancel ->
