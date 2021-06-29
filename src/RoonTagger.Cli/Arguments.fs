@@ -99,7 +99,7 @@ type MainArgs =
     // fsharplint:disable unionCasesNames
     | Version
     | [<AltCommandLine("-v"); Inherit>] Verbose
-    | [<Inherit>]Long_Help
+    | [<Inherit>] Long_Help
     | [<CliPrefix(CliPrefix.None)>] Set_Tags of ParseResults<SetTagsArgs>
     | [<CliPrefix(CliPrefix.None)>] Edit_Titles of ParseResults<EditTitlesArgs>
     | [<CliPrefix(CliPrefix.None)>] Credits of ParseResults<CreditsArgs>
