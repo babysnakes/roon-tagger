@@ -23,6 +23,7 @@ Register-ArgumentCompleter -Native -CommandName 'roon-tagger' -ScriptBlock {
             [CompletionResult]::new('--version', 'version', [CompletionResultType]::ParameterName, 'Print version and exit')
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
+            [CompletionResult]::new('--long-help', 'long-help', [CompletionResultType]::ParameterName, 'Long Help Description')
             [CompletionResult]::new('set-tags', 'set-tags', [CompletionResultType]::ParameterValue, 'Set roon specific tags')
             [CompletionResult]::new('edit-titles', 'edit-titles', [CompletionResultType]::ParameterValue, 'Edit the tiles of all provided tracks')
             [CompletionResult]::new('credits', 'credits', [CompletionResultType]::ParameterValue, 'Add/Delete track credits')
@@ -34,6 +35,7 @@ Register-ArgumentCompleter -Native -CommandName 'roon-tagger' -ScriptBlock {
         'roon-tagger;edit-titles' {
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
+            [CompletionResult]::new('--long-help', 'long-help', [CompletionResultType]::ParameterName, 'Long Help Description')
             break
         }
         'roon-tagger;set-tags' {
@@ -43,6 +45,7 @@ Register-ArgumentCompleter -Native -CommandName 'roon-tagger' -ScriptBlock {
             [CompletionResult]::new('--year', 'year', [CompletionResultType]::ParameterName, 'Album release date')
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
+            [CompletionResult]::new('--long-help', 'long-help', [CompletionResultType]::ParameterName, 'Long Help Description')
             break
         }
         'roon-tagger;credits' {
@@ -52,6 +55,7 @@ Register-ArgumentCompleter -Native -CommandName 'roon-tagger' -ScriptBlock {
             [CompletionResult]::new('--year', 'year', [CompletionResultType]::ParameterName, 'Album release date')
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
+            [CompletionResult]::new('--long-help', 'long-help', [CompletionResultType]::ParameterName, 'Long Help Description')
             break
         }
         'roon-tagger;configure' {
@@ -63,18 +67,21 @@ Register-ArgumentCompleter -Native -CommandName 'roon-tagger' -ScriptBlock {
             [CompletionResult]::new('--show', 'show', [CompletionResultType]::ParameterName, 'Show current configuration')
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
+            [CompletionResult]::new('--long-help', 'long-help', [CompletionResultType]::ParameterName, 'Long Help Description')
             break
         }
         'roon-tagger;configure' {
             [CompletionResult]::new('--raw-credits', 'raw-credits', [CompletionResultType]::ParameterName, 'View raw credits')
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
+            [CompletionResult]::new('--long-help', 'long-help', [CompletionResultType]::ParameterName, 'Long Help Description')
             break
         }
         'roon-tagger;extract-works' {
             [CompletionResult]::new('--add-roman-numerals', 'add-roman-numerals', [CompletionResultType]::ParameterName, 'Adds Roman numerals to movement names')
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
+            [CompletionResult]::new('--long-help', 'long-help', [CompletionResultType]::ParameterName, 'Long Help Description')
             break
         }
     })
