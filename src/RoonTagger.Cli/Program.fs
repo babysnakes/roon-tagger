@@ -23,7 +23,7 @@ let main argv =
 
     try
         parser.Parse argv
-        |> Main.handleCmd
+        |> Main.runMain
         |> Result.tee (fun _ -> Console.WriteLine("")) // Add an empty line for a little space
         |> function
         | Ok _ -> 0

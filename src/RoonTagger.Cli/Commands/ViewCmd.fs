@@ -5,6 +5,7 @@ open Argu
 open FsToolkit.ErrorHandling
 open Spectre.Console
 open RoonTagger.Cli.Arguments
+open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 open RoonTagger.Metadata
 
@@ -89,3 +90,8 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         AnsiConsole.Render(panel)
     }
     |> Result.mapError (fun err -> handleErrors [ error2String err ])
+
+let makeViewCmd (args: ParseResults<ViewArgs>) =
+    { new ISubCommand with
+        member this.Run() = handleCmd args
+        member this.LongHelp() = infoMessage "help wanted on view" |> Ok }

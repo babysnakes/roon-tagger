@@ -81,3 +81,10 @@ let handleCmd (args: ParseResults<ConfigureArgs>) (config: ConfigurationV1) (con
      else
          updateConfig args config configPath)
     |> Result.mapError (fun err -> handleErrors [ cliError2string err ])
+
+let makeConfigureCmd (args: ParseResults<ConfigureArgs>) (config: ConfigurationV1) (configPath: string) =
+    { new ISubCommand with
+        member this.Run() = handleCmd args config configPath
+
+        member this.LongHelp() =
+            infoMessage "help wanted on configure" |> Ok }

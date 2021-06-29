@@ -4,6 +4,7 @@ open System
 open Argu
 open FsToolkit.ErrorHandling
 open RoonTagger.Cli.Arguments
+open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 open RoonTagger.Metadata
 open RoonTagger.Metadata.Utils
@@ -51,3 +52,10 @@ let handleCmd (args: ParseResults<CreditsArgs>) : Result<unit, unit> =
             |> Result.map (fun _ -> handleOutput "Operation handled successfully")
     }
     |> Result.mapError (List.map error2String >> handleErrors)
+
+let makeCreditsCmd (args: ParseResults<CreditsArgs>) =
+    { new ISubCommand with
+        member this.Run() = handleCmd args
+
+        member this.LongHelp() =
+            infoMessage "help wanted on credits" |> Ok }

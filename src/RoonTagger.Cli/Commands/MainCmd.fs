@@ -8,17 +8,16 @@ open RoonTagger.Cli
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Commands
 open RoonTagger.Cli.Configuration
+open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 open Spectre.Console
 
-let (|VersionCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Version
 let (|SetTagsCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Set_Tags
 let (|EditTitlesCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Edit_Titles
 let (|ViewCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult View
 let (|CreditsCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Credits
 let (|ConfigureCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Configure
 let (|ExtractWorksCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Extract_Works
-let (|LongHelpWanted|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Long_Help
 
 let setupLogger (lc: LogConfigV1) (overrides: int) =
     let level =
@@ -39,8 +38,17 @@ let setupLogger (lc: LogConfigV1) (overrides: int) =
     | LogLevel.Trace
     | _ -> Some(f().MinimumLevel.Verbose().CreateLogger())
 
+let handleCmd (_: ParseResults<MainArgs>) : Result<unit, unit> =
+    Markup("Move along, nothing to see here...")
+    |> AnsiConsole.Render
+    |> Ok
 
-let handleCmd (opts: ParseResults<MainArgs>) =
+let makeMainCmd (args: ParseResults<MainArgs>) =
+    { new ISubCommand with
+        member this.Run() = handleCmd args
+        member this.LongHelp() = infoMessage "help wanted on Main" |> Ok }
+
+let runMain (opts: ParseResults<MainArgs>) =
     let printMarkups = List.iter AnsiConsole.Render
 
     result {
@@ -59,20 +67,21 @@ let handleCmd (opts: ParseResults<MainArgs>) =
 
         Console.WriteLine("")
 
-        match opts with
-        | VersionCmd _ -> return infoMessage $"{Info.Name}: {Info.Version}" |> Ok
-        | SetTagsCmd _ & LongHelpWanted _ -> return infoMessage "help wanted on set-tags" |> Ok
-        | SetTagsCmd args -> return SetTags.handleCmd args
-        | EditTitlesCmd _ & LongHelpWanted _ -> return infoMessage "help wanted on edit-titles" |> Ok
-        | EditTitlesCmd args -> return EditTitles.handleCmd args config
-        | ViewCmd _ & LongHelpWanted _ -> return infoMessage "help wanted on view" |> Ok
-        | ViewCmd args -> return View.handleCmd args
-        | CreditsCmd _ & LongHelpWanted _ -> return infoMessage "help wanted on credits" |> Ok
-        | CreditsCmd args -> return Credits.handleCmd args
-        | ConfigureCmd _ & LongHelpWanted _ -> return infoMessage "help wanted on configure" |> Ok
-        | ConfigureCmd args -> return Configure.handleCmd args config configFile
-        | ExtractWorksCmd _ & LongHelpWanted _ -> return infoMessage "help wanted on extract-works" |> Ok
-        | ExtractWorksCmd args -> return ExtractWorks.handleCmd args config
-        | LongHelpWanted _ -> return infoMessage "help wanted on main command" |> Ok
-        | _ -> return [ Markup("Move along, nothing to see here...") ] |> printMarkups |> Ok
+        if opts.Contains Version then
+            return infoMessage $"{Info.Name}: {Info.Version}" |> Ok
+        else
+            let subCommand =
+                match opts with
+                | SetTagsCmd args -> SetTags.makeSetArgsCmd args
+                | EditTitlesCmd args -> EditTitles.makeEditTitlesCmd args config
+                | ViewCmd args -> View.makeViewCmd args
+                | CreditsCmd args -> Credits.makeCreditsCmd args
+                | ConfigureCmd args -> Configure.makeConfigureCmd args config configFile
+                | ExtractWorksCmd args -> ExtractWorks.makeExtractWorkCommand args config
+                | _ -> makeMainCmd opts
+
+            if opts.Contains Long_Help then
+                return subCommand.LongHelp()
+            else
+                return subCommand.Run()
     }

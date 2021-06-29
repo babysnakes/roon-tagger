@@ -55,3 +55,10 @@ let handleCmd (args: ParseResults<EditTitlesArgs>) (config: ConfigurationV1) : R
     }
     |> Result.teeError (fun _ -> cleanup titlesFilePath |> ignore)
     |> Result.mapError (List.map cliError2string >> handleErrors)
+
+let makeEditTitlesCmd (args: ParseResults<EditTitlesArgs>) (config: ConfigurationV1) =
+    { new ISubCommand with
+        member this.Run() = handleCmd args config
+
+        member this.LongHelp() =
+            infoMessage "help wanted on edit-titles" |> Ok }

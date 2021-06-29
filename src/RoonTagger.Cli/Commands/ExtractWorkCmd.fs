@@ -192,3 +192,10 @@ let handleCmd (args: ParseResults<ExtractWorksArgs>) (config: ConfigurationV1) :
             infoMessage "Operation cancelled"
     }
     |> Result.mapError (List.map cliError2string >> handleErrors)
+
+let makeExtractWorkCommand (args: ParseResults<ExtractWorksArgs>) (config: ConfigurationV1) =
+    { new ISubCommand with
+        member this.Run() = handleCmd args config
+
+        member this.LongHelp() =
+            infoMessage "help wanted on extract-work" |> Ok }

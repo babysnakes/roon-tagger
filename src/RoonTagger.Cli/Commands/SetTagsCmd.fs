@@ -6,6 +6,7 @@ open FsToolkit.ErrorHandling.Operator.Result
 open RoonTagger
 open RoonTagger.Metadata
 open RoonTagger.Cli.Arguments
+open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 
 let extractTags (opts: ParseResults<SetTagsArgs>) =
@@ -52,3 +53,10 @@ let handleCmd (opts: ParseResults<SetTagsArgs>) =
             |> Result.map (fun _ -> handleOutput "Operation handled successfully")
     }
     |> Result.mapError (List.map error2String >> handleErrors)
+
+let makeSetArgsCmd (args: ParseResults<SetTagsArgs>) =
+    { new ISubCommand with
+        member this.Run() = handleCmd args
+
+        member this.LongHelp() =
+            infoMessage "help wanted on set-tags" |> Ok }
