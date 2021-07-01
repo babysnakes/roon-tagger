@@ -3,6 +3,7 @@ module RoonTagger.Cli.Commands.Credits
 open System
 open Argu
 open FsToolkit.ErrorHandling
+open Pluralize.NET
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
@@ -46,10 +47,14 @@ let handleCmd (args: ParseResults<CreditsArgs>) : Result<unit, unit> =
 
         do tracks |> List.map (fun t -> Track.addCredits t addCredits) |> ignore
 
+        let p = Pluralizer()
+        let addPlural = p.Format("credit", addCredits |> List.length, true)
+        let delPlural = p.Format("credit", delCredits |> List.length, true)
+
         do!
             tracks
             |> List.traverseResultM Track.applyTags
-            |> Result.map (fun _ -> handleOutput "Operation handled successfully")
+            |> Result.map (fun _ -> handleOutput $"Successfully added {addPlural} and deleted {delPlural}")
     }
     |> Result.mapError (List.map error2String >> handleErrors)
 

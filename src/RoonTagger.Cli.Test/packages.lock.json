@@ -233,6 +233,11 @@
         "resolved": "5.0.0",
         "contentHash": "c5JVjuVAm4f7E9Vj+v09Z9s2ZsqFDjBpcsyS3M9xRo0bEdm/LVZSzLxxNvfvAwRiiE8nwe1h2G4OwiwlzFKXlA=="
       },
+      "Pluralize.NET": {
+        "type": "Transitive",
+        "resolved": "1.0.2",
+        "contentHash": "kr/sOAem5NPH7Ft0tNiaQOO7f/W7ExcLRERpgvg5BlVZimQ/d/MCxhnwnk+WL4dy5Bj/KjToHUl1azYYDfqzpA=="
+      },
       "Roman-Numerals": {
         "type": "Transitive",
         "resolved": "1.0.3",
@@ -922,6 +927,7 @@
           "FSharp.Json": "0.4.0",
           "FsToolkit.ErrorHandling": "2.1.2",
           "Metadata.Lib": "1.0.0",
+          "Pluralize.NET": "1.0.2",
           "Serilog": "2.10.0",
           "Serilog.Sinks.File": "4.1.0",
           "Spectre.Console": "0.39.0"
