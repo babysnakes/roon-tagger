@@ -3,6 +3,7 @@ module RoonTagger.Cli.Commands.EditTitles
 open Argu
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
+open Spectre.Console
 open RoonTagger.Metadata
 open RoonTagger.Metadata.TrackHelpers
 open RoonTagger.Cli.Arguments
@@ -61,4 +62,4 @@ let makeEditTitlesCmd (args: ParseResults<EditTitlesArgs>) (config: Configuratio
         member this.Run() = handleCmd args config
 
         member this.LongHelp() =
-            infoMessage "help wanted on edit-titles" |> Ok }
+            [ Markup("help wanted on [italic]edit-titles[/]") ] }

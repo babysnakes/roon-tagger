@@ -2,6 +2,7 @@ module RoonTagger.Cli.Commands.Configure
 
 open Argu
 open FsToolkit.ErrorHandling
+open Spectre.Console
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Configuration
 open RoonTagger.Cli.Models
@@ -87,4 +88,4 @@ let makeConfigureCmd (args: ParseResults<ConfigureArgs>) (config: ConfigurationV
         member this.Run() = handleCmd args config configPath
 
         member this.LongHelp() =
-            infoMessage "help wanted on configure" |> Ok }
+            [ Markup("help wanted on [italic]configure[/]") ] }

@@ -46,7 +46,9 @@ let handleCmd (_: ParseResults<MainArgs>) : Result<unit, unit> =
 let makeMainCmd (args: ParseResults<MainArgs>) =
     { new ISubCommand with
         member this.Run() = handleCmd args
-        member this.LongHelp() = infoMessage "help wanted on Main" |> Ok }
+
+        member this.LongHelp() =
+            [ Markup("help wanted on [italic]Main[/]") ] }
 
 let runMain (opts: ParseResults<MainArgs>) =
     let printMarkups = List.iter AnsiConsole.Render
@@ -81,7 +83,7 @@ let runMain (opts: ParseResults<MainArgs>) =
                 | _ -> makeMainCmd opts
 
             if opts.Contains Long_Help then
-                return subCommand.LongHelp()
+                return subCommand.LongHelp() |> List.iter AnsiConsole.Render |> Ok
             else
                 return subCommand.Run()
     }

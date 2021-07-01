@@ -94,4 +94,6 @@ let handleCmd (args: ParseResults<ViewArgs>) =
 let makeViewCmd (args: ParseResults<ViewArgs>) =
     { new ISubCommand with
         member this.Run() = handleCmd args
-        member this.LongHelp() = infoMessage "help wanted on view" |> Ok }
+
+        member this.LongHelp() =
+            [ Markup("help wanted on [italic]view[/]") ] }

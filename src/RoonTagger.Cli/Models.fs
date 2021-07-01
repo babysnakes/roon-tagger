@@ -1,5 +1,6 @@
 module RoonTagger.Cli.Models
 
+open Spectre.Console.Rendering
 open RoonTagger.Metadata
 
 type ISubCommand =
@@ -7,7 +8,7 @@ type ISubCommand =
     abstract member Run : unit -> Result<unit, unit>
 
     /// Prints long help for the sub-command.
-    abstract member LongHelp : unit -> Result<unit, unit>
+    abstract member LongHelp : unit -> IRenderable list
 
 type CliErrors =
     | MError of MetadataErrors

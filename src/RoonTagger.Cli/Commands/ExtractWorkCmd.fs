@@ -198,4 +198,4 @@ let makeExtractWorkCommand (args: ParseResults<ExtractWorksArgs>) (config: Confi
         member this.Run() = handleCmd args config
 
         member this.LongHelp() =
-            infoMessage "help wanted on extract-work" |> Ok }
+            [ Markup("help wanted on [italic]extract-works[/]") ] }
