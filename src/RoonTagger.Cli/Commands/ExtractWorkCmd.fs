@@ -9,6 +9,7 @@ open RoonTagger.Metadata.Utils
 open RoonTagger.Metadata.WorkMovement
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Configuration
+open RoonTagger.Cli.Help.LongHelp
 open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 open RoonTagger.Cli.TagsInFile
@@ -196,6 +197,4 @@ let handleCmd (args: ParseResults<ExtractWorksArgs>) (config: ConfigurationV1) :
 let makeExtractWorkCommand (args: ParseResults<ExtractWorksArgs>) (config: ConfigurationV1) =
     { new ISubCommand with
         member this.Run() = handleCmd args config
-
-        member this.LongHelp() =
-            [ Markup("help wanted on [italic]extract-works[/]") ] }
+        member this.LongHelp() = extractWorksLH }

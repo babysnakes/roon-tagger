@@ -3,10 +3,10 @@ module RoonTagger.Cli.Commands.SetTags
 open Argu
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
-open Spectre.Console
 open RoonTagger
 open RoonTagger.Metadata
 open RoonTagger.Cli.Arguments
+open RoonTagger.Cli.Help.LongHelp
 open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 
@@ -58,6 +58,4 @@ let handleCmd (opts: ParseResults<SetTagsArgs>) =
 let makeSetArgsCmd (args: ParseResults<SetTagsArgs>) =
     { new ISubCommand with
         member this.Run() = handleCmd args
-
-        member this.LongHelp() =
-            [ Markup("help wanted on [italic]set-tags[/]") ] }
+        member this.LongHelp() = setTagsLH }

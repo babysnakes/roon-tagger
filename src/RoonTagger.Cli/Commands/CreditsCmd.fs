@@ -4,8 +4,8 @@ open System
 open Argu
 open FsToolkit.ErrorHandling
 open Pluralize.NET
-open Spectre.Console
 open RoonTagger.Cli.Arguments
+open RoonTagger.Cli.Help.LongHelp
 open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 open RoonTagger.Metadata
@@ -62,6 +62,4 @@ let handleCmd (args: ParseResults<CreditsArgs>) : Result<unit, unit> =
 let makeCreditsCmd (args: ParseResults<CreditsArgs>) =
     { new ISubCommand with
         member this.Run() = handleCmd args
-
-        member this.LongHelp() =
-            [ Markup("help wanted on [italic]credits[/]") ] }
+        member this.LongHelp() = creditsLH }

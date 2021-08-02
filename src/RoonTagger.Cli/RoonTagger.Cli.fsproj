@@ -6,6 +6,7 @@
   <ItemGroup>
     <Compile Include="Info.fs" />
     <Compile Include="Models.fs" />
+    <Compile Include="Help\LongHelp.fs" />
     <Compile Include="Configuration.fs" />
     <Compile Include="Arguments.fs" />
     <Compile Include="Output.fs" />

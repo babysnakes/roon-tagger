@@ -4,13 +4,19 @@ open System
 open Argu
 open FsToolkit.ErrorHandling
 open Serilog
+open Spectre.Console
+open Spectre.Console.Rendering
 open RoonTagger.Cli
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Commands
 open RoonTagger.Cli.Configuration
+open RoonTagger.Cli.Help.LongHelp
 open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
-open Spectre.Console
+
+let writeLine (r: IRenderable) =
+    AnsiConsole.Render(r)
+    AnsiConsole.MarkupLine("")
 
 let (|SetTagsCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Set_Tags
 let (|EditTitlesCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Edit_Titles
@@ -38,21 +44,14 @@ let setupLogger (lc: LogConfigV1) (overrides: int) =
     | LogLevel.Trace
     | _ -> Some(f().MinimumLevel.Verbose().CreateLogger())
 
-let handleCmd (_: ParseResults<MainArgs>) : Result<unit, unit> =
-    Markup("Move along, nothing to see here...")
-    |> AnsiConsole.Render
-    |> Ok
+let handleCmd (_: ParseResults<MainArgs>) : Result<unit, unit> = mainLH |> print |> Ok
 
 let makeMainCmd (args: ParseResults<MainArgs>) =
     { new ISubCommand with
         member this.Run() = handleCmd args
-
-        member this.LongHelp() =
-            [ Markup("help wanted on [italic]Main[/]") ] }
+        member this.LongHelp() = mainLH }
 
 let runMain (opts: ParseResults<MainArgs>) =
-    let printMarkups = List.iter AnsiConsole.Render
-
     result {
         let appDir = getConfigDirectory ()
         let configFile = getConfigFilePath appDir "config" ConfigurationVersion.V1
@@ -83,7 +82,7 @@ let runMain (opts: ParseResults<MainArgs>) =
                 | _ -> makeMainCmd opts
 
             if opts.Contains Long_Help then
-                return subCommand.LongHelp() |> List.iter AnsiConsole.Render |> Ok
+                return subCommand.LongHelp() |> print |> Ok
             else
                 return subCommand.Run()
     }
