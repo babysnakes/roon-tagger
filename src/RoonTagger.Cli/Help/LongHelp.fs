@@ -35,6 +35,8 @@ let setTagsLH =
 let extractWorksLH =
     ("Extract (mostly classical music) work and movements from existing album metadata.", mkUri "commands/extract-works")
 
-let mainLH = ("Roon Tagger - A tool for setting Roon specific metadata.", mkUri "main")
+let mainLH =
+    ("Roon Tagger - A tool for setting Roon specific metadata. Run with -h for usage.", mkUri "main")
+
 let creditsLH = ("Add/Remove personnel credits for track.", mkUri "commands/credits")
 let configureLH = ("Configure CLI behavior.", mkUri "commands/configure")
