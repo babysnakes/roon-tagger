@@ -14,10 +14,10 @@ let splitTitle2WorkMovement (track: AudioTrack) =
     title.Split(":", 2)
     |> List.ofArray
     |> function
-    | title :: [ movement ] -> (title.Trim(), Some(movement.Trim()))
-    | other ->
-        let title = (other |> List.head).Trim()
-        (title, None)
+        | title :: [ movement ] -> (title.Trim(), Some(movement.Trim()))
+        | other ->
+            let title = (other |> List.head).Trim()
+            (title, None)
 
 /// Extract work name from track's title. Return None if can not split to work/movement
 let workFromTitle =
@@ -82,21 +82,21 @@ module MovementParser =
     let parseLayout movement =
         run titleLayout movement
         |> function
-        | Success (r, _, _) ->
-            log.Verbose("Parsing layout of '{Movement}' returned: {R}", movement, r)
-            r
-        | Failure (msg, _, _) ->
-            failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
+            | Success (r, _, _) ->
+                log.Verbose("Parsing layout of '{Movement}' returned: {R}", movement, r)
+                r
+            | Failure (msg, _, _) ->
+                failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
 
     /// Extract the movement name (remove prefixes)
     let parseMovement movement =
         run title movement
         |> function
-        | Success (s, _, _) ->
-            log.Verbose("Parsing title of '{Movement}' returned: {S}", movement, s)
-            s
-        | Failure (msg, _, _) ->
-            failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
+            | Success (s, _, _) ->
+                log.Verbose("Parsing title of '{Movement}' returned: {S}", movement, s)
+                s
+            | Failure (msg, _, _) ->
+                failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
 
 /// An already parsed work (not applied). Only use `Create` to initialize
 type Work =
@@ -138,11 +138,11 @@ type Work =
             if constantLayout then
                 fun idx movement ->
                     let newMvmt = MovementParser.parseMovement movement |> finalizeMovementName idx
-                    setWorkMovement tracks.[idx] workName newMvmt (idx + 1) count
+                    Track.setTag tracks.[idx] (Movement newMvmt) |> Result.ignore
             else
                 fun idx mvmt ->
                     let newMovement = finalizeMovementName idx mvmt
-                    setWorkMovement tracks.[idx] workName newMovement (idx + 1) count
+                    Track.setTag tracks.[idx] (Movement newMovement) |> Result.ignore
 
         movements
         |> List.mapi workSetterFn
@@ -171,5 +171,11 @@ let extractWorks (ConsecutiveTracks tracks) addRomans =
 
 /// Applies (saves) the work data
 let applyWork (Work (name, (ConsecutiveTracks tracks))) =
+    let saveTrack t =
+        result {
+            do! Track.setTag t (RoonTag.Work name) |> Result.ignore |> Result.mapError List.ofItem
+            return! Track.applyTags t
+        }
+    
     log.Information("Saving metadata of work: '{Name}'", name)
-    tracks |> List.traverseResultM Track.applyTags |> Result.map ignore
+    tracks |> List.traverseResultM saveTrack |> Result.map ignore

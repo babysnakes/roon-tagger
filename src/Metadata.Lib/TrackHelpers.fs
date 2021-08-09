@@ -6,15 +6,6 @@ open RoonTagger.Metadata.Utils
 
 let log = Serilog.Log.Logger
 
-let setWorkMovement (track: AudioTrack) (work: string) (movement: string) (idx: int) (count: int) =
-    result {
-        match track.Track with
-        | Flac _ ->
-            do! Track.setTag track (Work work) |> Result.map ignore
-            do! Track.setTag track (Movement movement) |> Result.map ignore
-            return ()
-    }
-
 let extractTrackNumber (track: AudioTrack) : Result<int, MetadataErrors> =
     try
         Track.safeGetTagStringValue track TrackNumberTag
