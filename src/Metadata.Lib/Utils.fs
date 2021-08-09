@@ -24,7 +24,7 @@ let loadSupportedRoles () =
 
 [<RequireQualifiedAccess>]
 module List =
-    // Remove all occurrences of every item in values from the list.
+    /// Remove all occurrences of every item in values from the list.
     let removeByValues (values: 'T list) (lst: 'T list) : 'T list =
         let folder (item: 'T) (acc: 'T list) =
             if List.contains item values then
@@ -35,6 +35,15 @@ module List =
         List.foldBack folder lst []
 
     let ofItem (value: 'T) : 'T list = [ value ]
+
+    /// Map the items in a list for side effect and return original items
+    let tee (f: 'T -> unit) (lst: 'T list) : 'T list =
+        let fn item =
+            f item
+            item
+
+        lst |> List.map fn
+
 
     let groupByConsecutively (fKey: 'T -> 'key) (lst: 'T list) : ('key * 'T list) list =
         let loop (item: 'T) (state: ('key * 'T list) list) : ('key * 'T list) list =

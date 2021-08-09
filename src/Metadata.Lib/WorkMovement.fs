@@ -14,10 +14,10 @@ let splitTitle2WorkMovement (track: AudioTrack) =
     title.Split(":", 2)
     |> List.ofArray
     |> function
-        | title :: [ movement ] -> (title.Trim(), Some(movement.Trim()))
-        | other ->
-            let title = (other |> List.head).Trim()
-            (title, None)
+    | title :: [ movement ] -> (title.Trim(), Some(movement.Trim()))
+    | other ->
+        let title = (other |> List.head).Trim()
+        (title, None)
 
 /// Extract work name from track's title. Return None if can not split to work/movement
 let workFromTitle =
@@ -82,21 +82,21 @@ module MovementParser =
     let parseLayout movement =
         run titleLayout movement
         |> function
-            | Success (r, _, _) ->
-                log.Verbose("Parsing layout of '{Movement}' returned: {R}", movement, r)
-                r
-            | Failure (msg, _, _) ->
-                failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
+        | Success (r, _, _) ->
+            log.Verbose("Parsing layout of '{Movement}' returned: {R}", movement, r)
+            r
+        | Failure (msg, _, _) ->
+            failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
 
     /// Extract the movement name (remove prefixes)
     let parseMovement movement =
         run title movement
         |> function
-            | Success (s, _, _) ->
-                log.Verbose("Parsing title of '{Movement}' returned: {S}", movement, s)
-                s
-            | Failure (msg, _, _) ->
-                failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
+        | Success (s, _, _) ->
+            log.Verbose("Parsing title of '{Movement}' returned: {S}", movement, s)
+            s
+        | Failure (msg, _, _) ->
+            failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
 
 /// An already parsed work (not applied). Only use `Create` to initialize
 type Work =
@@ -153,29 +153,25 @@ type Work =
 let extractWorks (ConsecutiveTracks tracks) addRomans =
     tracks
     |> List.groupByConsecutively workFromTitle
-    |> List.map
-        (fun pair ->
-            log.Debug("Found possible work: %A{Pair}", pair)
-            pair)
+    |> List.tee (fun pair -> log.Debug("Found possible work: %A{Pair}", pair))
     |> List.filter (fun (title, tracks) -> title.IsSome && tracks |> List.length > 1)
-    |> List.map
-        (fun pair ->
-            log.Verbose("Filtered work: %A{Pair}", pair)
-            pair)
+    |> List.tee (fun pair -> log.Verbose("Filtered work: %A{Pair}", pair))
     |> List.traverseResultM
         (fun (titleOpt, tracks) ->
-            let title = titleOpt |> Option.get
-
             ConsecutiveTracks.Create tracks
-            |> Result.bind (Work.Create title addRomans))
+            |> Result.bind (Work.Create(titleOpt |> Option.get) addRomans))
 
 /// Applies (saves) the work data
 let applyWork (Work (name, (ConsecutiveTracks tracks))) =
     let saveTrack t =
         result {
-            do! Track.setTag t (RoonTag.Work name) |> Result.ignore |> Result.mapError List.ofItem
+            do!
+                Track.setTag t (RoonTag.Work name)
+                |> Result.ignore
+                |> Result.mapError List.ofItem
+
             return! Track.applyTags t
         }
-    
+
     log.Information("Saving metadata of work: '{Name}'", name)
     tracks |> List.traverseResultM saveTrack |> Result.map ignore
