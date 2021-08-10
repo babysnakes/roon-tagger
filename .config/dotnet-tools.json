@@ -13,6 +13,12 @@
       "commands": [
         "dotnet-fsharplint"
       ]
+    },
+    "paket": {
+      "version": "6.0.3",
+      "commands": [
+        "paket"
+      ]
     }
   }
 }

@@ -1,15 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.13.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="FsUnit" Version="4.0.4" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="LoggingTests.fs" />
     <Compile Include="ConfigurationTests.fs" />
@@ -22,4 +17,5 @@
     <ProjectReference Include="..\RoonTagger.Cli\RoonTagger.Cli.fsproj" />
     <ProjectReference Include="..\Metadata.Test\Metadata.Test.fsproj" />
   </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

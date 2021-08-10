@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{2DEB3887-9FB8-450B-A764-A61B7E0562CD}"
+	ProjectSection(SolutionItems) = preProject
+		paket.dependencies = paket.dependencies
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7C6DD87A-C2D8-4A7F-A00F-F6C9F1ED6203}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RoonTagger.Cli", "src\RoonTagger.Cli\RoonTagger.Cli.fsproj", "{C57CC9D3-5427-4940-9A6D-FA40901CDA62}"

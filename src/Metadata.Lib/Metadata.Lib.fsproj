@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -15,11 +16,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="FlacLibSharp" Version="3.2.1" />
-    <PackageReference Include="FParsec" Version="1.1.1" />
-    <PackageReference Include="FsToolkit.ErrorHandling" Version="2.1.2" />
-    <PackageReference Include="Roman-Numerals" Version="1.0.3" />
-    <PackageReference Include="Serilog" Version="2.10.0" />
-  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
