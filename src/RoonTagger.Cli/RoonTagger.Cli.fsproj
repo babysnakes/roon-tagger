@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>roon-tagger</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Info.fs" />
