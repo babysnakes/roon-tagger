@@ -18,8 +18,8 @@ let searchInPath (cmd: string) =
             |> Array.map (fun d -> IO.Path.Combine(d, cmd))
             |> Array.tryFind IO.File.Exists
             |> function
-            | Some exe -> exe
-            | None -> cmd
+                | Some exe -> exe
+                | None -> cmd
             |> fun exe ->
                 log.Debug("Search in path result: {Exe}", exe)
                 exe

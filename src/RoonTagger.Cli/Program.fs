@@ -26,8 +26,9 @@ let main argv =
         |> Main.runMain
         |> Result.tee (fun _ -> Console.WriteLine("")) // Add an empty line for a little space
         |> function
-        | Ok _ -> 0
-        | _ -> 1
-    with ex ->
+            | Ok _ -> 0
+            | _ -> 1
+    with
+    | ex ->
         AnsiConsole.WriteException(ex)
         1
