@@ -16,7 +16,7 @@ dotnet build
 # Optionally run the build tool locally. Without arguments it will show you
 # usage summary
 .\build.ps1 # or ./build.sh for unix shells ...
-.\build.ps1 --target <some target>
+.\build.ps1 <options>
 ```
 
 ### Refreshing Roles List

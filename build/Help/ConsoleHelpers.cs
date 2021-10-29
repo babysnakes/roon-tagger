@@ -22,19 +22,21 @@ namespace RoonTagger.Build.Help
             gr1.AddRow("[italic]Main Targets[/]:");
 
             var gr2 = AddOptionsGrid();
-            gr2.AddRow($"{star} Build:", "Build");
+            gr2.AddRow($"{star} Check:", "Run various checks. Fails if checks fail. Good for CI.");
+            gr2.AddRow($"{star} Publish:", "Create compressed distributions for all supported architectures.");
             gr2.AddRow($"{star} todo:", "...");
             gr2.AddEmptyRow();
-            
+
             var gr3 = AddTextGrid();
             gr3.AddRow("[italic]Global Options[/]:");
 
             var gr4 = AddOptionsGrid();
             gr4.AddRow($"{star} --release:", "Work on [italic]Release[/] configuration. Default is [italic]Debug[/].");
             gr4.AddRow($"{star} --clean:", "Run the [italic]Clean[/] task before relevant tasks.");
+            gr4.AddRow($"{star} --release-tag:", "Specify the version to give (WIP - later we'll fetch it from git).");
 
             Grid[] grids = { gr1, gr2, gr3, gr4 };
-            foreach(Grid g in grids)
+            foreach (Grid g in grids)
             {
                 Write(g);
             }

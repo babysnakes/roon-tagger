@@ -14,6 +14,9 @@ bin
 !.paket/paket.bootstrapper.exe
 .ionide/
 
+### Build Output ###
+/output/
+
 ### Linux ###
 *~
 
@@ -155,7 +158,7 @@ BenchmarkDotNet.Artifacts/
 # .NET Core
 project.lock.json
 project.fragment.lock.json
-artifacts/
+# artifacts/
 
 # StyleCop
 StyleCopReport.xml
