@@ -1,6 +1,7 @@
 namespace RoonTagger.Build
 {
 
+    using static Git.GitHelpers;
     using static Help.ConsoleHelpers;
     using Artifacts;
     using Cake.Common.Diagnostics;
@@ -36,6 +37,7 @@ namespace RoonTagger.Build
         public bool CleanRequested { get; init; }
         public string MainSln { get; init; }
         public string CliProj { get; init; }
+        public DirectoryPath RootDir { get; init; }
         public DirectoryPath BuildDir { get; init; }
         public DirectoryPath DistDir { get; init; }
         public DirectoryPath OutputDir { get; init; }
@@ -54,16 +56,30 @@ namespace RoonTagger.Build
                 (Targets.Linux_X64, ArchiveTypes.TarGz)
             };
 
-            Version = context.Arguments.GetArgument("release-tag"); // WIP
             Config = context.Arguments.HasArgument("release") ? ReleaseConfig : DebugConfig;
             CleanRequested = context.Arguments.HasArgument("clean");
-            var projectRootDir = context.Directory("../");
-            OutputDir = projectRootDir + context.Directory("output");
+            RootDir = context.Directory("../");
+            OutputDir = RootDir + context.Directory("output");
             BuildDir = OutputDir + context.Directory("build");
             DistDir = OutputDir + context.Directory("dist");
-            var srcDir = projectRootDir + context.Directory("src/");
-            MainSln = projectRootDir + context.File(Solution);
+            var srcDir = RootDir + context.Directory("src/");
+            MainSln = RootDir + context.Directory(Solution);
             CliProj = srcDir + context.Directory("RoonTagger.Cli") + context.File("RoonTagger.Cli.fsproj");
+            var versionOverride = context.Arguments.GetArgument("override-version"); // WIP
+            Version = String.IsNullOrEmpty(versionOverride) ? ExtractVersionFromRepo(context) : versionOverride;
+        }
+
+        private string ExtractVersionFromRepo(ICakeContext context)
+        {
+            try
+            {
+                return ExtractTagFromHead(RootDir.FullPath);
+            }
+            catch (Exception e)
+            {
+                context.Debug($"Error extracting tag from repo: {e}");
+                return null;
+            }
         }
     }
 
@@ -138,7 +154,7 @@ namespace RoonTagger.Build
                 Configuration = context.Config,
                 OutputDirectory = context.BuildDir + context.Directory(dirName),
                 PublishReadyToRun = target.ReadyToRunSupported(),
-                PublishReadyToRunShowWarnings = target.ReadyToRunSupported(),
+                PublishReadyToRunShowWarnings = false,
                 SelfContained = true,
                 Runtime = target.ToRID()
             };

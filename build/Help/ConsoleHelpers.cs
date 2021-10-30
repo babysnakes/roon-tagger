@@ -15,7 +15,10 @@ namespace RoonTagger.Build.Help
             gr1.AddEmptyRow();
             string[] desc = {
                 "This build system is targetted toward CI checks and publishing artifacts.",
-                "It's not optimized for running during development."
+                "It's not optimized for running during development.",
+                "For publishing or releasing it requires a tag that points to",
+                "the current [italic]HEAD[/], Otherwise it fails (This could be overriden, see options).",
+                "This tag is used as the version in the artifact's name and as the tag in the release."
             };
             gr1.AddRow(string.Join(" ", desc));
             gr1.AddEmptyRow();
@@ -33,7 +36,7 @@ namespace RoonTagger.Build.Help
             var gr4 = AddOptionsGrid();
             gr4.AddRow($"{star} --release:", "Work on [italic]Release[/] configuration. Default is [italic]Debug[/].");
             gr4.AddRow($"{star} --clean:", "Run the [italic]Clean[/] task before relevant tasks.");
-            gr4.AddRow($"{star} --release-tag:", "Specify the version to give (WIP - later we'll fetch it from git).");
+            gr4.AddRow($"{star} --override-version:", "Specify version to use. Overrides the current tag in the repository.");
 
             Grid[] grids = { gr1, gr2, gr3, gr4 };
             foreach (Grid g in grids)
