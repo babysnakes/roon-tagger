@@ -16,7 +16,7 @@ type SetTagsArgs =
         member s.Usage =
             match s with
             | Title _ -> "The title of the song."
-            | Import_Date _ -> "The import date into roon (yyyy-mm-dd)."
+            | Import_Date _ -> "The import date into roon (yyyy-mm-dd, also accepts 'today')."
             | Release_Date _ -> "The original release date of the album (yyyy-mm-dd)."
             | Year _ -> "The year the album was released (yyyy)."
             | Files _ -> "files to edit."
@@ -131,3 +131,8 @@ let parseDate dateString =
         DateTime.Parse dateString
     with
     | _ -> failwith "Not a valid date format"
+
+let parseTodayOrDate =
+    function
+    | "today" -> DateTime.Today
+    | other -> parseDate other

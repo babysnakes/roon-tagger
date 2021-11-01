@@ -15,7 +15,7 @@ let extractTags (opts: ParseResults<SetTagsArgs>) =
 
     let importDateTag =
         if (opts.Contains Import_Date) then
-            opts.PostProcessResult(<@ Import_Date @>, parseDate)
+            opts.PostProcessResult(<@ Import_Date @>, parseTodayOrDate)
             |> ImportDate
             |> Some
         else
