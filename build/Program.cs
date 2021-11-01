@@ -114,7 +114,23 @@ namespace RoonTagger.Build
     [TaskName("Check")]
     [TaskDescription("Run various code checks.")]
     [IsDependentOn(typeof(TestTask))]
-    public sealed class CheckTask : FrostingTask<BuildContext> { }
+    public sealed class CheckTask : FrostingTask<BuildContext> {
+
+        public override void Run(BuildContext context)
+        {
+            var lintArgs = new ProcessArgumentBuilder()
+                .Append("lint")
+                .Append(context.MainSln);
+            var fantomasArgs = new ProcessArgumentBuilder()
+                .Append(context.RootDir.FullPath)
+                .Append("--recurse")
+                .Append("--check");
+            context.Information("\nRunning Linter ...\n");
+            context.DotNetCoreTool(context.RootDir.FullPath, "fsharplint", lintArgs);
+            context.Information("\nRunning Formatter checks ...\n");
+            context.DotNetCoreTool(context.RootDir.FullPath, "fantomas", fantomasArgs);
+        }
+    }
 
     [TaskName("Publish")]
     [TaskDescription("Create compressed distributions for all supported architectures.")]
