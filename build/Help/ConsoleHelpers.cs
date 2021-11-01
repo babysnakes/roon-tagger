@@ -18,16 +18,22 @@ namespace RoonTagger.Build.Help
                 "It's not optimized for running during development.",
                 "For publishing or releasing it requires a tag that points to",
                 "the current [italic]HEAD[/], Otherwise it fails (This could be overriden, see options).",
-                "This tag is used as the version in the artifact's name and as the tag in the release."
+                "This tag is used as the version in the artifact's name and as the tag in the release.",
+            };
+            string[] releaseNotes = {
+                "If you run the [italic]Release[/] task you have to follow the printed link to",
+                "fill out the release notes and publish the release."
             };
             gr1.AddRow(string.Join(" ", desc));
+            gr1.AddEmptyRow();
+            gr1.AddRow(string.Join(" ", releaseNotes));
             gr1.AddEmptyRow();
             gr1.AddRow("[italic]Main Targets[/]:");
 
             var gr2 = AddOptionsGrid();
             gr2.AddRow($"{star} Check:", "Run various checks. Fails if checks fail. Good for CI.");
             gr2.AddRow($"{star} Publish:", "Create compressed distributions for all supported architectures.");
-            gr2.AddRow($"{star} todo:", "...");
+            gr2.AddRow($"{star} Release:", "Create a draft release using the artifacts created in publish. Requires configured [italic]gh[/] command (currently windows only).");
             gr2.AddEmptyRow();
 
             var gr3 = AddTextGrid();

@@ -4,6 +4,7 @@ namespace RoonTagger.Build
     using static Git.GitHelpers;
     using static Help.ConsoleHelpers;
     using Artifacts;
+    using Cake.Common;
     using Cake.Common.Diagnostics;
     using Cake.Common.IO;
     using Cake.Common.Tools.DotNetCore;
@@ -17,6 +18,7 @@ namespace RoonTagger.Build
     using Cake.Frosting;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public static class Program
     {
@@ -148,7 +150,7 @@ namespace RoonTagger.Build
 
         private string PublishArch(BuildContext context, Targets target)
         {
-            var dirName = $"roon-tagger-{context.Version}-{target.ToRID()}";
+            var dirName = $"roon-tagger_{context.Version}_{target.ToRID()}";
             var settings = new DotNetCorePublishSettings
             {
                 Configuration = context.Config,
@@ -164,7 +166,7 @@ namespace RoonTagger.Build
 
         private string PublishNoArch(BuildContext context, Targets target)
         {
-            var dirName = $"roon-tagger-{context.Version}-{target.ToRID()}";
+            var dirName = $"roon-tagger_{context.Version}_{target.ToRID()}";
             var settings = new DotNetCorePublishSettings
             {
                 Configuration = context.Config,
@@ -172,6 +174,38 @@ namespace RoonTagger.Build
             };
             context.DotNetCorePublish(context.CliProj, settings);
             return dirName;
+        }
+    }
+
+    [TaskName("Release")]
+    [TaskDescription("Create a draft release containing the project's artifact. Requires configured 'gh' CLI.")]
+    [IsDependentOn(typeof(PublishTask))]
+    public sealed class ReleaseTask : FrostingTask<BuildContext>
+    {
+        public override void Run(BuildContext context)
+        {
+            context.Information($"\nCreating draft release for tag: {context.Version}\n");
+            var fileList = context.GetFiles($"{context.DistDir}/*");
+            var paths = fileList.Select(f => f.FullPath);
+            var files = String.Join(" ", paths);
+
+            var cmd = context.Tools.Resolve("gh.exe");
+            var args = new ProcessArgumentBuilder()
+                .Append("release")
+                .Append("create")
+                .Append(context.Version)
+                .Append(files)
+                .AppendSwitch("--notes-file", @".\Resources\ReleaseTemplate.md")
+                .AppendSwitch("--target", "master")
+                .Append("--draft");
+            var exitCode = context.StartProcess(cmd, new ProcessSettings
+                {
+                    Arguments = args
+                });
+            if (exitCode != 0)
+            {
+                throw new Exception("It seems that there was an error creating the release! Check output above.");
+            }
         }
     }
 
