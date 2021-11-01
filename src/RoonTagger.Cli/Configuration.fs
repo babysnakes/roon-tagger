@@ -76,7 +76,8 @@ let saveConfig (config: ConfigurationV1) (path: string) : Result<unit, CliErrors
         do!
             try
                 Directory.CreateDirectory dirName |> ignore |> Ok
-            with ex ->
+            with
+            | ex ->
                 log.Error("Create configuration directory: {Ex}", ex)
                 Error(CliIOError $"Error creating config directory: {ex.Message}")
 
@@ -86,14 +87,16 @@ let saveConfig (config: ConfigurationV1) (path: string) : Result<unit, CliErrors
                     File.Copy(path, path + ".bak", true) |> Ok
                 else
                     Ok()
-            with ex ->
+            with
+            | ex ->
                 log.Error("Backing up configuration: {Ex}", ex)
                 Error(CliIOError $"Error backing up old config: {ex.Message}")
 
         do!
             try
                 File.WriteAllText(path, contents) |> Ok
-            with ex ->
+            with
+            | ex ->
                 log.Error("Saving configuration: {Ex}", ex)
                 Error(CliIOError $"Error saving configuration: {ex.Message}")
     }

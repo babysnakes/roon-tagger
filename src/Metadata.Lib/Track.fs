@@ -54,8 +54,8 @@ module Track =
     let safeGetTagStringValue track tagName =
         getTagStringValue track tagName
         |> function
-        | [] -> [ "" ]
-        | l -> l
+            | [] -> [ "" ]
+            | l -> l
 
     /// Converts "shortcut" list of name and list of roles to correctly
     /// formatted `Personnel` tags. Fails if any of the roles fail validation.

@@ -8,9 +8,15 @@ Sometime in the future it will be a CLI utility for tagging music files with
 Requires _.Net 5.0.x_.
 
 Run:
-```
+
+```powershell
 dotnet tool restore
+dotnet paket restore
 dotnet build
+# Optionally run the build tool locally. Without arguments it will show you
+# usage summary
+.\build.ps1 # or ./build.sh for unix shells ...
+.\build.ps1 <options>
 ```
 
 ### Refreshing Roles List

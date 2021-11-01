@@ -18,7 +18,8 @@ let loadSupportedRoles () =
 
     try
         File.ReadAllLines(rolesPath) |> List.ofSeq |> Ok
-    with ex ->
+    with
+    | ex ->
         log.Error("Loading roles from file: {Ex}", ex)
         UnexpectedError ex.Message |> Error
 

@@ -20,8 +20,8 @@ let extractEditorWithArgs (args: ParseResults<ConfigureArgs>) =
 
     args.PostProcessResults(<@ Editor_With_Args @>, parseEditor)
     |> function
-    | [] -> None
-    | lst -> Some(lst |> List.last)
+        | [] -> None
+        | lst -> Some(lst |> List.last)
 
 let resetEditor (config: ConfigurationV1) (configPath: string) =
     result {

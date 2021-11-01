@@ -88,12 +88,12 @@ type WorkProcessor =
 
             selectEditMethod this.Config "movements"
             |> function
-            | EditAsync ->
-                log.Verbose("User selected to edit movements async")
-                prompt path "Movements"
-            | EditDirectly ->
-                log.Verbose("User selected to edit movements directly")
-                editTagsWithEditor this.Config.Editor.Value path
+                | EditAsync ->
+                    log.Verbose("User selected to edit movements async")
+                    prompt path "Movements"
+                | EditDirectly ->
+                    log.Verbose("User selected to edit movements directly")
+                    editTagsWithEditor this.Config.Editor.Value path
 
             let! newMovements = readValues path
             log.Verbose("Edited movements: {NewMovements}", newMovements)

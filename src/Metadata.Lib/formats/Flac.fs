@@ -60,6 +60,7 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
 let applyChanges (track: FlacFile) =
     try
         track.Save() |> Ok
-    with ex ->
+    with
+    | ex ->
         log.Error("Saving track: {Ex}", ex)
         Error [ FileSaveError ex.Message ]

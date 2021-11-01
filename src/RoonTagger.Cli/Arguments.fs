@@ -129,4 +129,5 @@ let parseFiles files =
 let parseDate dateString =
     try
         DateTime.Parse dateString
-    with _ -> failwith "Not a valid date format"
+    with
+    | _ -> failwith "Not a valid date format"

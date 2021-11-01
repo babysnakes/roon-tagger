@@ -1,0 +1,17 @@
+source https://api.nuget.org/v3/index.json
+
+nuget FSharp.Core
+nuget Argu ~> 6.1
+nuget FlacLibSharp ~> 3.2.1
+nuget FParsec ~> 1.1.1
+nuget FSharp.Json ~> 0.4.0
+nuget FsToolkit.ErrorHandling ~> 2.1
+nuget FsUnit ~> 4.0
+nuget Microsoft.NET.Test.Sdk ~> 16.5
+nuget NUnit ~> 3.13
+nuget NUnit3TestAdapter ~> 3.17
+nuget Pluralize.NET ~> 1.0
+nuget Roman-Numerals ~> 1.0
+nuget Serilog ~> 2.10
+nuget Serilog.Sinks.File ~> 4.1
+nuget Spectre.Console ~> 0.39
