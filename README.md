@@ -5,7 +5,7 @@ Sometime in the future it will be a CLI utility for tagging music files with
 
 ### Development Setup
 
-Requires _.Net 5.0.x_.
+Requires _.Net 6.0.x_.
 
 Run:
 

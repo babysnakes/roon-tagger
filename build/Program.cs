@@ -171,7 +171,7 @@ namespace RoonTagger.Build
             {
                 Configuration = context.Config,
                 OutputDirectory = context.BuildDir + context.Directory(dirName),
-                PublishReadyToRun = target.ReadyToRunSupported(),
+                PublishReadyToRun = true,
                 PublishReadyToRunShowWarnings = false,
                 SelfContained = true,
                 Runtime = target.ToRID()
