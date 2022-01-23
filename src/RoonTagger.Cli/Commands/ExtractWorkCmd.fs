@@ -52,10 +52,9 @@ let printWork (Work (name, ConsecutiveTracks tracks)) =
     grid.AddColumn(GridColumn()) |> ignore
 
     tracks
-    |> List.iteri
-        (fun idx t ->
-            let movement = Track.safeGetTagStringValue t MovementTag |> List.head
-            grid.AddRow($"|-> {idx + 1}:", $"{movement}") |> ignore)
+    |> List.iteri (fun idx t ->
+        let movement = Track.safeGetTagStringValue t MovementTag |> List.head
+        grid.AddRow($"|-> {idx + 1}:", $"{movement}") |> ignore)
 
     grid.AddEmptyRow() |> ignore
     AnsiConsole.Render(grid)

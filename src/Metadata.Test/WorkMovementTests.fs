@@ -93,8 +93,8 @@ module ``Work and Movements Tests`` =
             |> Result.unwrap
 
         rslt |> should haveLength 2
-        let (Work (w1, ConsecutiveTracks ts1)) = rslt.[0]
-        let (Work (w2, ConsecutiveTracks ts2)) = rslt.[1]
+        let (Work (w1, ConsecutiveTracks ts1)) = rslt[0]
+        let (Work (w2, ConsecutiveTracks ts2)) = rslt[1]
         w1 |> should equal workTitle
         w2 |> should equal workTitle
         ts1 |> should haveLength 2
@@ -114,11 +114,11 @@ module ``Work and Movements Tests`` =
             |> Result.unwrap
 
         rslt |> should haveLength 1
-        let (Work (w, ConsecutiveTracks ts)) = rslt.[0]
+        let (Work (w, ConsecutiveTracks ts)) = rslt[0]
 
         w |> should equal workTitle
-        ts.[0] |> extractMovement |> should equal "I. First movement"
-        ts.[1] |> extractMovement |> should equal "II. Second movement"
+        ts[0] |> extractMovement |> should equal "I. First movement"
+        ts[1] |> extractMovement |> should equal "II. Second movement"
 
     [<Test>]
     let ``Work.Create should parse movement names with consistent num prefix`` () =
@@ -134,8 +134,8 @@ module ``Work and Movements Tests`` =
             |> Result.unwrap
 
         w |> should equal workTitle
-        ts.[0] |> extractMovement |> should equal "First movement"
-        ts.[1] |> extractMovement |> should equal "Second movement"
+        ts[0] |> extractMovement |> should equal "First movement"
+        ts[1] |> extractMovement |> should equal "Second movement"
 
     [<Test>]
     let ``Work.Create should add roman numerals if requested`` () =
@@ -151,8 +151,8 @@ module ``Work and Movements Tests`` =
             |> Result.unwrap
 
         w |> should equal workTitle
-        ts.[0] |> extractMovement |> should equal "I. First movement"
-        ts.[1] |> extractMovement |> should equal "II. Second movement"
+        ts[0] |> extractMovement |> should equal "I. First movement"
+        ts[1] |> extractMovement |> should equal "II. Second movement"
 
     [<Test>]
     let ``Work.Create should add roman numerals if requested (on non-constant layout)`` () =
@@ -168,8 +168,8 @@ module ``Work and Movements Tests`` =
             |> Result.unwrap
 
         w |> should equal workTitle
-        ts.[0] |> extractMovement |> should equal "I. 1. First movement"
-        ts.[1] |> extractMovement |> should equal "II. Second movement"
+        ts[0] |> extractMovement |> should equal "I. 1. First movement"
+        ts[1] |> extractMovement |> should equal "II. Second movement"
 
     [<Test>]
     let ``Work.Create should not extract num prefix from title if layout is not consistent`` () =
@@ -185,5 +185,5 @@ module ``Work and Movements Tests`` =
             |> Result.unwrap
 
         w |> should equal workTitle
-        ts.[0] |> extractMovement |> should equal "No 1. First movement"
-        ts.[1] |> extractMovement |> should equal "Second movement"
+        ts[0] |> extractMovement |> should equal "No 1. First movement"
+        ts[1] |> extractMovement |> should equal "Second movement"

@@ -44,15 +44,15 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
     | TitleTag -> comment.Title
     | AlbumTag -> comment.Album
     | ArtistTag -> comment.Artist
-    | WorkTag -> comment.[WorkTag]
-    | MovementTag -> comment.[MovementTag]
-    | SectionTag -> comment.[SectionTag]
-    | ImportDateTag -> comment.[ImportDateTag]
-    | OriginalReleaseDateTag -> comment.[OriginalReleaseDateTag]
-    | YearTag -> comment.[YearTag]
-    | CreditTag -> comment.[CreditTag]
+    | WorkTag -> comment[WorkTag]
+    | MovementTag -> comment[MovementTag]
+    | SectionTag -> comment[SectionTag]
+    | ImportDateTag -> comment[ImportDateTag]
+    | OriginalReleaseDateTag -> comment[OriginalReleaseDateTag]
+    | YearTag -> comment[YearTag]
+    | CreditTag -> comment[CreditTag]
     | TrackNumberTag -> comment.TrackNumber
-    | DiscNumberTag -> comment.[DiskNumberTag]
+    | DiscNumberTag -> comment[DiskNumberTag]
     | MovementIndexTag
     | MovementCountTag -> VorbisCommentValues()
     |> List.ofSeq

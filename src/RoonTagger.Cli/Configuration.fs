@@ -28,7 +28,9 @@ type ConfigurationVersion =
 /// Get the local directory to save configurations to.
 let getConfigDirectory () =
     // Todo: handle exceptions
-    let localAppData = Environment.GetFolderPath Environment.SpecialFolder.LocalApplicationData
+    let localAppData =
+        Environment.GetFolderPath Environment.SpecialFolder.LocalApplicationData
+
     Path.Join(localAppData, Info.Name)
 
 /// Returns the full path of config file based on dir, base name and version.
@@ -62,8 +64,8 @@ let loadConfigWithDefault (path: string) : Result<ConfigurationV1, CliErrors> =
     let defaultConfig =
         { Editor = None
           Log =
-              { File = $"{Info.Name}.log"
-                Level = LogLevel.None } }
+            { File = $"{Info.Name}.log"
+              Level = LogLevel.None } }
 
     loadConfig path |> Result.map (Option.defaultValue defaultConfig)
 

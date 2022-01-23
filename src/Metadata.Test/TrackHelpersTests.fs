@@ -108,6 +108,6 @@ module MetadataHelpersTests =
             |> Result.unwrap
 
         let (ConsecutiveTracks tracks) = result
-        tracks.[0].Path |> should endWith "disc1track1.flac"
-        tracks.[1].Path |> should endWith "disc1track2.flac"
-        tracks.[2].Path |> should endWith "disc1track3.flac"
+        tracks[0].Path |> should endWith "disc1track1.flac"
+        tracks[1].Path |> should endWith "disc1track2.flac"
+        tracks[2].Path |> should endWith "disc1track3.flac"

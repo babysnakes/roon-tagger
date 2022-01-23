@@ -18,11 +18,9 @@ open FSharp.Data
 
 let basePath = __SOURCE_DIRECTORY__
 
-let rolesJson =
-    Path.Join([| basePath; "bin"; "roles.json" |])
+let rolesJson = Path.Join([| basePath; "bin"; "roles.json" |])
 
-let resources =
-    Path.Join([| __SOURCE_DIRECTORY__; "Resources" |])
+let resources = Path.Join([| __SOURCE_DIRECTORY__; "Resources" |])
 
 let outputFile = Path.Join([| resources; "roles.txt" |])
 

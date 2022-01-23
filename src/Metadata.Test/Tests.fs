@@ -33,10 +33,10 @@ module ``Track operations`` =
         let originalRelease = OriginalReleaseDate sampleDate
         Track.setTags track [ import; originalRelease ] |> ignore
 
-        (Track.getTagStringValue track ImportDateTag).[0]
+        (Track.getTagStringValue track ImportDateTag)[0]
         |> should equal "2021-05-21"
 
-        (Track.getTagStringValue track OriginalReleaseDateTag).[0]
+        (Track.getTagStringValue track OriginalReleaseDateTag)[0]
         |> should equal "2021-05-21"
 
     [<Test>]
@@ -45,7 +45,7 @@ module ``Track operations`` =
 
         Track.setTags track [ Year 2012 ] |> ignore
 
-        (Track.getTagStringValue track YearTag).[0] |> should equal "2012"
+        (Track.getTagStringValue track YearTag)[0] |> should equal "2012"
 
     [<Test>]
     let ``Setting credits is forbidden`` () =
@@ -171,8 +171,8 @@ module ``Track operations`` =
 
         resultErrors |> should haveLength 2
 
-        resultErrors.[0]
+        resultErrors[0]
         |> should be (ofCase <@ DeletingNonExistingPersonnel @>)
 
-        resultErrors.[1]
+        resultErrors[1]
         |> should be (ofCase <@ DeletingNonExistingPersonnel @>)
