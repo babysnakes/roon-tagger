@@ -172,9 +172,10 @@ namespace RoonTagger.Build
                 Configuration = context.Config,
                 OutputDirectory = context.BuildDir + context.Directory(dirName),
                 PublishReadyToRun = true,
-                PublishReadyToRunShowWarnings = false,
                 SelfContained = true,
-                Runtime = target.ToRID()
+                Runtime = target.ToRID(),
+                PublishTrimmed = true,
+                PublishSingleFile = true,
             };
             context.DotNetCorePublish(context.CliProj, settings);
             return dirName;
@@ -186,7 +187,8 @@ namespace RoonTagger.Build
             var settings = new DotNetCorePublishSettings
             {
                 Configuration = context.Config,
-                OutputDirectory = context.BuildDir + context.Directory(dirName)
+                OutputDirectory = context.BuildDir + context.Directory(dirName),
+                PublishTrimmed = false, // Explicit because it's enabled in the project
             };
             context.DotNetCorePublish(context.CliProj, settings);
             return dirName;
