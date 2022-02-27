@@ -73,7 +73,7 @@ type ConsecutiveTracks =
                 |> Result.map (List.map snd)
 
             log.Debug("disc number * track number of requested tracks: {TnDns}", tnDns)
-            let pairs = tnDns |> List.windowed 2 |> List.map (fun lst -> (lst.[0], lst.[1]))
+            let pairs = tnDns |> List.windowed 2 |> List.map (fun lst -> (lst[0], lst[1]))
             log.Debug("Pairs for consecutive tracks: {Pairs}", pairs)
             let isConsecutive = pairs |> List.map consecutive |> List.forall id
 

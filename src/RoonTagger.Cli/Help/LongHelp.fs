@@ -38,5 +38,7 @@ let extractWorksLH =
 let mainLH =
     ("Roon Tagger - A tool for setting Roon specific metadata. Run with -h for usage.", mkUri "main")
 
-let creditsLH = ("Add/Remove personnel credits for track.", mkUri "commands/credits")
+let creditsLH =
+    ("Add/Remove personnel credits for track.", mkUri "commands/credits")
+
 let configureLH = ("Configure CLI behavior.", mkUri "commands/configure")

@@ -29,8 +29,7 @@ type LoggingTests() =
            [ (LogEventLevel.Debug, true)
              (LogEventLevel.Verbose, false) ])
 
-          ({ defaultLC with
-                 Level = LogLevel.Debug },
+          ({ defaultLC with Level = LogLevel.Debug },
            0,
            [ (LogEventLevel.Debug, true)
              (LogEventLevel.Verbose, false) ])

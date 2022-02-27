@@ -13,15 +13,6 @@ namespace RoonTagger.Build.Artifacts
             Targets.Linux_X64 => "linux-x64",
             _ => throw new ArgumentOutOfRangeException($"Invalid target: {target}")
         };
-
-        public static bool ReadyToRunSupported(this Targets target) => target switch
-        {
-            Targets.NoArch => false,
-            Targets.Win_X64 => true,
-            Targets.Osx_X64 => false,
-            Targets.Linux_X64 => false,
-            _ => throw new ArgumentOutOfRangeException($"Invalid target: {target}")
-        };
     }
 
     public enum Targets

@@ -15,7 +15,7 @@ open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 
 let writeLine (r: IRenderable) =
-    AnsiConsole.Render(r)
+    AnsiConsole.Write(r)
     AnsiConsole.MarkupLine("")
 
 let (|SetTagsCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Set_Tags
@@ -59,11 +59,10 @@ let runMain (opts: ParseResults<MainArgs>) =
         let verbosity = opts.GetResults Verbose |> List.length
 
         setupLogger config.Log verbosity
-        |> Option.map
-            (fun logger ->
-                Console.WriteLine ""
-                infoMessage $"Logs will be written to '{config.Log.File}'"
-                Log.Logger <- logger)
+        |> Option.map (fun logger ->
+            Console.WriteLine ""
+            infoMessage $"Logs will be written to '{config.Log.File}'"
+            Log.Logger <- logger)
         |> ignore
 
         Console.WriteLine("")

@@ -7,7 +7,7 @@ namespace RoonTagger.Build
     using Cake.Common;
     using Cake.Common.Diagnostics;
     using Cake.Common.IO;
-    using Cake.Common.Tools.DotNetCore;
+    using Cake.Common.Tools.DotNet;
     using Cake.Common.Tools.DotNetCore.Build;
     using Cake.Common.Tools.DotNetCore.Clean;
     using Cake.Common.Tools.DotNetCore.Publish;
@@ -107,7 +107,7 @@ namespace RoonTagger.Build
                 Configuration = context.Config
             };
             context.Information("Building ({0}) ...\n", context.Config);
-            context.DotNetCoreBuild(context.MainSln, settings);
+            context.DotNetBuild(context.MainSln, settings);
         }
     }
 
@@ -126,9 +126,9 @@ namespace RoonTagger.Build
                 .Append("--recurse")
                 .Append("--check");
             context.Information("\nRunning Linter ...\n");
-            context.DotNetCoreTool(context.RootDir.FullPath, "fsharplint", lintArgs);
+            context.DotNetTool(context.RootDir.FullPath, "fsharplint", lintArgs);
             context.Information("\nRunning Formatter checks ...\n");
-            context.DotNetCoreTool(context.RootDir.FullPath, "fantomas", fantomasArgs);
+            context.DotNetTool(context.RootDir.FullPath, "fantomas", fantomasArgs);
         }
     }
 
@@ -171,12 +171,13 @@ namespace RoonTagger.Build
             {
                 Configuration = context.Config,
                 OutputDirectory = context.BuildDir + context.Directory(dirName),
-                PublishReadyToRun = target.ReadyToRunSupported(),
-                PublishReadyToRunShowWarnings = false,
+                PublishReadyToRun = true,
                 SelfContained = true,
-                Runtime = target.ToRID()
+                Runtime = target.ToRID(),
+                PublishTrimmed = true,
+                PublishSingleFile = true,
             };
-            context.DotNetCorePublish(context.CliProj, settings);
+            context.DotNetPublish(context.CliProj, settings);
             return dirName;
         }
 
@@ -186,9 +187,10 @@ namespace RoonTagger.Build
             var settings = new DotNetCorePublishSettings
             {
                 Configuration = context.Config,
-                OutputDirectory = context.BuildDir + context.Directory(dirName)
+                OutputDirectory = context.BuildDir + context.Directory(dirName),
+                PublishTrimmed = false, // Explicit because it's enabled in the project
             };
-            context.DotNetCorePublish(context.CliProj, settings);
+            context.DotNetPublish(context.CliProj, settings);
             return dirName;
         }
     }
@@ -237,7 +239,7 @@ namespace RoonTagger.Build
                 Configuration = context.Config
             };
             context.Information("Testing ({0}) ...\n", context.Config);
-            context.DotNetCoreTest(context.MainSln, settings);
+            context.DotNetTest(context.MainSln, settings);
         }
     }
 
@@ -257,7 +259,7 @@ namespace RoonTagger.Build
                 Configuration = context.Config
             };
             context.Information("Cleaning ({0}) ...\n", context.Config);
-            context.DotNetCoreClean(context.MainSln, settings);
+            context.DotNetClean(context.MainSln, settings);
         }
     }
 }

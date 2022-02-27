@@ -138,11 +138,11 @@ type Work =
             if constantLayout then
                 fun idx movement ->
                     let newMvmt = MovementParser.parseMovement movement |> finalizeMovementName idx
-                    Track.setTag tracks.[idx] (Movement newMvmt) |> Result.ignore
+                    Track.setTag tracks[idx] (Movement newMvmt) |> Result.ignore
             else
                 fun idx mvmt ->
                     let newMovement = finalizeMovementName idx mvmt
-                    Track.setTag tracks.[idx] (Movement newMovement) |> Result.ignore
+                    Track.setTag tracks[idx] (Movement newMovement) |> Result.ignore
 
         movements
         |> List.mapi workSetterFn
@@ -156,10 +156,9 @@ let extractWorks (ConsecutiveTracks tracks) addRomans =
     |> List.tee (fun pair -> log.Debug("Found possible work: %A{Pair}", pair))
     |> List.filter (fun (title, tracks) -> title.IsSome && tracks |> List.length > 1)
     |> List.tee (fun pair -> log.Verbose("Filtered work: %A{Pair}", pair))
-    |> List.traverseResultM
-        (fun (titleOpt, tracks) ->
-            ConsecutiveTracks.Create tracks
-            |> Result.bind (Work.Create(titleOpt |> Option.get) addRomans))
+    |> List.traverseResultM (fun (titleOpt, tracks) ->
+        ConsecutiveTracks.Create tracks
+        |> Result.bind (Work.Create(titleOpt |> Option.get) addRomans))
 
 /// Applies (saves) the work data
 let applyWork (Work (name, (ConsecutiveTracks tracks))) =

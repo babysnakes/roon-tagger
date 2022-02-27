@@ -15,9 +15,9 @@ module ConfigurationTests =
 
     let config2 =
         { Editor =
-              Some
-                  { Cmd = "cmd"
-                    Arguments = [ "arg1"; "arg2" ] }
+            Some
+                { Cmd = "cmd"
+                  Arguments = [ "arg1"; "arg2" ] }
           Log = config1.Log }
 
     let config3 =

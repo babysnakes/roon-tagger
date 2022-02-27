@@ -35,7 +35,7 @@ let handleErrors (errs: string list) =
     errs
     |> List.iter (fun err -> grid.AddRow("  [red]*[/]", err) |> ignore)
 
-    AnsiConsole.Render(grid)
+    AnsiConsole.Write(grid)
 
 let handleOutput (out: string) =
     AnsiConsole.MarkupLine($"[green]Success:[/] {out}")

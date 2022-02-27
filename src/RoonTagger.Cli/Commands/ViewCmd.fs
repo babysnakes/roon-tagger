@@ -30,7 +30,7 @@ let printRawCredits (grid: Grid) (credits: string list) =
 let printCredits (grid: Grid) (credits: string list) =
     let sp = credits |> List.map (fun s -> s.Split(" - ", 2) |> List.ofArray)
     let cs, other = List.partition (fun l -> List.length l = 2) sp
-    let credits = cs |> List.map (fun l -> (l.[1], l.[0]))
+    let credits = cs |> List.map (fun l -> (l[1], l[0]))
     let byRole = credits |> List.groupBy fst
 
     if not (List.isEmpty sp) then
@@ -88,7 +88,7 @@ let handleCmd (args: ParseResults<ViewArgs>) =
             printCredits grid credits
 
         let panel = PanelExtensions.Header(Panel(grid), $"Info: {fileName} ")
-        AnsiConsole.Render(panel)
+        AnsiConsole.Write(panel)
     }
     |> Result.mapError (fun err -> handleErrors [ error2String err ])
 
