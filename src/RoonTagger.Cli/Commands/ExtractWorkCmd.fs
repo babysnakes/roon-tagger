@@ -57,7 +57,7 @@ let printWork (Work (name, ConsecutiveTracks tracks)) =
         grid.AddRow($"|-> {idx + 1}:", $"{movement}") |> ignore)
 
     grid.AddEmptyRow() |> ignore
-    AnsiConsole.Render(grid)
+    AnsiConsole.Write(grid)
 
 let printWorks = List.iter printWork
 
@@ -137,7 +137,7 @@ type WorkProcessor =
                 Ok $"Work [yellow]{name.EscapeMarkup()}[/] ignored"
             | ViewWork ->
                 log.Debug("Viewing work: {Name}", name)
-                AnsiConsole.Render(Rule($"[yellow] * {name.EscapeMarkup()}[/]"))
+                AnsiConsole.Write(Rule($"[yellow] * {name.EscapeMarkup()}[/]"))
                 printWork work
                 loop work
             | EditWorkName ->

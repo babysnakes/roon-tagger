@@ -88,7 +88,7 @@ let handleCmd (args: ParseResults<ViewArgs>) =
             printCredits grid credits
 
         let panel = PanelExtensions.Header(Panel(grid), $"Info: {fileName} ")
-        AnsiConsole.Render(panel)
+        AnsiConsole.Write(panel)
     }
     |> Result.mapError (fun err -> handleErrors [ error2String err ])
 

@@ -15,7 +15,7 @@ open RoonTagger.Cli.Models
 open RoonTagger.Cli.Output
 
 let writeLine (r: IRenderable) =
-    AnsiConsole.Render(r)
+    AnsiConsole.Write(r)
     AnsiConsole.MarkupLine("")
 
 let (|SetTagsCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Set_Tags
