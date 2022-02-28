@@ -68,7 +68,8 @@ let runMain (opts: ParseResults<MainArgs>) =
         Console.WriteLine("")
 
         if opts.Contains Version then
-            return infoMessage $"{Info.Name}: {Info.Version}" |> Ok
+            let v = Info.Version()
+            return infoMessage $"{Info.Name}: {v.Major}.{v.Minor}.{v.Build} (revision {v.Revision})" |> Ok
         else
             let subCommand =
                 match opts with

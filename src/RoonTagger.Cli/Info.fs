@@ -1,4 +1,5 @@
 module RoonTagger.Cli.Info
+open System.Reflection
 
 let Name = "roon-tagger"
-let Version = "0.1.0"
+let Version () = Assembly.GetExecutingAssembly().GetName().Version
