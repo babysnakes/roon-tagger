@@ -4,6 +4,7 @@ nuget FSharp.Core
 nuget Argu ~> 6.1
 nuget FlacLibSharp ~> 3.2.1
 nuget FParsec ~> 1.1.1
+nuget FSharp.Data.LiteralProviders 0.3.5
 nuget FSharp.Json ~> 0.4.0
 nuget FsToolkit.ErrorHandling ~> 2.1
 nuget FsUnit ~> 4.0

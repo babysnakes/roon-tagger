@@ -4,3 +4,4 @@ FsToolkit.ErrorHandling
 Roman-Numerals
 Serilog
 FSharp.Core
+FSharp.Data.LiteralProviders

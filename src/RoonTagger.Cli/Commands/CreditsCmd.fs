@@ -26,14 +26,11 @@ let extractAddCredits (opts: ParseResults<CreditsArgs>) =
 
 let handleCmd (args: ParseResults<CreditsArgs>) : Result<unit, unit> =
     result {
-        let! validator =
+        let validator =
             if args.Contains Skip_Validation then
-                Roles None |> Ok
+                Roles None
             else
-                loadSupportedRoles ()
-                |> Result.map Some
-                |> Result.map Roles
-                |> Result.mapError List.ofItem
+                getSupportedRoles() |> Some |> Roles
 
         let files = args.GetResult CreditsArgs.Files
         let! tracks = List.traverseResultA Track.load files

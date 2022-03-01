@@ -3,25 +3,13 @@ module RoonTagger.Metadata.Utils
 open System
 open System.IO
 open RoonTagger.Metadata
+open FSharp.Data.LiteralProviders
 
 let log = Serilog.Log.Logger
 
 let formatDate (date: DateTime) = date.ToString("yyyy-MM-dd")
-
-let loadSupportedRoles () =
-    let rolesPath =
-        Path.Join(
-            [| AppContext.BaseDirectory
-               "Resources"
-               "roles.txt" |]
-        )
-
-    try
-        File.ReadAllLines(rolesPath) |> List.ofSeq |> Ok
-    with
-    | ex ->
-        log.Error("Loading roles from file: {Ex}", ex)
-        UnexpectedError ex.Message |> Error
+let [<Literal>] supportedRoles = TextFile.Resources.``roles.txt``.Text
+let getSupportedRoles () = supportedRoles.Split(Environment.NewLine) |> List.ofArray
 
 [<RequireQualifiedAccess>]
 module List =
