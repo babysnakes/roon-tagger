@@ -24,6 +24,7 @@ let (|ViewCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult View
 let (|CreditsCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Credits
 let (|ConfigureCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Configure
 let (|ExtractWorksCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Extract_Works
+let (|CompletionsCmd|_|) (opts: ParseResults<MainArgs>) = opts.TryGetResult Completions
 
 let setupLogger (lc: LogConfigV1) (overrides: int) =
     let level =
@@ -69,7 +70,10 @@ let runMain (opts: ParseResults<MainArgs>) =
 
         if opts.Contains Version then
             let v = Info.Version()
-            return infoMessage $"{Info.Name}: {v.Major}.{v.Minor}.{v.Build} (revision {v.Revision})" |> Ok
+
+            return
+                infoMessage $"{Info.Name}: {v.Major}.{v.Minor}.{v.Build} (revision {v.Revision})"
+                |> Ok
         else
             let subCommand =
                 match opts with
@@ -79,6 +83,7 @@ let runMain (opts: ParseResults<MainArgs>) =
                 | CreditsCmd args -> Credits.makeCreditsCmd args
                 | ConfigureCmd args -> Configure.makeConfigureCmd args config configFile
                 | ExtractWorksCmd args -> ExtractWorks.makeExtractWorkCommand args config
+                | CompletionsCmd args -> Completions.makeCompletionsCmd args
                 | _ -> makeMainCmd opts
 
             if opts.Contains Long_Help then

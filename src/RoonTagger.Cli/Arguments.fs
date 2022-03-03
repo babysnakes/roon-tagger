@@ -2,6 +2,7 @@ module RoonTagger.Cli.Arguments
 
 open System
 open Argu
+open Models
 
 type SetTagsArgs =
     // fsharplint:disable unionCasesNames
@@ -94,6 +95,14 @@ type ConfigureArgs =
             | Reset_Editor -> "Delete the editor configuration."
             | Show -> "Show current configuration and exit."
 
+type CompletionsArgs =
+    | [<MainCommand; ExactlyOnce>] Shell of SupportedShells
+
+    interface IArgParserTemplate with
+        member s.Usage =
+            match s with
+            | Shell _ -> "The shell to generate completion for"
+
 [<HelpFlags([| "-h"; "--help" |])>]
 type MainArgs =
     // fsharplint:disable unionCasesNames
@@ -106,6 +115,7 @@ type MainArgs =
     | [<CliPrefix(CliPrefix.None)>] Configure of ParseResults<ConfigureArgs>
     | [<CliPrefix(CliPrefix.None)>] View of ParseResults<ViewArgs>
     | [<CliPrefix(CliPrefix.None)>] Extract_Works of ParseResults<ExtractWorksArgs>
+    | [<CliPrefix(CliPrefix.None)>] Completions of ParseResults<CompletionsArgs>
     // fsharplint:enable unionCasesNames
 
     interface IArgParserTemplate with
@@ -120,6 +130,7 @@ type MainArgs =
             | Configure _ -> $"Configure {Info.Name}"
             | View _ -> "View metadata of the provided file"
             | Extract_Works _ -> "Try to identify and save work/movements from the provided files."
+            | Completions _ -> "Generate tab completion script for supported shells."
 
 let parseFiles files =
     match files with

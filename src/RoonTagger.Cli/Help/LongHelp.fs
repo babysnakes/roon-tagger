@@ -41,4 +41,7 @@ let mainLH =
 let creditsLH =
     ("Add/Remove personnel credits for track.", mkUri "commands/credits")
 
+let completionsLH =
+    ("Print shell tab completion script to stdout (for supported shells).", mkUri "commands/completions")
+
 let configureLH = ("Configure CLI behavior.", mkUri "commands/configure")

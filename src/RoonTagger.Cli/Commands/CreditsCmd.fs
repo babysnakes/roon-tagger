@@ -30,7 +30,7 @@ let handleCmd (args: ParseResults<CreditsArgs>) : Result<unit, unit> =
             if args.Contains Skip_Validation then
                 Roles None
             else
-                getSupportedRoles() |> Some |> Roles
+                getSupportedRoles () |> Some |> Roles
 
         let files = args.GetResult CreditsArgs.Files
         let! tracks = List.traverseResultA Track.load files

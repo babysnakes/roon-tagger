@@ -31,9 +31,17 @@ Register-ArgumentCompleter -Native -CommandName 'roon-tagger' -ScriptBlock {
             [CompletionResult]::new('configure', 'configure', [CompletionResultType]::ParameterValue, 'Configure roon-tagger')
             [CompletionResult]::new('view', 'view', [CompletionResultType]::ParameterValue, 'View file tags')
             [CompletionResult]::new('extract-works', 'extract-works', [CompletionResultType]::ParameterValue, 'Identify work/movements in the provided tracks')
+            [CompletionResult]::new('completions', 'completions', [CompletionResultType]::ParameterValue, 'Generate shall tab completion script')
             break
         }
         'roon-tagger;edit-titles' {
+            [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
+            [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
+            [CompletionResult]::new('--long-help', 'long-help', [CompletionResultType]::ParameterName, 'Long Help Description')
+            break
+        }
+        'roon-tagger;completions' {
+            [CompletionResult]::new('powershell', 'powershell', [CompletionResultType]::ParameterValue, 'Generate completions for PowerShell')
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')
             [CompletionResult]::new('--long-help', 'long-help', [CompletionResultType]::ParameterName, 'Long Help Description')

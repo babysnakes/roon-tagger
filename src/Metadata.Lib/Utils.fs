@@ -1,15 +1,17 @@
 module RoonTagger.Metadata.Utils
 
 open System
-open System.IO
-open RoonTagger.Metadata
 open FSharp.Data.LiteralProviders
 
 let log = Serilog.Log.Logger
 
 let formatDate (date: DateTime) = date.ToString("yyyy-MM-dd")
-let [<Literal>] supportedRoles = TextFile.Resources.``roles.txt``.Text
-let getSupportedRoles () = supportedRoles.Split(Environment.NewLine) |> List.ofArray
+
+[<Literal>]
+let supportedRoles = TextFile.Resources.``roles.txt``.Text
+
+let getSupportedRoles () =
+    supportedRoles.Split(Environment.NewLine) |> List.ofArray
 
 [<RequireQualifiedAccess>]
 module List =

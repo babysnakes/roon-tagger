@@ -1,6 +1,5 @@
 module RoonTagger.Cli.Models
 
-open Spectre.Console.Rendering
 open RoonTagger.Metadata
 open System
 
@@ -17,3 +16,5 @@ type CliErrors =
     | TagsCountError
     | ConfigurationParseError of string
     | CliArgumentsError of string
+
+type SupportedShells = | PowerShell

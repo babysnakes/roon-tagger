@@ -16,6 +16,7 @@
     <Compile Include="Output.fs" />
     <Compile Include="ProcessRunner.fs" />
     <Compile Include="TagsInFile.fs" />
+    <Compile Include="Commands\CompletionsCmd.fs" />
     <Compile Include="Commands\ConfigureCmd.fs" />
     <Compile Include="Commands\ExtractWorkCmd.fs" />
     <Compile Include="Commands\ViewCmd.fs" />
@@ -24,9 +25,6 @@
     <Compile Include="Commands\SetTagsCmd.fs" />
     <Compile Include="Commands\MainCmd.fs" />
     <Compile Include="Program.fs" />
-    <None Include="Resources/**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Metadata.Lib\Metadata.Lib.fsproj" />
