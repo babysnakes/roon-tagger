@@ -22,6 +22,7 @@ The following sub-commands are available:
 * [`configure`](commands/configure.md)
 * [`view`](commands/view.md)
 * [`extract-works`](commands/extract-works.md)
+* [`completions`](commands/completions.md)
 
 ### Menu Navigation
 
