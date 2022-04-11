@@ -158,7 +158,7 @@ let extractWorks (ConsecutiveTracks tracks) addRomans =
     |> List.tee (fun pair -> log.Verbose("Filtered work: %A{Pair}", pair))
     |> List.traverseResultM (fun (titleOpt, tracks) ->
         ConsecutiveTracks.Create tracks
-        |> Result.bind (Work.Create(titleOpt |> Option.get) addRomans))
+        |> Result.bind (Work.Create (titleOpt |> Option.get) addRomans))
 
 /// Applies (saves) the work data
 let applyWork (Work (name, (ConsecutiveTracks tracks))) =

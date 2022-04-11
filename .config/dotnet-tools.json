@@ -3,19 +3,19 @@
   "isRoot": true,
   "tools": {
     "fantomas-tool": {
-      "version": "4.6.0",
+      "version": "4.7.6",
       "commands": [
         "fantomas"
       ]
     },
     "dotnet-fsharplint": {
-      "version": "0.21.0",
+      "version": "0.21.2",
       "commands": [
         "dotnet-fsharplint"
       ]
     },
     "paket": {
-      "version": "6.2.1",
+      "version": "7.1.4",
       "commands": [
         "paket"
       ]
