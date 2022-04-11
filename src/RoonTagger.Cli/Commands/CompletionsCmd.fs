@@ -8,12 +8,12 @@ open FSharp.Data.LiteralProviders
 open System
 
 [<Literal>]
-let powershellCompletion =
+let PowershellCompletion =
     TextFile.Resources.Completions.``roon-tagger-completion.ps1``.Text
 
 let handleCmd (args: ParseResults<CompletionsArgs>) =
     // Currently there's no need to check anything
-    Console.WriteLine powershellCompletion
+    Console.WriteLine PowershellCompletion
     Ok(())
 
 let makeCompletionsCmd (args: ParseResults<CompletionsArgs>) =

@@ -8,10 +8,10 @@ let log = Serilog.Log.Logger
 let formatDate (date: DateTime) = date.ToString("yyyy-MM-dd")
 
 [<Literal>]
-let supportedRoles = TextFile.Resources.``roles.txt``.Text
+let SupportedRoles = TextFile.Resources.``roles.txt``.Text
 
 let getSupportedRoles () =
-    supportedRoles.Split(Environment.NewLine) |> List.ofArray
+    SupportedRoles.Split(Environment.NewLine) |> List.ofArray
 
 [<RequireQualifiedAccess>]
 module List =
