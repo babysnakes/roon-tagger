@@ -126,7 +126,6 @@ type Work =
             mvmt |> Option.get
 
         let movements = tracks |> List.map processTrack
-        let count = movements |> List.length
         let layout = movements |> List.head |> MovementParser.parseLayout
 
         let constantLayout =
@@ -161,7 +160,7 @@ let extractWorks (ConsecutiveTracks tracks) addRomans =
         |> Result.bind (Work.Create (titleOpt |> Option.get) addRomans))
 
 /// Applies (saves) the work data
-let applyWork (Work (name, (ConsecutiveTracks tracks))) =
+let applyWork (Work (name, ConsecutiveTracks tracks)) =
     let saveTrack t =
         result {
             do!

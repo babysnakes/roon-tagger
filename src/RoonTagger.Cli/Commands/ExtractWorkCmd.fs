@@ -47,7 +47,7 @@ let printWork (Work (name, ConsecutiveTracks tracks)) =
     let grid = Grid()
     let firstColumn = GridColumn()
     firstColumn.NoWrap |> ignore
-    AnsiConsole.MarkupLine($"| [green]*[/] {name}") |> ignore
+    AnsiConsole.MarkupLine($"| [green]*[/] {name}")
     grid.AddColumn(firstColumn) |> ignore
     grid.AddColumn(GridColumn()) |> ignore
 
@@ -123,8 +123,6 @@ type WorkProcessor =
     member this.HandleSingleWork(work: Work) : Result<string, CliErrors list> =
 
         let rec loop (Work (name, cTracks) as work) =
-            let (ConsecutiveTracks tracks) = cTracks
-
             match (this.PromptWorkOperation work) with
             | SaveWork ->
                 log.Debug("Applying work: {Name}", name)

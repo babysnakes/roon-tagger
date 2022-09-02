@@ -4,7 +4,6 @@ open System
 open NUnit.Framework
 open FsUnit
 open RoonTagger.Metadata
-open RoonTagger.Metadata.Formats
 open TestsUtils
 
 module ``Track operations`` =
@@ -112,7 +111,6 @@ module ``Track operations`` =
             track
             [ Personnel "First Last - Cello"
               Personnel "The Orchestra - Orchestra" ]
-        |> ignore
 
         let p = Track.getTagStringValue track CreditTag
         p |> should contain "First Last - Cello"
@@ -128,7 +126,6 @@ module ``Track operations`` =
             track
             [ duplicate
               Personnel "Musician C - Double Bass" ]
-        |> ignore
 
         let p = Track.getTagStringValue track CreditTag
         p |> should haveLength 4

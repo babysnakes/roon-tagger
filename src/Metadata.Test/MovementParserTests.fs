@@ -37,14 +37,14 @@ type MovementParserTests() =
           ("1I title one", "1I title one")
           ("I1 title one", "I1 title one") ]
 
-    [<TestCaseSource(nameof (MovementParserTests.SimpleParsingData))>]
+    [<TestCaseSource(nameof MovementParserTests.SimpleParsingData)>]
     member this.``Simple parsing should apply``((testParser, data, expected)) =
         run testParser data
         |> function
             | Success (res, _, _) when res = expected -> ()
             | x -> Assert.Fail($"Unexpected result '%A{x}', expected '{expected}'")
 
-    [<TestCaseSource(nameof (MovementParserTests.MatchingTitlesTestData))>]
+    [<TestCaseSource(nameof MovementParserTests.MatchingTitlesTestData)>]
     member this.``Matching layout tests``((_description, title1, title2, shouldMatch)) =
         let r1 = run titleLayout title1 |> unwrapParserResult
         let r2 = run titleLayout title2 |> unwrapParserResult
@@ -54,7 +54,7 @@ type MovementParserTests() =
         else
             r1 |> should not' (equal r2)
 
-    [<TestCaseSource(nameof (MovementParserTests.ExtractTitleTestData))>]
+    [<TestCaseSource(nameof MovementParserTests.ExtractTitleTestData)>]
     member this.``Extract title test``((testData, expected)) =
         let result = run title testData |> unwrapParserResult
         result |> should equal expected

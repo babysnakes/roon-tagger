@@ -1,7 +1,6 @@
 namespace RoonTagger.Cli.Test
 
 open Argu
-open FsUnit
 open NUnit.Framework
 open RoonTagger.Cli.Arguments
 open RoonTagger.Cli.Commands.SetTags

@@ -132,11 +132,6 @@ type MainArgs =
             | Extract_Works _ -> "Try to identify and save work/movements from the provided files."
             | Completions _ -> "Generate tab completion script for supported shells."
 
-let parseFiles files =
-    match files with
-    | "file" :: rest -> failwith "invalid file name"
-    | _ -> files
-
 let parseDate dateString =
     try
         DateTime.Parse dateString

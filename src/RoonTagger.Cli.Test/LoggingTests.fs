@@ -37,14 +37,14 @@ type LoggingTests() =
           (defaultLC, 3, [ (LogEventLevel.Verbose, true) ])
           (defaultLC, 5, [ (LogEventLevel.Verbose, true) ]) ]
 
-    [<TestCaseSource(nameof (LoggingTests.LoggingEnabledInput))>]
+    [<TestCaseSource(nameof LoggingTests.LoggingEnabledInput)>]
     member this.``Test log level calculation with logging enabled``
         ((lc: LogConfigV1, overrides: int, testCases: (LogEventLevel * bool) list))
         =
         let logger = setupLogger lc overrides |> Option.get
 
         for case in testCases do
-            let (level, enabled) = case
+            let level, enabled = case
             logger.IsEnabled level |> should equal enabled
 
     [<Test>]

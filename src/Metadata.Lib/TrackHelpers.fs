@@ -20,8 +20,8 @@ let extractDiscNumberWithDefault (track: AudioTrack) : Result<int, MetadataError
         Track.getTagStringValue track DiscNumberTag
         |> function
             | [] -> 0 |> Ok
-            | "" :: tail -> 0 |> Ok
-            | head :: tail -> head |> int |> Ok
+            | "" :: _tail -> 0 |> Ok
+            | head :: _tail -> head |> int |> Ok
     with
     | :? System.FormatException -> MissingOrInvalidTag DiscNumberTag |> Error
 
@@ -55,7 +55,7 @@ type ConsecutiveTracks =
 
     /// Sorts the tracks and guarantees that it produces legal ConsecutiveTracks.
     static member Create(tracks: AudioTrack list) : Result<ConsecutiveTracks, MetadataErrors list> =
-        let consecutive ((t: int * int), (tNext: int * int)) =
+        let consecutive (t: int * int, tNext: int * int) =
             match t, tNext with
             | (discNum, trackNum), (discNum', trackNum') when discNum = discNum' && trackNum' - trackNum = 1 -> true
             | (discNum, _), (discNum', trackNum) when trackNum = 1 && discNum' - discNum = 1 -> true

@@ -29,7 +29,7 @@ let printRawCredits (grid: Grid) (credits: string list) =
 
 let printCredits (grid: Grid) (credits: string list) =
     let sp = credits |> List.map (fun s -> s.Split(" - ", 2) |> List.ofArray)
-    let cs, other = List.partition (fun l -> List.length l = 2) sp
+    let cs, _ = List.partition (fun l -> List.length l = 2) sp
     let credits = cs |> List.map (fun l -> (l[1], l[0]))
     let byRole = credits |> List.groupBy fst
 

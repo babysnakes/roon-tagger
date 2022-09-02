@@ -29,9 +29,7 @@ module ConfigurationTests =
         IO.Directory.CreateDirectory tmpDirectory |> ignore
 
     [<OneTimeTearDown>]
-    let tearDown () =
-        IO.Directory.Delete(tmpDirectory, true) |> ignore
-
+    let tearDown () = IO.Directory.Delete(tmpDirectory, true)
 
     [<Test>]
     let ``getConfigFilePath returns the correct path according to directory and version`` () =

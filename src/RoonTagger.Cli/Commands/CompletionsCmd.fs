@@ -11,7 +11,7 @@ open System
 let PowershellCompletion =
     TextFile.Resources.Completions.``roon-tagger-completion.ps1``.Text
 
-let handleCmd (args: ParseResults<CompletionsArgs>) =
+let handleCmd (_: ParseResults<CompletionsArgs>) =
     // Currently there's no need to check anything
     Console.WriteLine PowershellCompletion
     Ok(())
