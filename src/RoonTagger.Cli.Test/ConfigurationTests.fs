@@ -1,6 +1,7 @@
 namespace RoonTagger.Cli.Test
 
 open System
+open System.Runtime.InteropServices
 open NUnit.Framework
 open FsUnit
 open RoonTagger.Cli.Configuration
@@ -33,8 +34,15 @@ module ConfigurationTests =
 
     [<Test>]
     let ``getConfigFilePath returns the correct path according to directory and version`` () =
-        getConfigFilePath @"c:\some\dir" "config" ConfigurationVersion.V1
-        |> should equal @"c:\some\dir\config_v1.json"
+        // Don't fail when testing different OSes.
+        let basePath, expected =
+            if (RuntimeInformation.IsOSPlatform OSPlatform.Windows) then
+                @"c:\some\dir", @"c:\some\dir\config_v1.json"
+            else
+                "/home/user", "/home/user/config_v1.json"
+
+        getConfigFilePath basePath "config" ConfigurationVersion.V1
+        |> should equal expected
 
     [<Test>]
     let ``Configuration saves and reloads the configuration successfully`` () =
