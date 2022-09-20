@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="UserContentModel">
-    <attachedFolders />
+    <attachedFolders>
+      <Path>.github</Path>
+      <Path>Resources</Path>
+      <Path>docs</Path>
+    </attachedFolders>
     <explicitIncludes>
+      <Path>.fantomasignore</Path>
+      <Path>.gitignore</Path>
+      <Path>.markdownlint.yaml</Path>
+      <Path>README.md</Path>
       <Path>build.fsx</Path>
+      <Path>global.json</Path>
     </explicitIncludes>
     <explicitExcludes />
   </component>

@@ -1,0 +1,28 @@
+name: Testing and Code Metrics
+env:
+  DOTNET_VERSION: '6'                 # set this to the .NET major version
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up .NET
+        uses: xt0rted/setup-dotnet@v1.0.0 
+      - name: Install dependencies
+        run: |
+          dotnet tool restore
+          dotnet paket restore
+      - name: Set up dependency caching for faster builds
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-paket-${{ hashFiles('**/paket.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-paket-
+      - name: Run code checks
+        run: dotnet fake build -t Check

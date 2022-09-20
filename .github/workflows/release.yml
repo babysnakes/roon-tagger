@@ -1,0 +1,30 @@
+name: Create a Draft Release
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+permissions: 
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up .NET
+        uses: xt0rted/setup-dotnet@v1.0.0 
+      - name: Install dependencies
+        run: |
+          dotnet tool restore
+          dotnet paket restore
+      - name: Set up dependency caching for faster builds
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-paket-${{ hashFiles('**/paket.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-paket-
+      - name: Test code
+        run: dotnet fake build -t Check
+      - name: Create release draft
+        run: dotnet fake build -t Release
