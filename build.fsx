@@ -33,8 +33,19 @@ let cliProj =
 
 [<AutoOpen>]
 module Helpers =
+    open System.Text.RegularExpressions
 
     let log msg = Trace.log $"===> {msg}"
+
+    let parseVersion =
+        function
+        | Some version -> version
+        | None -> failwith "No Version - either HEAD should be a tag or version override must be specified"
+
+    // Normalizes versions to be valid dotnet version (e.g. v1.2.3 -> 1.2.3).
+    let normalizeVersion (version: string) =
+        let rgx = Regex "^[a-z,A-Z]+"
+        rgx.Replace(version, "")
 
 [<AutoOpen>]
 module Outputs =
@@ -131,7 +142,7 @@ let versionOverride =
 
 let version = lazy Option.orElse versionOverride (extractVersionFromTag ())
 
-let publishArch dir rid =
+let publishArch dir rid version =
     let buildConfig =
         Option.defaultValue DotNet.BuildConfiguration.Release buildConfig.Value
 
@@ -150,10 +161,10 @@ let publishArch dir rid =
                             ("PublishSingleFile", "true")
                             :: ("PublishTrimmed", "true")
                                :: ("PublishReadyToRun", "true")
-                                  :: p.MSBuildParams.Properties } })
+                                  :: ("Version", version) :: p.MSBuildParams.Properties } })
         cliProj
 
-let publishNoArch dir =
+let publishNoArch dir version =
     let buildConfig =
         Option.defaultValue DotNet.BuildConfiguration.Release buildConfig.Value
 
@@ -169,7 +180,7 @@ let publishNoArch dir =
                         Properties =
                             // Explicit because  specified as true in the project file.
                             ("PublishTrimmed", "false")
-                            :: p.MSBuildParams.Properties } })
+                            :: ("Version", version) :: p.MSBuildParams.Properties } })
         cliProj
 
 Target.create "CodeCheck" ignore
@@ -179,8 +190,20 @@ Target.create "Build" (fun _ ->
     let buildConfig =
         Option.defaultValue DotNet.BuildConfiguration.Release buildConfig.Value
 
+    let version = parseVersion version.Value
+    let dotNetVersion = normalizeVersion version
     Trace.traceHeader $"Building with '{buildConfig}' profile"
-    DotNet.build (fun s -> { s with Configuration = buildConfig }) mainSln)
+
+    DotNet.build
+        (fun p ->
+            { p with
+                Configuration = buildConfig
+                MSBuildParams =
+                    { p.MSBuildParams with
+                        Properties =
+                            ("Version", dotNetVersion)
+                            :: p.MSBuildParams.Properties } })
+        mainSln)
 
 Target.create "Clean" (fun _ ->
     Trace.traceHeader "Running dotnet clean"
@@ -225,10 +248,8 @@ Target.create "Test" (fun _ ->
     DotNet.test (fun s -> { s with Configuration = buildConfig }) mainSln)
 
 Target.create "Publish" (fun _ ->
-    if version.Value.IsNone then
-        failwith "No Version - either HEAD should be a tag or version override must be specified"
-
-    let version = Option.get version.Value
+    let version = parseVersion version.Value
+    let dotNetVersion = normalizeVersion version
     Shell.cleanDir outputDir
     Shell.mkdir buildDir
     Shell.mkdir distDir
@@ -238,10 +259,10 @@ Target.create "Publish" (fun _ ->
         let dir = $"roon-tagger_{version}_{rid}"
 
         match target with
-        | NoArch -> publishNoArch dir
+        | NoArch -> publishNoArch dir dotNetVersion
         | WinX64
         | LinuxX64
-        | OsxX64 -> publishArch dir rid
+        | OsxX64 -> publishArch dir rid dotNetVersion
 
         match archive with
         | Zip -> compressZip dir
@@ -294,8 +315,9 @@ options:
     Trace.log msg)
 
 // Tasks dependencies
-"Clean" ?=> "Build" ==> "Publish" ==> "Release"
-"Clean" ==> "Publish"
+"Clean" ?=> "Build"
+"Clean" ?=> "Publish" ==> "Release"
+"Clean" ==> "Release"
 "Format" ==> "Lint" ==> "CodeCheck"
 "Test" ==> "Check"
 "CodeCheck" ==> "Check"

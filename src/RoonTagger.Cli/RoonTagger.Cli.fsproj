@@ -5,7 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>roon-tagger</AssemblyName>
     <PublishTrimmed>true</PublishTrimmed>
-    <Version>0.1.0.0</Version>
+    <Version>0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Info.fs" />
