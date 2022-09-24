@@ -19,6 +19,7 @@ type RoonTag =
     | ImportDate of DateTime
     | OriginalReleaseDate of DateTime
     | Year of int // Roon's "Released" field
+    | Composer of string list
     | Credit of Personnel
 
 type TagName =
@@ -33,6 +34,7 @@ type TagName =
     | ImportDateTag
     | OriginalReleaseDateTag
     | YearTag
+    | ComposerTag
     | CreditTag
     | TrackNumberTag
     | DiscNumberTag

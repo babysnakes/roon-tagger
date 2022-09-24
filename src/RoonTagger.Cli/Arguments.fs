@@ -9,6 +9,7 @@ type SetTagsArgs =
     | [<Unique>] Title of title: string
     | [<AltCommandLine("-I")>] Import_Date of date: string
     | [<AltCommandLine("-R")>] Release_Date of date: string
+    | Composer of string
     | Year of int
     | [<MainCommand; ExactlyOnce; Last; Mandatory>] Files of file: string list
     // fsharplint:enable unionCasesNames
@@ -19,6 +20,7 @@ type SetTagsArgs =
             | Title _ -> "The title of the song."
             | Import_Date _ -> "The import date into roon (yyyy-mm-dd, also accepts 'today')."
             | Release_Date _ -> "The original release date of the album (yyyy-mm-dd)."
+            | Composer _ -> "The composer tag (also sets composer credits). For multiple composers separate by commas."
             | Year _ -> "The year the album was released (yyyy)."
             | Files _ -> "files to edit."
 

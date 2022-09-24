@@ -11,6 +11,7 @@ let WorkTag = "WORK"
 let MovementTag = "PART"
 let SectionTag = "SECTION"
 let CreditTag = "PERSONNEL"
+let ComposerTag = "COMPOSER"
 let DiskNumberTag = "DISCNUMBER"
 
 let log = Serilog.Log.Logger
@@ -29,6 +30,7 @@ let setTag (track: FlacFile) (tag: RoonTag) =
     | ImportDate date -> Ok(replace ImportDateTag (formatDate date))
     | OriginalReleaseDate date -> Ok(replace OriginalReleaseDateTag (formatDate date))
     | Year year -> Ok(replace YearTag $"%d{year}")
+    | Composer composers -> Ok(comment.Replace(ComposerTag, VorbisCommentValues composers))
     | MovementIndex _
     | MovementCount _ -> Error UnsupportedTagForFormat
     | Credit _ -> Error(UnsupportedTagOperation "Credit tag does not support *set* operation, only add/delete.")
@@ -55,6 +57,7 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
     | DiscNumberTag -> comment[DiskNumberTag]
     | MovementIndexTag
     | MovementCountTag -> VorbisCommentValues()
+    | ComposerTag -> comment[ComposerTag]
     |> List.ofSeq
 
 let applyChanges (track: FlacFile) =

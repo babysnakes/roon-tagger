@@ -5,6 +5,7 @@
       <Path>.github</Path>
       <Path>Resources</Path>
       <Path>docs</Path>
+      <Path>src/RoonTagger.Cli/Resources</Path>
     </attachedFolders>
     <explicitIncludes>
       <Path>.fantomasignore</Path>

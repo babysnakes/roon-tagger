@@ -51,6 +51,7 @@ Register-ArgumentCompleter -Native -CommandName 'roon-tagger' -ScriptBlock {
             [CompletionResult]::new('--title', 'title', [CompletionResultType]::ParameterName, 'The title to set')
             [CompletionResult]::new('--import-date', 'import-date', [CompletionResultType]::ParameterName, 'The date the track was imported to roon')
             [CompletionResult]::new('--release-date', 'release-date', [CompletionResultType]::ParameterName, 'The release date of the track/album')
+            [CompletionResult]::new('--compser', 'compser', [CompletionResultType]::ParameterName, 'The composer to set (also as credits)')
             [CompletionResult]::new('--year', 'year', [CompletionResultType]::ParameterName, 'Album release date')
             [CompletionResult]::new('--verbose', 'verbose', [CompletionResultType]::ParameterName, 'Enable verbose output')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Prints help information')

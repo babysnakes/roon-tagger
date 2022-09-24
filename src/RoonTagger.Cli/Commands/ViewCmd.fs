@@ -50,6 +50,7 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         let getValue = Track.getTagStringValue track
         let album = getValue AlbumTag
         let artist = getValue ArtistTag
+        let composer = getValue ComposerTag
         let title = getValue TitleTag
         let work = getValue WorkTag
         let movement = getValue MovementTag
@@ -74,6 +75,7 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         print "Artist" artist
         print "Title" title
         print "Work" work
+        print "Composer" composer
         print "Movement" movement
         print "Movement Index" movementIndex
         print "Track Number" tn

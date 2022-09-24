@@ -1,7 +1,10 @@
 ## Set Roon Specific Tags - _set-tags_
 
-Sets roon specific tags. Unless specifically indicated (run with `-h`), all
-provided tags *overwrite* existing tags.
+Sets roon specific tags. Unless specifically indicated (run with `-h`), all provided tags *
+overwrite* existing tags.
+
+One spacial case is **composer** (`--composer`). While it's not *Roon* specific in any way, it both
+sets the *composer* tag **and** adds *composer* credits.
 
 ### Example Usage
 
