@@ -247,6 +247,22 @@ Target.create "Test" (fun _ ->
     Trace.traceHeader $"Testing with '{buildConfig}' profile"
     DotNet.test (fun s -> { s with Configuration = buildConfig }) mainSln)
 
+Target.create "Scoop" (fun _ ->
+    let version = parseVersion version.Value
+    let scoopFile = distDir @@ "roon-tagger.json"
+
+    let final =
+        $"""{{
+  "version": "{version}",
+  "description": "A utility to set Roon specific tags in flac files.",
+  "homepage": "https://babysnakes.github.io/roon-tagger/",
+  "url": "https://github.com/babysnakes/roon-tagger/releases/download/{version}/roon-tagger_{version}_linux-x64.tar.gz",
+  "bin": "roon-tagger.exe"
+}}
+"""
+
+    File.writeString false scoopFile final)
+
 Target.create "Publish" (fun _ ->
     let version = parseVersion version.Value
     let dotNetVersion = normalizeVersion version
@@ -275,7 +291,11 @@ Target.create "Release" (fun _ ->
         failwith "No Version - either HEAD should be a tag or version override must be specified"
 
     let version = Option.get version.Value
-    let files = !! "output/dist/*.zip" ++ "output/dist/*.tar.gz"
+
+    let files =
+        !! "output/dist/*.zip"
+        ++ "output/dist/*.tar.gz"
+        ++ "output/dist/*.json"
 
     let contents =
         repoRoot @@ "Resources" @@ "ReleaseTemplate.md"
@@ -318,6 +338,7 @@ options:
 "Clean" ?=> "Build"
 "Clean" ?=> "Publish" ==> "Release"
 "Clean" ==> "Release"
+"Scoop" ==> "Release"
 "Format" ==> "Lint" ==> "CodeCheck"
 "Test" ==> "Check"
 "CodeCheck" ==> "Check"
