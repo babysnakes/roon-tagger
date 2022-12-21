@@ -26,6 +26,7 @@ module SetArgsIntegrationTests =
 
     [<Test>]
     let ``--composer sets both composer tag and credits`` () =
+        // fsharplint:disable-next-line redundantNewKeyword // it's disposable
         use tmp = new CopiedFile("empty.flac")
         let path = tmp.Path
 

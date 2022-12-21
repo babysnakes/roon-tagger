@@ -36,8 +36,8 @@ module List =
         lst |> List.map fn
 
 
-    let groupByConsecutively (fKey: 'T -> 'key) (lst: 'T list) : ('key * 'T list) list =
-        let loop (item: 'T) (state: ('key * 'T list) list) : ('key * 'T list) list =
+    let groupByConsecutively (fKey: 'T -> 'Key) (lst: 'T list) : ('Key * 'T list) list =
+        let loop (item: 'T) (state: ('Key * 'T list) list) : ('Key * 'T list) list =
             let key = fKey item
 
             match state with
