@@ -18,10 +18,7 @@ module List =
     /// Remove all occurrences of every item in values from the list.
     let removeByValues (values: 'T list) (lst: 'T list) : 'T list =
         let folder (item: 'T) (acc: 'T list) =
-            if List.contains item values then
-                acc
-            else
-                item :: acc
+            if List.contains item values then acc else item :: acc
 
         List.foldBack folder lst []
 

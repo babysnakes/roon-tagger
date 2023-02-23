@@ -29,11 +29,7 @@ module SetArgsIntegrationTests =
         // fsharplint:disable-next-line redundantNewKeyword // it's disposable
         use tmp = new CopiedFile("empty.flac")
         let path = tmp.Path
-
-        let args =
-            parser.Parse [| "--composer"
-                            "Composer A,Composer B"
-                            path |]
+        let args = parser.Parse [| "--composer"; "Composer A,Composer B"; path |]
 
         handleCmd args
         |> function

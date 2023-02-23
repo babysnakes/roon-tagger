@@ -48,11 +48,7 @@ let extractTags (opts: ParseResults<SetTagsArgs>) =
 
     let yearTag = opts.TryGetResult Year |> Option.map Metadata.Year
 
-    [ titleTag
-      composerTag
-      importDateTag
-      ordTag
-      yearTag ]
+    [ titleTag; composerTag; importDateTag; ordTag; yearTag ]
     |> List.filter Option.isSome
     |> List.map Option.get // safe as we filtered out the None tags.
 

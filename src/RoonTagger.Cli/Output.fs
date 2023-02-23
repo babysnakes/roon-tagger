@@ -9,7 +9,7 @@ let error2String (err: MetadataErrors) : string =
     | FileDoesNotExist err -> err
     | InvalidFileFormat err -> err
     | UnexpectedError err -> sprintf "Unexpected error: %s" err
-    | DeletingNonExistingPersonnel (track, err) -> $"'{track.Path}': Trying to delete non existing credit: {err}"
+    | DeletingNonExistingPersonnel(track, err) -> $"'{track.Path}': Trying to delete non existing credit: {err}"
     | FileSaveError err -> $"Error saving file: {err}"
     | MissingOrInvalidTag tag -> $"Missing or invalid tag: {tag.ToString()}"
     | UnsupportedRole role -> $"Role '{role}' is not a valid role according to Roon's wiki."

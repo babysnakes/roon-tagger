@@ -12,8 +12,8 @@ let extractTrackNumber (track: AudioTrack) : Result<int, MetadataErrors> =
         |> List.head
         |> int
         |> Ok
-    with
-    | :? System.FormatException -> MissingOrInvalidTag TrackNumberTag |> Error
+    with :? System.FormatException ->
+        MissingOrInvalidTag TrackNumberTag |> Error
 
 let extractDiscNumberWithDefault (track: AudioTrack) : Result<int, MetadataErrors> =
     try
@@ -22,8 +22,8 @@ let extractDiscNumberWithDefault (track: AudioTrack) : Result<int, MetadataError
             | [] -> 0 |> Ok
             | "" :: _tail -> 0 |> Ok
             | head :: _tail -> head |> int |> Ok
-    with
-    | :? System.FormatException -> MissingOrInvalidTag DiscNumberTag |> Error
+    with :? System.FormatException ->
+        MissingOrInvalidTag DiscNumberTag |> Error
 
 let private extractDiscAndTrackNumbers (track: AudioTrack) =
     result {

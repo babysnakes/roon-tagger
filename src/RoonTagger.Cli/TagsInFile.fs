@@ -38,8 +38,7 @@ let writeValues (lines: string list) path =
     try
         File.WriteAllLines(path, lines)
         Ok path
-    with
-    | ex ->
+    with ex ->
         log.Error("Writing tags edit file: {Ex}", ex)
 
         [ CliIOError $"Error writing tags edit file: {ex.Message}" ] |> Error
@@ -47,8 +46,7 @@ let writeValues (lines: string list) path =
 let readValues path =
     try
         File.ReadAllLines(path) |> List.ofArray |> Ok
-    with
-    | ex ->
+    with ex ->
         log.Error("Reading tags edit file: {Ex}", ex)
 
         [ CliIOError $"Error reading tags edit file: {ex.Message}" ] |> Error
@@ -60,12 +58,9 @@ let editTagsWithEditor editorCommand path =
 
 let cleanup path =
     try
-        if File.Exists path then
-            File.Delete path
-
+        if File.Exists path then File.Delete path
         Ok()
-    with
-    | ex ->
+    with ex ->
         log.Error("Cleanup tags edit file: {Ex}", ex)
         Error [ CliIOError $"Error deleting tags edit file: {ex.Message}" ]
 
@@ -75,8 +70,8 @@ let applyValues (mkTag: string -> RoonTag) (ConsecutiveTracks tracks) (values: s
 
     try
         List.zip tracks values |> Ok
-    with
-    | :? System.ArgumentException -> [ TagsCountError ] |> Error
+    with :? System.ArgumentException ->
+        [ TagsCountError ] |> Error
     |> Result.bind (
         List.traverseResultM applyTrack
         >> Result.mapError (fun err -> [ err ])

@@ -14,25 +14,18 @@ type LoggingTests() =
               { File = "file.log"
                 Level = LogLevel.None }
 
-          (defaultLC,
-           1,
-           [ (LogEventLevel.Information, true)
-             (LogEventLevel.Debug, false) ])
+          (defaultLC, 1, [ (LogEventLevel.Information, true); (LogEventLevel.Debug, false) ])
 
           ({ defaultLC with Level = LogLevel.Info },
            0,
-           [ (LogEventLevel.Information, true)
-             (LogEventLevel.Debug, false) ])
+           [ (LogEventLevel.Information, true); (LogEventLevel.Debug, false) ])
 
-          (defaultLC,
-           2,
-           [ (LogEventLevel.Debug, true)
-             (LogEventLevel.Verbose, false) ])
+          (defaultLC, 2, [ (LogEventLevel.Debug, true); (LogEventLevel.Verbose, false) ])
 
-          ({ defaultLC with Level = LogLevel.Debug },
+          ({ defaultLC with
+              Level = LogLevel.Debug },
            0,
-           [ (LogEventLevel.Debug, true)
-             (LogEventLevel.Verbose, false) ])
+           [ (LogEventLevel.Debug, true); (LogEventLevel.Verbose, false) ])
 
           (defaultLC, 3, [ (LogEventLevel.Verbose, true) ])
           (defaultLC, 5, [ (LogEventLevel.Verbose, true) ]) ]

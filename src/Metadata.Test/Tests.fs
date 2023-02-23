@@ -68,8 +68,7 @@ module ``Track operations`` =
     [<Test>]
     let ``mkPersonnel should correctly convert Personnel to strings`` () =
         let testData =
-            [ ("Musician A", [ "Guitar"; "Voice" ])
-              ("Musician B", [ "Violin" ]) ]
+            [ ("Musician A", [ "Guitar"; "Voice" ]); ("Musician B", [ "Violin" ]) ]
 
         let emptyValidator = None |> Roles
         let res = Track.mkPersonnel emptyValidator testData |> Result.unwrap
@@ -83,8 +82,7 @@ module ``Track operations`` =
         let validator = Some [ "Guitar"; "Cello" ] |> Roles
 
         let testData =
-            [ ("Musician A", [ "Guitar"; "NOSUCH1" ])
-              ("Musician B", [ "NOSUCH2" ]) ]
+            [ ("Musician A", [ "Guitar"; "NOSUCH1" ]); ("Musician B", [ "NOSUCH2" ]) ]
 
         let errors = Track.mkPersonnel validator testData |> Result.unwrapError
         errors |> should haveLength 2
@@ -94,8 +92,7 @@ module ``Track operations`` =
         let validator = None |> Roles
 
         let testData =
-            [ ("Musician A", [ "Guitar"; "NOSUCH1" ])
-              ("Musician B", [ "NOSUCH2" ]) ]
+            [ ("Musician A", [ "Guitar"; "NOSUCH1" ]); ("Musician B", [ "NOSUCH2" ]) ]
 
         let res = Track.mkPersonnel validator testData |> Result.unwrap
         res |> should contain (Personnel "Musician A - NOSUCH1")
@@ -107,10 +104,7 @@ module ``Track operations`` =
         // sample track contains 3 credit entries.
         let track = "with-credits.flac" |> loadTrackSuccess
 
-        Track.addCredits
-            track
-            [ Personnel "First Last - Cello"
-              Personnel "The Orchestra - Orchestra" ]
+        Track.addCredits track [ Personnel "First Last - Cello"; Personnel "The Orchestra - Orchestra" ]
 
         let p = Track.getTagStringValue track CreditTag
         p |> should contain "First Last - Cello"
@@ -122,10 +116,7 @@ module ``Track operations`` =
         let track = "with-credits.flac" |> loadTrackSuccess
         let duplicate = Personnel "Musician A - Guitar"
 
-        Track.addCredits
-            track
-            [ duplicate
-              Personnel "Musician C - Double Bass" ]
+        Track.addCredits track [ duplicate; Personnel "Musician C - Double Bass" ]
 
         let p = Track.getTagStringValue track CreditTag
         p |> should haveLength 4
@@ -138,10 +129,7 @@ module ``Track operations`` =
         let existingValue1 = "Musician A - Guitar"
         let existingValue2 = "Musician B - Vocals"
 
-        Track.deleteCredits
-            track
-            [ Personnel existingValue1
-              Personnel existingValue2 ]
+        Track.deleteCredits track [ Personnel existingValue1; Personnel existingValue2 ]
         |> ignore
 
         Track.getTagStringValue track CreditTag
