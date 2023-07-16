@@ -320,13 +320,13 @@ let runHelp _ =
         """
 Fake build for RoonTagger.
 
-Usage (from repository root):
+Usage ($BUILD = ./build.sh or .\build.cmd - depending on your OS):
   Show this help:
-    $ ./build
+    $BUILD
   Run task:
-    $ ./build -t <task name>  [ options ]
+    $BUILD -t <task name>  [ options ]
   Get all available targets:
-    $ ./build --list
+    $BUILD --list
 
 tasks:
     * Help      - show help (default task if no task is specified)
@@ -343,6 +343,7 @@ options:
     --debug           Force 'Debug' mode on Build / Publish / Release.
 """
 
+    Trace.traceHeader "Building Project Help"
     Trace.log msg
 
 

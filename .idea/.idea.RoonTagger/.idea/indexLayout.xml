@@ -12,7 +12,9 @@
       <Path>.gitignore</Path>
       <Path>.markdownlint.yaml</Path>
       <Path>README.md</Path>
+      <Path>build.cmd</Path>
       <Path>build.fsx</Path>
+      <Path>build.sh</Path>
       <Path>global.json</Path>
     </explicitIncludes>
     <explicitExcludes />

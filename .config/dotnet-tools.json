@@ -14,12 +14,6 @@
         "paket"
       ]
     },
-    "fake-cli": {
-      "version": "5.23.0",
-      "commands": [
-        "fake"
-      ]
-    },
     "fantomas": {
       "version": "5.2.1",
       "commands": [
