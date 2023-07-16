@@ -1,0 +1,10 @@
+group Build
+    Fake.Api.GitHub
+    Fake.Core.UserInput
+    Fake.DotNet.Cli
+    Fake.IO.FileSystem
+    Fake.IO.Zip
+    Fake.Core.Process
+    Fake.Core.Target
+    Fake.Tools.Git
+    FSharpx.Extras

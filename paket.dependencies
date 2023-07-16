@@ -16,3 +16,17 @@ nuget Roman-Numerals ~> 1.0
 nuget Serilog ~> 2.10
 nuget Serilog.Sinks.File ~> 4.1
 nuget Spectre.Console ~> 0.39
+
+// FAKE build dependencies
+group Build
+    source https://www.nuget.org/api/v2
+
+    nuget Fake.Api.GitHub ~> 6.0.0
+    nuget Fake.Core.UserInput ~> 6.0.0
+    nuget Fake.DotNet.Cli ~> 6.0.0
+    nuget Fake.IO.FileSystem ~> 6.0.0
+    nuget Fake.IO.Zip ~> 6.0.0
+    nuget Fake.Core.Process ~> 6.0.0
+    nuget Fake.Core.Target ~> 6.0.0
+    nuget Fake.Tools.Git ~> 6.0.0
+nuget FSharpx.Extras 3.1.0
