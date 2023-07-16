@@ -95,6 +95,10 @@ module GitHelpers =
 
 [<AutoOpen>]
 module Archives =
+    open SharpCompress.Archives
+    open SharpCompress.Common
+    open SharpCompress.Writers
+    open System.IO
 
     let compressZip dirName =
         log $"Creating ZIP archive from '{dirName}'"
@@ -105,11 +109,10 @@ module Archives =
     let compressTarGzip dirName =
         log $"Creating TAR archive from '{dirName}'"
         let tarFile = distDir @@ $"{dirName}.tar.gz"
-        let args = [ "czf"; tarFile; dirName ] |> String.concat " "
-        let result = Shell.Exec("tar", args, buildDir)
-
-        if result <> 0 then
-            failwith $"Failed to create tar from '{dirName}'. Check errors above."
+        let writerOptions = WriterOptions(CompressionType.GZip, LeaveStreamOpen = true)
+        use stream: Stream = File.OpenWrite tarFile
+        use writer = WriterFactory.Open(stream, ArchiveType.Tar, writerOptions)
+        writer.WriteAll(buildDir, $"{dirName}/*", SearchOption.AllDirectories)
 
 let outputCombinations =
     [ OutputFormat(NoArch, Zip)

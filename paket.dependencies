@@ -29,4 +29,5 @@ group Build
     nuget Fake.Core.Process ~> 6.0.0
     nuget Fake.Core.Target ~> 6.0.0
     nuget Fake.Tools.Git ~> 6.0.0
-nuget FSharpx.Extras 3.1.0
+    nuget FSharpx.Extras 3.1.0
+    nuget SharpCompress
