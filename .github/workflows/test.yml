@@ -25,4 +25,4 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-paket-
       - name: Run code checks
-        run: dotnet fake build -t Check
+        run: ./build.sh -t Check
