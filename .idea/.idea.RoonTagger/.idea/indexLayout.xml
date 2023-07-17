@@ -17,6 +17,8 @@
       <Path>build.sh</Path>
       <Path>global.json</Path>
     </explicitIncludes>
-    <explicitExcludes />
+    <explicitExcludes>
+      <Path>docs</Path>
+    </explicitExcludes>
   </component>
 </project>
