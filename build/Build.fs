@@ -17,6 +17,7 @@ let targetRelease = "Release"
 let targetScoop = "Scoop"
 let targetLint = "Lint"
 let targetPublish = "Publish"
+let targetFormatCheck = "FormatCheck"
 let targetFormat = "Format"
 let targetTest = "Test"
 let targetHelp = "Help"
@@ -28,10 +29,7 @@ let buildDir = outputDir @@ "build"
 let distDir = outputDir @@ "dist"
 let srcDir = repoRoot @@ "src"
 let mainSln = repoRoot @@ "RoonTagger.sln"
-
-let cliProj =
-    srcDir
-    @@ "RoonTagger.Cli" @@ "RoonTagger.Cli.fsproj"
+let cliProj = srcDir @@ "RoonTagger.Cli" @@ "RoonTagger.Cli.fsproj"
 
 [<AutoOpen>]
 module Helpers =
@@ -78,11 +76,7 @@ module GitHelpers =
     let extractVersionFromTag () =
         let describe = Information.describe repoRoot
         let lastTag = Information.getLastTag ()
-
-        if (describe = lastTag) then
-            Some lastTag
-        else
-            None
+        if (describe = lastTag) then Some lastTag else None
 
     let promptGithubToken () =
         let tokenEnv = "GITHUB_TOKEN"
@@ -90,8 +84,7 @@ module GitHelpers =
         let prompt () =
             UserInput.getUserPassword "Github token: "
 
-        Environment.environVarOrNone tokenEnv
-        |> Option.defaultWith prompt
+        Environment.environVarOrNone tokenEnv |> Option.defaultWith prompt
 
 [<AutoOpen>]
 module Archives =
@@ -109,6 +102,7 @@ module Archives =
     let compressTarGzip dirName =
         log $"Creating TAR archive from '{dirName}'"
         let tarFile = distDir @@ $"{dirName}.tar.gz"
+        // fsharplint:disable-next-line
         let writerOptions = WriterOptions(CompressionType.GZip, LeaveStreamOpen = true)
         use stream: Stream = File.OpenWrite tarFile
         use writer = WriterFactory.Open(stream, ArchiveType.Tar, writerOptions)
@@ -123,6 +117,7 @@ let outputCombinations =
 
 let buildConfig ctx =
     let args = ctx.Context.Arguments
+
     lazy
         if Seq.contains "--release" args then
             Some DotNet.BuildConfiguration.Release
@@ -130,7 +125,6 @@ let buildConfig ctx =
             Some DotNet.BuildConfiguration.Debug
         else
             None
-
 
 let version ctx =
     let versionOverride =
@@ -144,8 +138,8 @@ let version ctx =
             else
                 return version
         }
-    
-    lazy Option.orElse versionOverride  (extractVersionFromTag ())
+
+    lazy Option.orElse versionOverride (extractVersionFromTag ())
 
 let publishArch dir rid version ctx =
     let buildConfig =
@@ -166,8 +160,9 @@ let publishArch dir rid version ctx =
                         Properties =
                             ("PublishSingleFile", "true")
                             :: ("PublishTrimmed", "true")
-                               :: ("PublishReadyToRun", "true")
-                                  :: ("Version", version) :: p.MSBuildParams.Properties } })
+                            :: ("PublishReadyToRun", "true")
+                            :: ("Version", version)
+                            :: p.MSBuildParams.Properties } })
         cliProj
 
 let publishNoArch dir version ctx =
@@ -187,7 +182,8 @@ let publishNoArch dir version ctx =
                         Properties =
                             // Explicit because  specified as true in the project file.
                             ("PublishTrimmed", "false")
-                            :: ("Version", version) :: p.MSBuildParams.Properties } })
+                            :: ("Version", version)
+                            :: p.MSBuildParams.Properties } })
         cliProj
 
 let runBuild ctx =
@@ -205,9 +201,7 @@ let runBuild ctx =
                 MSBuildParams =
                     { p.MSBuildParams with
                         DisableInternalBinLog = true // TODO: see https://github.com/fsprojects/FAKE/issues/2722
-                        Properties =
-                            ("Version", dotNetVersion)
-                            :: p.MSBuildParams.Properties } })
+                        Properties = ("Version", dotNetVersion) :: p.MSBuildParams.Properties } })
         mainSln
 
 let runClean _ =
@@ -220,8 +214,7 @@ let runClean _ =
 let runFullClean _ =
     Trace.traceHeader "Performing Full Clean"
 
-    !! "src/*/obj" ++ "src/*/bin" ++ "output"
-    |> File.deleteAll
+    !! "src/*/obj" ++ "src/*/bin" ++ "output" |> File.deleteAll
 
 let runLint _ =
     Trace.traceHeader "Linting the project"
@@ -234,11 +227,17 @@ let runLint _ =
     if not result.OK then
         failwith "Linting errors found. See output above"
 
-let runFormat _ =
+let runFormat check =
     Trace.traceHeader "Check project formatting"
+    let defaultArgs = if check then [ "--check" ] else []
 
     let result =
-        [ repoRoot; "--recurse"; "--check" ]
+        !! "**/*.fs"
+        -- "packages/**/*.fs"
+        -- "**/obj/**/*.fs"
+        -- "**/bin/**/*.fs"
+        |> Seq.toList
+        |> List.append defaultArgs
         |> String.concat " "
         |> DotNet.exec id "fantomas"
 
@@ -250,11 +249,16 @@ let runTest ctx =
         Option.defaultValue DotNet.BuildConfiguration.Debug (buildConfig ctx).Value
 
     Trace.traceHeader $"Testing with '{buildConfig}' profile"
-    DotNet.test (fun s ->
-                     { s with
-                         Configuration = buildConfig
-                         // TODO: see https://github.com/fsprojects/FAKE/issues/2722
-                         MSBuildParams = { s.MSBuildParams with DisableInternalBinLog = true } }) mainSln
+
+    DotNet.test
+        (fun s ->
+            { s with
+                Configuration = buildConfig
+                // TODO: see https://github.com/fsprojects/FAKE/issues/2722
+                MSBuildParams =
+                    { s.MSBuildParams with
+                        DisableInternalBinLog = true } })
+        mainSln
 
 let runScoop ctx =
     let version = parseVersion (version ctx).Value
@@ -279,7 +283,7 @@ let runPublish ctx =
     Shell.mkdir buildDir
     Shell.mkdir distDir
 
-    for OutputFormat (target, archive) in outputCombinations do
+    for OutputFormat(target, archive) in outputCombinations do
         let rid = toRID target
         let dir = $"roon-tagger_{version}_{rid}"
 
@@ -298,6 +302,7 @@ let runRelease ctx =
     let version = version ctx
 
     if version.Value.IsNone then
+        // fsharplint:disable-next-line FailwithBadUsage
         failwith "No Version - either HEAD should be a tag or version override must be specified"
 
     let version = Option.get version.Value
@@ -333,12 +338,13 @@ Usage ($BUILD = ./build.sh or .\build.cmd - depending on your OS):
 
 tasks:
     * Help      - show help (default task if no task is specified)
+    * Format    - Perform in-place formatting on all F# files in project
     * Test      - run project tests
     * CodeCheck - check linting and formatting
     * Check     - run all project checks
     * Build     - Build the project (by default in Release mode)
-    * Publish   - Create archives of roon-tagger for all supported platforms.
-    * Release   - Create github draft release (with the published files).
+    * Publish   - Create archives of roon-tagger for all supported platforms
+    * Release   - Create github draft release (with the published files)
 
 options:
     --version VERSION Override git tag as version.
@@ -351,36 +357,34 @@ options:
 
 
 let initTargets () =
-    
+
     /// Defines a dependency - y is dependent on x. Finishes the chain.
-    let (==>!) x y =
-        x ==> y
-        |> ignore
+    let (==>!) x y = x ==> y |> ignore
 
     /// Defines a soft dependency. x must run before y, if it is present, but y does not require x to be run. Finishes the chain.
-    let (?=>!) x y =
-        x ?=> y
-        |> ignore
-        
+    let (?=>!) x y = x ?=> y |> ignore
+
     Target.create targetCodeCheck ignore
     Target.create targetCheck ignore
     Target.create targetBuild runBuild
     Target.create targetClean runClean
     Target.create targetFullClean runFullClean
     Target.create targetLint runLint
-    Target.create targetFormat runFormat
+    Target.create targetFormatCheck <| fun _ -> runFormat true
+    Target.create targetFormat <| fun _ -> runFormat false
     Target.create targetTest runTest
     Target.create targetScoop runScoop
     Target.create targetPublish runPublish
     Target.create targetRelease runRelease
     Target.create targetHelp runHelp
-    
+
     // Tasks dependencies
     targetClean ?=>! targetBuild
     targetClean ?=> targetPublish ==>! targetRelease
     targetClean ==>! targetRelease
     targetScoop ==>! targetRelease
-    targetFormat ==> targetLint ==>! targetCodeCheck
+    targetFormatCheck ?=> targetLint ==>! targetCodeCheck
+    targetFormatCheck ==>! targetCodeCheck
     targetTest ==>! targetCheck
     targetCodeCheck ==>! targetCheck
     targetClean ==>! targetCheck
@@ -394,6 +398,10 @@ let main argv =
     |> Context.setExecutionContext
 
     initTargets ()
-    Target.runOrDefaultWithArguments targetHelp
 
-    0 // return an integer exit code
+    try
+        Target.runOrDefaultWithArguments targetHelp
+        0 // return an integer exit code
+    with ex ->
+        Trace.traceError ex.Message
+        1
