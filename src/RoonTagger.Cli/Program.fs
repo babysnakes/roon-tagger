@@ -28,7 +28,6 @@ let main argv =
         |> function
             | Ok _ -> 0
             | _ -> 1
-    with
-    | ex ->
+    with ex ->
         AnsiConsole.WriteException(ex)
         1

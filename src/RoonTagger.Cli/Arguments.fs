@@ -137,8 +137,8 @@ type MainArgs =
 let parseDate dateString =
     try
         DateTime.Parse dateString
-    with
-    | _ -> failwith "Not a valid date format"
+    with _ ->
+        failwith "Not a valid date format"
 
 let parseTodayOrDate =
     function

@@ -12,6 +12,7 @@ module Track =
 
     let load (fileName: string) : Result<AudioTrack, MetadataErrors> =
         try
+            // fsharplint:disable-next-line redundantNewKeyword // it's IDisposable
             let track = new FlacFile(fileName)
             Ok { Path = fileName; Track = Flac track }
         with
@@ -20,7 +21,7 @@ module Track =
             Error(FileDoesNotExist err.Message)
         | :? Exceptions.FlacLibSharpInvalidFormatException as err ->
             log.Error("Loading track '{FileName}': {Err}", fileName, err)
-            Error(sprintf "Not a valid FLAC file: '%s'" fileName |> InvalidFileFormat)
+            Error($"Not a valid FLAC file: '%s{fileName}'" |> InvalidFileFormat)
         | err ->
             log.Error("Loading track '{FileName}': {Err}", fileName, err)
             Error(UnexpectedError err.Message)

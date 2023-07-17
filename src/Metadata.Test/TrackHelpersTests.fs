@@ -38,15 +38,10 @@ module MetadataHelpersTests =
 
     [<Test>]
     let ``sort tracks by tracks and cd number if cd is empty`` () =
-        let before =
-            [ "track3.flac"
-              "track1.flac"
-              "track2.flac" ]
+        let before = [ "track3.flac"; "track1.flac"; "track2.flac" ]
 
         let expected =
-            [ "track1.flac"
-              "track2.flac"
-              "track3.flac" ]
+            [ "track1.flac"; "track2.flac"; "track3.flac" ]
             |> List.map loadTracksPath
 
         before
@@ -58,10 +53,7 @@ module MetadataHelpersTests =
 
     [<Test>]
     let ``sort tracks fails if there are duplicate track and disc numbers`` () =
-        let tracks =
-            [ "track2.flac"
-              "another-track1.flac"
-              "track1.flac" ]
+        let tracks = [ "track2.flac"; "another-track1.flac"; "track1.flac" ]
 
         tracks
         |> List.map loadTrackSuccess
@@ -101,9 +93,7 @@ module MetadataHelpersTests =
     [<Test>]
     let ``Consecutive tracks sorts the provided tracks`` () =
         let result =
-            [ "disc1track2.flac"
-              "disc1track1.flac"
-              "disc1track3.flac" ]
+            [ "disc1track2.flac"; "disc1track1.flac"; "disc1track3.flac" ]
             |> createConsecutiveTracks
             |> Result.unwrap
 

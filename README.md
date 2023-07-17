@@ -22,10 +22,14 @@ dotnet test
 We also use [Fake][] for running some build/test tasks. For help run:
 
 ```powershell
-dotnet fake build
+.\build # on Windows
 ```
 
-This will list the main targets to run. These targets are also running in CI.
+```shell
+./build.sh # on mac/linux
+```
+
+This will show the build system Usage. It could be used in CI.
 
 ### Refreshing Roles List
 

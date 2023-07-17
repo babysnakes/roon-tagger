@@ -5,7 +5,7 @@
     <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ExtractRoles.fsx" />
+    <None Include="ExtractRoles.fsx" />
     <Compile Include="Models.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="formats/Flac.fs" />

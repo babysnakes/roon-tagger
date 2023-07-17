@@ -42,7 +42,7 @@ type WorkPromptResponse =
         | EditWorkName -> "Edit work name"
         | EditMovements -> "Edit movements in a file"
 
-let printWork (Work (name, ConsecutiveTracks tracks)) =
+let printWork (Work(name, ConsecutiveTracks tracks)) =
     log.Debug("Printing work '{Name}' with tracks: {Tracks}", name, tracks)
     let grid = Grid()
     let firstColumn = GridColumn()
@@ -105,24 +105,18 @@ type WorkProcessor =
         }
         |> Result.teeError (fun _ -> cleanup movementsFilePath |> ignore)
 
-    member _.PromptWorkOperation(Work (workName, _)) =
+    member _.PromptWorkOperation(Work(workName, _)) =
         let prompt = SelectionPrompt<WorkPromptResponse>()
         prompt.Title <- $"[yellow]{workName.EscapeMarkup()}:[/]"
 
-        prompt.AddChoices(
-            [ ViewWork
-              SaveWork
-              EditWorkName
-              EditMovements
-              DeleteWork ]
-        )
+        prompt.AddChoices([ ViewWork; SaveWork; EditWorkName; EditMovements; DeleteWork ])
         |> ignore
 
         AnsiConsole.Prompt(prompt)
 
     member this.HandleSingleWork(work: Work) : Result<string, CliErrors list> =
 
-        let rec loop (Work (name, cTracks) as work) =
+        let rec loop (Work(name, cTracks) as work) =
             match (this.PromptWorkOperation work) with
             | SaveWork ->
                 log.Debug("Applying work: {Name}", name)

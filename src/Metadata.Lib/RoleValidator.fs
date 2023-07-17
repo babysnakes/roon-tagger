@@ -11,7 +11,7 @@ type RoleValidator =
     member rv.Validate(role: string) : Result<unit, MetadataErrors> =
         match rv with
         | Roles None -> Ok()
-        | Roles (Some roles) ->
+        | Roles(Some roles) ->
             if roles |> List.contains role then
                 Ok()
             else

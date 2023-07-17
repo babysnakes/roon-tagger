@@ -22,11 +22,7 @@ let splitTitle2WorkMovement (track: AudioTrack) =
 /// Extract work name from track's title. Return None if can not split to work/movement
 let workFromTitle =
     splitTitle2WorkMovement
-    >> fun (work, movement) ->
-        if Option.isSome movement then
-            Some work
-        else
-            None
+    >> fun (work, movement) -> if Option.isSome movement then Some work else None
 
 /// Parsing movement part of the title. Should be able to parse the following as
 /// indexed:
@@ -82,20 +78,20 @@ module MovementParser =
     let parseLayout movement =
         run titleLayout movement
         |> function
-            | Success (r, _, _) ->
+            | Success(r, _, _) ->
                 log.Verbose("Parsing layout of '{Movement}' returned: {R}", movement, r)
                 r
-            | Failure (msg, _, _) ->
+            | Failure(msg, _, _) ->
                 failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
 
     /// Extract the movement name (remove prefixes)
     let parseMovement movement =
         run title movement
         |> function
-            | Success (s, _, _) ->
+            | Success(s, _, _) ->
                 log.Verbose("Parsing title of '{Movement}' returned: {S}", movement, s)
                 s
-            | Failure (msg, _, _) ->
+            | Failure(msg, _, _) ->
                 failwith $"[BUG]: Error parsing movement! this should not have happened. Error was: {msg}"
 
 /// An already parsed work (not applied). Only use `Create` to initialize
@@ -160,7 +156,7 @@ let extractWorks (ConsecutiveTracks tracks) addRomans =
         |> Result.bind (Work.Create (titleOpt |> Option.get) addRomans))
 
 /// Applies (saves) the work data
-let applyWork (Work (name, ConsecutiveTracks tracks)) =
+let applyWork (Work(name, ConsecutiveTracks tracks)) =
     let saveTrack t =
         result {
             do!

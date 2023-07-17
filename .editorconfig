@@ -1,6 +1,7 @@
-[*.fs]
+[*.{fs,fsx}]
 fsharp_max_value_binding_width = 80
 fsharp_max_infix_operator_expression = 70
+fsharp_max_if_then_short_width = 50
 
 [*.md]
 max_line_length = 100

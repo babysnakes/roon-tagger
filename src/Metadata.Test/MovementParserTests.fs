@@ -41,7 +41,7 @@ type MovementParserTests() =
     member this.``Simple parsing should apply``((testParser, data, expected)) =
         run testParser data
         |> function
-            | Success (res, _, _) when res = expected -> ()
+            | Success(res, _, _) when res = expected -> ()
             | x -> Assert.Fail($"Unexpected result '%A{x}', expected '{expected}'")
 
     [<TestCaseSource(nameof MovementParserTests.MatchingTitlesTestData)>]
