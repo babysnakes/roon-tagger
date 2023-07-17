@@ -269,7 +269,11 @@ let runScoop ctx =
   "version": "{version}",
   "description": "A utility to set Roon specific tags in flac files.",
   "homepage": "https://babysnakes.github.io/roon-tagger/",
-  "url": "https://github.com/babysnakes/roon-tagger/releases/download/{version}/roon-tagger_{version}_linux-x64.tar.gz",
+  "architecture": {{
+    "64bit": {{
+      "url": "https://github.com/babysnakes/roon-tagger/releases/download/{version}/roon-tagger_{version}_win-x64.tar.gz"
+    }}
+  }},
   "bin": "roon-tagger.exe"
 }}
 """
