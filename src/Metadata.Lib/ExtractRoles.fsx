@@ -1,43 +1,48 @@
-// This documents the process of extracting the supported roles of the Roon
-// wiki.
+(*
+    This documents the process of extracting the supported roles of the Roon wiki.
 
-// The first step is to point hour browser to:
-// https://help.roonlabs.com/portal/en/kb/articles/credit-roles
-//
-// This might take long to load. Open your browser's developer tools in the
-// *Network* tab and select 'xhr'. than save it locally under "bin\roles.json"
-// (relative to this file).
+    Note, This wiki occasionally changes it's technology. Currently the list of roles are passed as large markdown
+    section which is being parsed in browser rendering. Trying to parse the page directly via this script proved to be a
+    little challenging and since this process should be performed only once in a while it makes more sense to let the
+    browser render the page, than save it locally and then process it.
 
-// Send the file to FSI and then run: `run()` - This should update the saved
-// copy of `roles.txt`.
+    The first step is to point your browser to:
+    https://kb.roonlabs.com/Roon_Credit_Roles
 
-#r "nuget: FSharp.Data, 4.1.0"
+    Now you should save the web page as `page.html` under './bin` relative to this script's location. Open the file in
+    browser or text viewer to validate that the roles section is a rendered HTML and not large text block. Also validate
+    that there are exactly 6 categories under *Role Categories* at the top of the page.
+
+    From the root of the repository run:
+   
+    $ dotnet paket generate-load-scripts -g Dev
+    $ dotnet fsi ./src/Metadata.Lib/ExtractRoles.fsx
+    
+    It should overwrite `src/Metadata.Lib/Resources/roles.txt`.
+*)
+
+#load "../../.paket/load/net6.0/Dev/dev.group.fsx"
 
 open System.IO
 open FSharp.Data
 
-let basePath = __SOURCE_DIRECTORY__
+[<Literal>]
+let htmlPath = __SOURCE_DIRECTORY__ + @"\bin\page.html"
 
-let rolesJson = Path.Join([| basePath; "bin"; "roles.json" |])
+let outputFile = Path.Join([| __SOURCE_DIRECTORY__; "Resources"; "roles.txt" |])
 
-let resources = Path.Join([| __SOURCE_DIRECTORY__; "Resources" |])
+let p = new HtmlProvider<htmlPath>()
+let a1 = p.Tables.``Composer Roles``.Rows |> Array.map (fun r -> r.Role)
+let a2 = p.Tables.``Conductor Roles``.Rows |> Array.map (fun r -> r.Role)
+let a3 = p.Tables.``Ensemble Roles``.Rows |> Array.map (fun r -> r.Role)
+let a4 = p.Tables.``Performer Roles``.Rows |> Array.map (fun r -> r.Role)
+let a5 = p.Tables.``Production Roles``.Rows |> Array.map (fun r -> r.Role)
+let a6 = p.Tables.``Main Performer Roles``.Rows |> Array.map (fun r -> r.Role)
 
-let outputFile = Path.Join([| resources; "roles.txt" |])
+let roles =
+    [| a1; a2; a3; a4; a5; a6 |]
+    |> Array.concat
+    |> (Set.ofArray >> Set.toArray) // make it unique
+    |> Array.sort
 
-let run () =
-    let json = JsonValue.Load(rolesJson)
-    let rolesData = json.GetProperty "answer"
-    let html = HtmlDocument.Parse(rolesData.AsString())
-    let table = html.Descendants [ "table" ] |> Seq.head
-
-    let roles =
-        [
-          // First table row is titles
-          for row in table.Descendants [ "tr" ] |> Seq.tail do
-              for td in row.Descendants [ "td" ] do
-                  let t = td.InnerText().Trim()
-                  if t <> "" then yield t ]
-        |> List.sort
-
-    Directory.CreateDirectory resources |> ignore
-    File.WriteAllLines(outputFile, roles)
+File.WriteAllLines(outputFile, roles)

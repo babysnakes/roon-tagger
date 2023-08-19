@@ -248,7 +248,6 @@ Arranged By [String Arrangements]
 Arranged By [String]
 Arranged By [Strings
 Arranged By [Strings & Horns]
-Arranged By [Strings & Horns]
 Arranged By [Strings]
 Arranged By [Vocal Arrangement]
 Arranged By [Vocal Arrangements]
@@ -944,11 +943,6 @@ Candido
 Candombe Drum
 Caneco
 Canonaki
-Canonical Credit
-Canonical Credit
-Canonical Credit
-Canonical Credit
-Canonical Credit
 Cantatrice
 Cante
 Cantilena
@@ -1285,7 +1279,6 @@ Composed By [Uncredited]
 Composer
 Composer's Assistant
 Composer/Lyricist
-Composer/Lyricist
 Composite
 Compuesto
 Computer
@@ -1336,7 +1329,6 @@ Concertmaster
 Concertmistress
 Conch
 Conch Shell
-Conductor
 Conductor
 Conductor [Dirijor]
 Conductor [Orchestra]
@@ -2229,7 +2221,6 @@ Enhanced CD Engineering
 Enhanced Programming
 Enhanced Recording
 Ensemble
-Ensemble
 Ensemble Arrangement
 Ensemble Arranger
 Ensemble Director
@@ -2319,9 +2310,7 @@ Featured Artist
 Featuring
 Featuring [Feat.]
 Featuring [Rap]
-Featuring [Rap]
 Featuring [Uncredited]
-Featuring [Vocals]
 Featuring [Vocals]
 Featuring [With]
 Feedback
@@ -2678,7 +2667,6 @@ Guest Chorus Master
 Guest Conductor
 Guest Operator
 Guest Vocals
-Guest Vocals
 Guica
 Guichero
 Guido
@@ -2753,7 +2741,6 @@ Guitar [Guitars]
 Guitar [Lead]
 Guitar [Rhythm]
 Guitar [Slide]
-Guitar [Solo]
 Guitar [Solo]
 Guitar [Uncredited]
 GuitarViol
@@ -3649,7 +3636,6 @@ Machines
 Maculele
 Madal
 Main Personnel
-MainPerformer
 Make-Up
 Make-Up Assistant
 Male Alto
@@ -4364,7 +4350,6 @@ Pad Chitarra
 Padeiro
 Page Setup
 Page Setup Designer
-Page last changed Thu Nov 21 2019
 Pahu Tupa'i
 Pahū
 Pai
@@ -4468,7 +4453,6 @@ Percussion Technician
 Percussion [Additional]
 Performance Assistant
 Performance Supervisor
-Performer
 Performer
 Performer [All Instruments]
 Performer [Musician]
@@ -4808,7 +4792,6 @@ Producer [Vocals]
 Product Development
 Product Development Director
 Product Manager
-Production
 Production Accountant
 Production Administrator
 Production Advisor
@@ -5028,7 +5011,6 @@ Ranat Thum
 Rantang
 Rap
 Rap Lyric Adaptation
-Rap [Featuring]
 Rap [Featuring]
 Rap [Uncredited]
 Raperos
@@ -5519,7 +5501,6 @@ Saxophone [Alto]
 Saxophone [Baritone]
 Saxophone [Sax]
 Saxophone [Solo]
-Saxophone [Solo]
 Saxophone [Tenor]
 Saz
 Sazabo
@@ -5836,8 +5817,6 @@ Solo
 Solo Coordinator
 Solo Instrumental
 Solo Vocal
-Solo Vocal
-Solo Vocals
 Solo Vocals
 Soloist
 Sona
@@ -6223,11 +6202,6 @@ Supervising Producer
 Supervision Assistant
 Supervisor
 Supervisor of Analog Tape Transfers
-Supported Aliases
-Supported Aliases
-Supported Aliases
-Supported Aliases
-Supported Aliases
 Surbahar
 Surdo
 Surdo Virado
@@ -6775,7 +6749,6 @@ Trumpet Flugelhorn
 Trumpet Samples
 Trumpet Violin
 Trumpet [Solo]
-Trumpet [Solo]
 Trumpet [Uncredited]
 Trumpets
 Tràm Plè
@@ -6952,7 +6925,6 @@ Violin [1st]
 Violin [2nd]
 Violin [Electric]
 Violin [Solo]
-Violin [Solo]
 Violino Piccolo
 Violins
 Viololyra
@@ -7026,9 +6998,7 @@ Vocals [Chorus]
 Vocals [Duet With]
 Vocals [Duet]
 Vocals [Featuring]
-Vocals [Featuring]
 Vocals [Female]
-Vocals [Guest]
 Vocals [Guest]
 Vocals [Uncredited]
 Vocals [Vocal]

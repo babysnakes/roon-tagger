@@ -31,3 +31,9 @@ group Build
     nuget Fake.Tools.Git ~> 6.0.0
     nuget FSharpx.Extras 3.1.0
     nuget SharpCompress
+
+// DEV scripts dependencies (e.g. for occasionally pulling roles page)
+group Dev
+    source https://www.nuget.org/api/v2
+
+    nuget FSharp.Data ~> 6.2

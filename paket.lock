@@ -428,3 +428,43 @@ NUGET
     System.ValueTuple (4.5) - restriction: && (>= net45) (>= netstandard2.0)
     System.Windows.Extensions (7.0) - restriction: >= net6.0
       System.Drawing.Common (>= 7.0) - restriction: >= net6.0
+
+GROUP Dev
+NUGET
+  remote: https://www.nuget.org/api/v2
+    FSharp.Core (7.0.200) - restriction: >= netstandard2.0
+    FSharp.Data (6.2)
+      FSharp.Core (>= 5.0.1) - restriction: >= netstandard2.0
+      FSharp.Data.Csv.Core (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Html.Core (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Http (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Json.Core (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Runtime.Utilities (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.WorldBank.Core (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Xml.Core (>= 6.2) - restriction: >= netstandard2.0
+    FSharp.Data.Csv.Core (6.2) - restriction: >= netstandard2.0
+      FSharp.Core (>= 5.0.1) - restriction: >= netstandard2.0
+      FSharp.Data.Runtime.Utilities (>= 6.2) - restriction: >= netstandard2.0
+    FSharp.Data.Html.Core (6.2) - restriction: >= netstandard2.0
+      FSharp.Core (>= 5.0.1) - restriction: >= netstandard2.0
+      FSharp.Data.Csv.Core (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Runtime.Utilities (>= 6.2) - restriction: >= netstandard2.0
+    FSharp.Data.Http (6.2) - restriction: >= netstandard2.0
+      FSharp.Core (>= 5.0.1) - restriction: >= netstandard2.0
+    FSharp.Data.Json.Core (6.2) - restriction: >= netstandard2.0
+      FSharp.Core (>= 5.0.1) - restriction: >= netstandard2.0
+      FSharp.Data.Http (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Runtime.Utilities (>= 6.2) - restriction: >= netstandard2.0
+    FSharp.Data.Runtime.Utilities (6.2) - restriction: >= netstandard2.0
+      FSharp.Core (>= 5.0.1) - restriction: >= netstandard2.0
+      FSharp.Data.Http (>= 6.2) - restriction: >= netstandard2.0
+    FSharp.Data.WorldBank.Core (6.2) - restriction: >= netstandard2.0
+      FSharp.Core (>= 5.0.1) - restriction: >= netstandard2.0
+      FSharp.Data.Http (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Json.Core (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Runtime.Utilities (>= 6.2) - restriction: >= netstandard2.0
+    FSharp.Data.Xml.Core (6.2) - restriction: >= netstandard2.0
+      FSharp.Core (>= 5.0.1) - restriction: >= netstandard2.0
+      FSharp.Data.Http (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Json.Core (>= 6.2) - restriction: >= netstandard2.0
+      FSharp.Data.Runtime.Utilities (>= 6.2) - restriction: >= netstandard2.0
