@@ -1,7 +1,6 @@
 namespace RoonTagger.Metadata
 
 open Serilog
-open FlacLibSharp
 open FsToolkit.ErrorHandling
 open RoonTagger.Metadata.Formats
 open RoonTagger.Metadata.Utils
@@ -11,20 +10,9 @@ module Track =
     let log = Log.Logger
 
     let load (fileName: string) : Result<AudioTrack, MetadataErrors> =
-        try
-            // fsharplint:disable-next-line redundantNewKeyword // it's IDisposable
-            let track = new FlacFile(fileName)
-            Ok { Path = fileName; Track = Flac track }
-        with
-        | :? System.IO.FileNotFoundException as err ->
-            log.Error("Loading track: {Err}", err)
-            Error(FileDoesNotExist err.Message)
-        | :? Exceptions.FlacLibSharpInvalidFormatException as err ->
-            log.Error("Loading track '{FileName}': {Err}", fileName, err)
-            Error($"Not a valid FLAC file: '%s{fileName}'" |> InvalidFileFormat)
-        | err ->
-            log.Error("Loading track '{FileName}': {Err}", fileName, err)
-            Error(UnexpectedError err.Message)
+        // We only support flac currently ...
+        Flac.load fileName
+        |> Result.map (fun track -> { Path = fileName; Track = Flac track })
 
     /// Sets (replaces if needed) the tag in the track.
     let setTag (track: AudioTrack) (tag: RoonTag) : Result<AudioTrack, MetadataErrors> =

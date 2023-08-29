@@ -16,6 +16,21 @@ let DiskNumberTag = "DISCNUMBER"
 
 let log = Serilog.Log.Logger
 
+let load (fileName: string) : Result<FlacFile, MetadataErrors> =
+    try
+        // fsharplint:disable-next-line redundantNewKeyword // it's IDisposable
+        new FlacFile(fileName) |> Ok
+    with
+    | :? System.IO.FileNotFoundException as err ->
+        log.Error("Loading track: {Err}", err)
+        Error(FileDoesNotExist err.Message)
+    | :? Exceptions.FlacLibSharpInvalidFormatException as err ->
+        log.Error("Loading track '{FileName}': {Err}", fileName, err)
+        Error($"Not a valid FLAC file: '%s{fileName}'" |> InvalidFileFormat)
+    | err ->
+        log.Error("Loading track '{FileName}': {Err}", fileName, err)
+        Error(UnexpectedError err.Message)
+
 let setTag (track: FlacFile) (tag: RoonTag) =
     let comment = track.VorbisComment
 
