@@ -143,6 +143,9 @@ module TagsMap =
 
         updates |> Map.keys |> List.ofSeq |> List.fold folder original
 
+    let deleteTag (key: TagName) (m: TagsMap) : TagsMap =
+        m |> Map.remove key
+        
     let deleteTagValue (key: TagName) value (m: TagsMap) : TagsMap =
         m
         |> Map.change key (fun tv ->

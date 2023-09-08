@@ -75,7 +75,35 @@ module ``Track operations`` =
         result.Current |> should equal expected
 
     [<Test>]
-    let ``Delete entire tag from track should completely remove the tag`` () = Assert.Ignore "not implemented"
+    let ``Delete entire tag from track should completely remove the tag`` () =
+        let tags =
+            Map
+                [ (ArtistTag, TagValue.ofList [ "Artist 1"; "Artist 2" ])
+                  (AlbumTag, TagValue.ofString "my album") ]
+
+        let expected = Map [ (AlbumTag, TagValue.ofString "my album") ]
+        let track = { mkEmptyTrack () with Current = tags }
+        let result = Track.delTag track ArtistTag
+        result.Current |> should equal expected
+
+    [<Test>]
+    let ``Revert all tags modifications should dump all changes`` () =
+        let origTags = Map [ (ArtistTag, TagValue.ofString "An Artist") ]
+
+        let tags =
+            Map
+                [ (ArtistTag, TagValue.ofList [ "Artist 1"; "Artist 2" ])
+                  (AlbumTag, TagValue.ofString "my album") ]
+
+        let track =
+            { mkEmptyTrack () with
+                Original = origTags
+                Current = tags }
+
+        let result = track |> Track.revertTags
+        result.Current |> should equal origTags
+        result.Original |> should equal origTags
+
 
     [<Test>]
     let ``Setting dates should result in correct format`` () =

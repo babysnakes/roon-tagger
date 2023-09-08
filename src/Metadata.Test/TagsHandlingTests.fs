@@ -120,3 +120,8 @@ module ``TagsMap Manipulation`` =
     let ``deleting tags value should handle correctly`` (testData: DeleteTagsValueData) =
         let result = TagsMap.deleteTagValue testData.key testData.value testData.original
         Assert.AreEqual(testData.expected, result, testData.description)
+
+    [<Test>]
+    let ``remove tag with tag that does not exist in the TagsMap should return the same TagsMap`` () =
+        let tags = Map [ (ArtistTag, TagValue.ofList [ "Artist 1"; "artist 2" ]) ]
+        tags |> TagsMap.deleteTag AlbumTag |> should equal tags
