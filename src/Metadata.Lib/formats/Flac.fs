@@ -16,10 +16,12 @@ let diskNumberTag = "DISCNUMBER"
 
 let log = Serilog.Log.Logger
 
-let load (fileName: string) : Result<FlacFile, MetadataErrors> =
+let load (fileName: string) : Result<FlacFile * TagsMap, MetadataErrors> =
     try
         // fsharplint:disable-next-line redundantNewKeyword // it's IDisposable
-        new FlacFile(fileName) |> Ok
+        let track = new FlacFile(fileName)
+        // TODO: load metadata
+        Ok (track, Map.empty)
     with
     | :? System.IO.FileNotFoundException as err ->
         log.Error("Loading track: {Err}", err)
@@ -30,6 +32,9 @@ let load (fileName: string) : Result<FlacFile, MetadataErrors> =
     | err ->
         log.Error("Loading track '{FileName}': {Err}", fileName, err)
         Error(UnexpectedError err.Message)
+
+let validateTags (tags: TagsMap) : Result<TagsMap, MetadataErrors list> =
+    Ok tags
 
 let setTag (track: FlacFile) (tag: RoonTag) =
     let comment = track.VorbisComment

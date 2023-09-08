@@ -5,8 +5,6 @@ open FlacLibSharp
 
 type TrackFormat = Flac of FlacFile
 
-type AudioTrack = { Path: string; Track: TrackFormat }
-
 type Personnel = Personnel of String
 
 type RoonTag =
@@ -39,6 +37,16 @@ type TagName =
     | TrackNumberTag
     | DiscNumberTag
 
+type TagValue = private { Value: string list }
+
+type TagsMap = Map<TagName, TagValue>
+
+type AudioTrack =
+    { Path: string
+      Track: TrackFormat
+      Original: TagsMap
+      Current: TagsMap }
+
 type MetadataErrors =
     | FileDoesNotExist of string
     | InvalidFileFormat of string
@@ -51,3 +59,94 @@ type MetadataErrors =
     | UnsupportedRole of string
     | DuplicateTrackNumberForDisc
     | NonConsecutiveTracks
+
+[<RequireQualifiedAccess>]
+module TagValue =
+    /// Creates TagValue from string
+    let ofString (s: string) : TagValue = { Value = [ s ] }
+
+    /// Creates TagValue from list of strings
+    let ofList (ss: string list) : TagValue = { Value = ss }
+
+    /// Creates TagValue from int
+    let ofInt (n: int) : TagValue = { Value = [ $"{n}" ] }
+
+    /// Creates TagValue from date
+    let ofDate (date: DateTime) : TagValue =
+        { Value = [ date.ToString("yyyy-MM-dd") ] }
+
+    /// Extract value as string if exists (in tags that makes sense only as single value - e.g. title)
+    let toString v : string option =
+        match v.Value with
+        | "" :: _ -> None
+        | s :: _ -> Some s
+        | _ -> None
+
+    /// Extract value as list if any
+    let toList v : string list option =
+        if v.Value |> List.isEmpty then None else Some v.Value
+
+    /// Extract value as int if any
+    let toInt v : int option =
+        match v.Value with
+        | [] -> None
+        | s :: _ ->
+            match Int32.TryParse s with
+            | true, n -> Some n
+            | false, _ -> None
+
+    /// Extract value as date
+    let toDate v : DateTime option =
+        match v.Value with
+        | [] -> None
+        | s :: _ ->
+            match DateTime.TryParse s with
+            | true, date -> Some date
+            | false, _ -> None
+
+[<RequireQualifiedAccess>]
+module TagsMap =
+    let private mergeSingleTag (tag: TagName) (orig: TagValue option) (update: TagValue option) : TagValue option =
+        let joinListValue fst snd =
+            let f = TagValue.toList fst |> Option.defaultValue []
+            let s = TagValue.toList snd |> Option.defaultValue []
+            List.append f s |> TagValue.ofList
+
+        match orig, update with
+        | None, None -> None
+        | value, None -> value
+        | None, value -> value
+        | Some orig, Some up ->
+            match tag with
+            | TitleTag -> Some up
+            | AlbumTag -> Some up
+            | ArtistTag -> joinListValue up orig |> Some
+            | WorkTag -> Some up
+            | MovementTag -> Some up
+            | SectionTag -> Some up
+            | MovementIndexTag -> Some up
+            | MovementCountTag -> Some up
+            | ImportDateTag -> Some up
+            | OriginalReleaseDateTag -> Some up
+            | YearTag -> Some up
+            | ComposerTag -> joinListValue up orig |> Some
+            | CreditTag -> joinListValue up orig |> Some
+            | TrackNumberTag -> Some up
+            | DiscNumberTag -> Some up
+
+    let merge (original: TagsMap) (updates: TagsMap) : TagsMap =
+        let folder (state: TagsMap) (k: TagName) : TagsMap =
+            state
+            |> Map.change k (function
+                | None -> Map.tryFind k updates
+                | value -> mergeSingleTag k value (Map.tryFind k updates))
+
+        updates |> Map.keys |> List.ofSeq |> List.fold folder original
+
+    let deleteTagValue (key: TagName) value (m: TagsMap) : TagsMap =
+        m
+        |> Map.change key (fun tv ->
+            tv
+            |> Option.bind TagValue.toList
+            |> Option.map (List.filter (fun item -> item <> value))
+            |> Option.map TagValue.ofList)

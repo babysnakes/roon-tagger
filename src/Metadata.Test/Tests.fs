@@ -25,12 +25,65 @@ module ``Track operations`` =
         |> should be (ofCase <@ InvalidFileFormat @>)
 
     [<Test>]
+    let ``Merging valid TagsMap produces correctly merged metadata`` () =
+        let currentTags =
+            Map
+                [ (TitleTag, TagValue.ofString "my title")
+                  (ArtistTag, TagValue.ofString "John Coltrane")
+                  (TrackNumberTag, TagValue.ofInt 1) ]
+
+        let mergeTags =
+            Map
+                [ (ArtistTag, TagValue.ofString "Alvin Jones")
+                  (CreditTag, TagValue.ofString "Dan Tepfer - Piano") ]
+
+        let expected =
+            Map
+                [ (ArtistTag, TagValue.ofList [ "Alvin Jones"; "John Coltrane" ])
+                  (TitleTag, TagValue.ofString "my title")
+                  (TrackNumberTag, TagValue.ofInt 1)
+                  (CreditTag, TagValue.ofString "Dan Tepfer - Piano") ]
+
+        let track =
+            { mkEmptyTrack () with
+                Current = currentTags }
+
+        let result = Track.setTags track mergeTags |> Result.unwrap
+        result.Current |> should equal expected
+
+    [<Test>]
+    let ``Merge invalid tagsMap (unsupported values) should produce error`` () =
+        // Did I mean providing strings for disc number or list for title? use validateTag
+        Assert.Ignore "not implemented"
+
+    [<Test>]
+    let ``Delete tag value from track should delete only this value`` () =
+        let orig =
+            Map
+                [ (TitleTag, TagValue.ofString "my title")
+                  (ArtistTag, TagValue.ofList [ "John Coltrane"; "Alvin Jones" ])
+                  (TrackNumberTag, TagValue.ofInt 1) ]
+
+        let expected =
+            Map
+                [ (TitleTag, TagValue.ofString "my title")
+                  (ArtistTag, TagValue.ofString "Alvin Jones")
+                  (TrackNumberTag, TagValue.ofInt 1) ]
+
+        let track = { mkEmptyTrack () with Current = orig }
+        let result = Track.delTagValue track ArtistTag "John Coltrane"
+        result.Current |> should equal expected
+
+    [<Test>]
+    let ``Delete entire tag from track should completely remove the tag`` () = Assert.Ignore "not implemented"
+
+    [<Test>]
     let ``Setting dates should result in correct format`` () =
         let sampleDate = DateTime(2021, 5, 21)
         let track = "empty.flac" |> loadTrackSuccess
         let import = ImportDate sampleDate
         let originalRelease = OriginalReleaseDate sampleDate
-        Track.setTags track [ import; originalRelease ] |> ignore
+        Track.setTagsOld track [ import; originalRelease ] |> ignore
 
         (Track.getTagStringValue track ImportDateTag)[0]
         |> should equal "2021-05-21"
@@ -42,7 +95,7 @@ module ``Track operations`` =
     let ``Setting year should be parsed correctly`` () =
         let track = "empty.flac" |> loadTrackSuccess
 
-        Track.setTags track [ Year 2012 ] |> ignore
+        Track.setTagsOld track [ Year 2012 ] |> ignore
 
         (Track.getTagStringValue track YearTag)[0] |> should equal "2012"
 

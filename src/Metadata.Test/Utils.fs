@@ -38,6 +38,14 @@ type CopiedFile(fileName: string) =
             | _ ->
                 ()
 
+/// This function produces an empty AudioTrack. The `null` flac file is really hacky but for some tests we don't need
+/// anything better.
+let mkEmptyTrack () =
+    { Path = ""
+      Original = Map.empty
+      Current = Map.empty
+      Track = Flac null }
+    
 [<RequireQualifiedAccess>]
 module Result =
     /// After Rust's unwrap. Can throw `System.Exception`

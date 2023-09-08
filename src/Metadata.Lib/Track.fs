@@ -12,7 +12,11 @@ module Track =
     let load (fileName: string) : Result<AudioTrack, MetadataErrors> =
         // We only support flac currently ...
         Flac.load fileName
-        |> Result.map (fun track -> { Path = fileName; Track = Flac track })
+        |> Result.map (fun (track, metadata) ->
+            { Path = fileName
+              Track = Flac track
+              Original = metadata
+              Current = metadata })
 
     /// Sets (replaces if needed) the tag in the track.
     let setTag (track: AudioTrack) (tag: RoonTag) : Result<AudioTrack, MetadataErrors> =
@@ -20,8 +24,20 @@ module Track =
         | Flac file -> Flac.setTag file tag
         |> Result.map (fun _ -> track)
 
+    let setTags (track: AudioTrack) (tags: TagsMap) : Result<AudioTrack, MetadataErrors list> =
+        tags
+        // currently only flac is supported
+        |> Flac.validateTags
+        |> Result.map (fun tags ->
+            { track with
+                Current = TagsMap.merge track.Current tags })
+    
+    /// Delete a single value from tag (if exists)
+    let delTagValue (track: AudioTrack) (tag: TagName) value : AudioTrack =
+        { track with Current = TagsMap.deleteTagValue tag value track.Current }
+
     /// Sets (replaces if needed) the tags in the track.
-    let setTags (track: AudioTrack) (tags: RoonTag list) : Result<AudioTrack, MetadataErrors list> =
+    let setTagsOld (track: AudioTrack) (tags: RoonTag list) : Result<AudioTrack, MetadataErrors list> =
         tags
         |> List.traverseResultA (setTag track)
         |> Result.map (fun _ -> track)

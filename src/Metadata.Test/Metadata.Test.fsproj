@@ -12,6 +12,7 @@
     <Compile Include="TrackHelpersTests.fs" />
     <Compile Include="UtilsTests.fs" />
     <Compile Include="Tests.fs" />
+    <Compile Include="TagsHandlingTests.fs" />
     <Compile Include="Program.fs" />
     <None Include="Resources/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

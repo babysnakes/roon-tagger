@@ -75,7 +75,7 @@ let handleCmd (opts: ParseResults<SetTagsArgs>) =
             | Some composers -> do tracks |> List.map (fun t -> Track.addCredits t composers) |> ignore
 
         do!
-            List.traverseResultA (fun t -> Track.setTags t tags) tracks
+            List.traverseResultA (fun t -> Track.setTagsOld t tags) tracks
             |> Result.map ignore
             |> Result.mapError List.concat
 
