@@ -27,7 +27,7 @@ let private extractTagValue (track: FlacFile) (tag: TagName) : TagName * TagValu
     | MovementTag -> comment[MovementTag]
     | SectionTag -> comment[SectionTag]
     | MovementIndexTag
-    | MovementCountTag -> VorbisCommentValues() // TODO: remove unsupported flac tags?
+    | MovementCountTag -> VorbisCommentValues()
     | ImportDateTag -> comment[ImportDateTag]
     | OriginalReleaseDateTag -> comment[OriginalReleaseDateTag]
     | YearTag -> comment[YearTag]
@@ -42,7 +42,7 @@ let private extractTagValue (track: FlacFile) (tag: TagName) : TagName * TagValu
 let private loadTrackMetadata (track: FlacFile) : TagsMap =
     TagHelpers.allTagNames
     |> List.map (extractTagValue track)
-    |> List.filter (fun (_, value) -> value |> TagValue.toList |> Option.isSome)
+    |> List.filter (fun (_, value) -> value |> TagValue.isEmpty |> not)
     |> Map
 
 let load (fileName: string) : Result<FlacFile * TagsMap, MetadataErrors> =

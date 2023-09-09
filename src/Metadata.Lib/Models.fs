@@ -81,6 +81,12 @@ module TagHelpers =
 
 [<RequireQualifiedAccess>]
 module TagValue =
+    /// Checks whether the value is empty
+    let isEmpty v : bool =
+        match v.Value with
+        | [] -> true
+        | _ -> false
+
     /// Creates TagValue from string
     let ofString (s: string) : TagValue = { Value = [ s ] }
 
@@ -88,7 +94,7 @@ module TagValue =
     let ofList (ss: string list) : TagValue = { Value = ss }
 
     /// Creates TagValue from int
-    let ofInt (n: int) : TagValue = { Value = [ $"{n}" ] }
+    let ofInt (n: int) : TagValue = { Value = [ $"%02i{n}" ] }
 
     /// Creates TagValue from date
     let ofDate (date: DateTime) : TagValue =

@@ -9,6 +9,7 @@ module ``loading flac file`` =
 
     [<Test>]
     let ``load flac file reads all metadata`` () =
+        // fsharplint:disable-next-line redundantNewKeyword // it's IDisposable
         use tmp = new CopiedFile("with-metadata.flac")
         let path = tmp.Path
 
