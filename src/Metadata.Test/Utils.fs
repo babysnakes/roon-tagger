@@ -45,7 +45,7 @@ let mkEmptyTrack () =
       Original = Map.empty
       Current = Map.empty
       Track = Flac null }
-    
+
 [<RequireQualifiedAccess>]
 module Result =
     /// After Rust's unwrap. Can throw `System.Exception`

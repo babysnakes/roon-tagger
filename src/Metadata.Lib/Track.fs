@@ -31,19 +31,20 @@ module Track =
         |> Result.map (fun tags ->
             { track with
                 Current = TagsMap.merge track.Current tags })
-    
+
     /// Delete a single value from tag (if exists)
     let delTagValue (track: AudioTrack) (tag: TagName) value : AudioTrack =
-        { track with Current = TagsMap.deleteTagValue tag value track.Current }
-    
+        { track with
+            Current = TagsMap.deleteTagValue tag value track.Current }
+
     /// Delete entire tag (with value)
     let delTag (track: AudioTrack) (tag: TagName) : AudioTrack =
-        { track with Current = TagsMap.deleteTag tag track.Current }
+        { track with
+            Current = TagsMap.deleteTag tag track.Current }
 
     /// Revert all tags updates
-    let revertTags (track: AudioTrack) : AudioTrack =
-        { track with Current = track.Original }
-    
+    let revertTags (track: AudioTrack) : AudioTrack = { track with Current = track.Original }
+
     /// Sets (replaces if needed) the tags in the track.
     let setTagsOld (track: AudioTrack) (tags: RoonTag list) : Result<AudioTrack, MetadataErrors list> =
         tags

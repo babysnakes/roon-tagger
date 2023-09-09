@@ -125,3 +125,16 @@ module ``TagsMap Manipulation`` =
     let ``remove tag with tag that does not exist in the TagsMap should return the same TagsMap`` () =
         let tags = Map [ (ArtistTag, TagValue.ofList [ "Artist 1"; "artist 2" ]) ]
         tags |> TagsMap.deleteTag AlbumTag |> should equal tags
+
+module ``TagNamesHelpers`` =
+    open Microsoft.FSharp.Reflection
+
+    /// Get a seq of all DU cases.
+    let GetAllUnionCases<'T> () =
+        FSharpType.GetUnionCases(typeof<'T>)
+        |> Seq.map (fun x -> FSharpValue.MakeUnion(x, Array.zeroCreate (x.GetFields().Length)) :?> 'T)
+
+    [<Test>]
+    let ``validate allTagNames is in sync with TagName cases`` () =
+        let expected = GetAllUnionCases<TagName>() |> Set.ofSeq
+        TagHelpers.allTagNames |> Set.ofSeq |> should equal expected

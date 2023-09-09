@@ -60,6 +60,25 @@ type MetadataErrors =
     | DuplicateTrackNumberForDisc
     | NonConsecutiveTracks
 
+module TagHelpers =
+
+    let allTagNames =
+        [ TitleTag
+          AlbumTag
+          ArtistTag
+          WorkTag
+          MovementTag
+          SectionTag
+          MovementIndexTag
+          MovementCountTag
+          ImportDateTag
+          OriginalReleaseDateTag
+          YearTag
+          ComposerTag
+          CreditTag
+          TrackNumberTag
+          DiscNumberTag ]
+
 [<RequireQualifiedAccess>]
 module TagValue =
     /// Creates TagValue from string
@@ -143,9 +162,8 @@ module TagsMap =
 
         updates |> Map.keys |> List.ofSeq |> List.fold folder original
 
-    let deleteTag (key: TagName) (m: TagsMap) : TagsMap =
-        m |> Map.remove key
-        
+    let deleteTag (key: TagName) (m: TagsMap) : TagsMap = m |> Map.remove key
+
     let deleteTagValue (key: TagName) value (m: TagsMap) : TagsMap =
         m
         |> Map.change key (fun tv ->

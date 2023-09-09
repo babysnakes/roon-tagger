@@ -16,12 +16,40 @@ let diskNumberTag = "DISCNUMBER"
 
 let log = Serilog.Log.Logger
 
+let private extractTagValue (track: FlacFile) (tag: TagName) : TagName * TagValue =
+    let comment = track.VorbisComment
+
+    match tag with
+    | TitleTag -> comment.Title
+    | AlbumTag -> comment.Album
+    | ArtistTag -> comment.Artist
+    | WorkTag -> comment[WorkTag]
+    | MovementTag -> comment[MovementTag]
+    | SectionTag -> comment[SectionTag]
+    | MovementIndexTag
+    | MovementCountTag -> VorbisCommentValues() // TODO: remove unsupported flac tags?
+    | ImportDateTag -> comment[ImportDateTag]
+    | OriginalReleaseDateTag -> comment[OriginalReleaseDateTag]
+    | YearTag -> comment[YearTag]
+    | ComposerTag -> comment[ComposerTag]
+    | CreditTag -> comment[CreditTag]
+    | TrackNumberTag -> comment.TrackNumber
+    | DiscNumberTag -> comment[DiskNumberTag]
+    |> List.ofSeq
+    |> TagValue.ofList
+    |> (fun v -> tag, v)
+
+let private loadTrackMetadata (track: FlacFile) : TagsMap =
+    TagHelpers.allTagNames
+    |> List.map (extractTagValue track)
+    |> List.filter (fun (_, value) -> value |> TagValue.toList |> Option.isSome)
+    |> Map
+
 let load (fileName: string) : Result<FlacFile * TagsMap, MetadataErrors> =
     try
         // fsharplint:disable-next-line redundantNewKeyword // it's IDisposable
         let track = new FlacFile(fileName)
-        // TODO: load metadata
-        Ok (track, Map.empty)
+        Ok(track, loadTrackMetadata track)
     with
     | :? System.IO.FileNotFoundException as err ->
         log.Error("Loading track: {Err}", err)
@@ -33,8 +61,7 @@ let load (fileName: string) : Result<FlacFile * TagsMap, MetadataErrors> =
         log.Error("Loading track '{FileName}': {Err}", fileName, err)
         Error(UnexpectedError err.Message)
 
-let validateTags (tags: TagsMap) : Result<TagsMap, MetadataErrors list> =
-    Ok tags
+let validateTags (tags: TagsMap) : Result<TagsMap, MetadataErrors list> = Ok tags
 
 let setTag (track: FlacFile) (tag: RoonTag) =
     let comment = track.VorbisComment
