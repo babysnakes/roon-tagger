@@ -19,7 +19,7 @@ let main argv =
         )
 
     let parser =
-        ArgumentParser.Create<MainArgs>(programName = Info.Name, errorHandler = errorHandler)
+        ArgumentParser.Create<MainArgs>(programName = Info.name, errorHandler = errorHandler)
 
     try
         parser.Parse argv

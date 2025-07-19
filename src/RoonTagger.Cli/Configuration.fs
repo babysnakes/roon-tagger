@@ -31,7 +31,7 @@ let getConfigDirectory () =
     let localAppData =
         Environment.GetFolderPath Environment.SpecialFolder.LocalApplicationData
 
-    Path.Join(localAppData, Info.Name)
+    Path.Join(localAppData, Info.name)
 
 /// Returns the full path of config file based on dir, base name and version.
 let getConfigFilePath (dir: string) (baseName: string) (version: ConfigurationVersion) =
@@ -60,7 +60,7 @@ let loadConfigWithDefault (path: string) : Result<ConfigurationV1, CliErrors> =
     let defaultConfig =
         { Editor = None
           Log =
-            { File = $"{Info.Name}.log"
+            { File = $"{Info.name}.log"
               Level = LogLevel.None } }
 
     loadConfig path |> Result.map (Option.defaultValue defaultConfig)

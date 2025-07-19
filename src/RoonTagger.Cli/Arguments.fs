@@ -129,7 +129,7 @@ type MainArgs =
             | Set_Tags _ -> "set tags"
             | Edit_Titles _ -> "Edit the titles of the provided files as a text file"
             | Credits _ -> "Add/Delete credit entries"
-            | Configure _ -> $"Configure {Info.Name}"
+            | Configure _ -> $"Configure {Info.name}"
             | View _ -> "View metadata of the provided file"
             | Extract_Works _ -> "Try to identify and save work/movements from the provided files."
             | Completions _ -> "Generate tab completion script for supported shells."

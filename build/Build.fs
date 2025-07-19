@@ -214,7 +214,7 @@ let runClean _ =
 let runFullClean _ =
     Trace.traceHeader "Performing Full Clean"
 
-    !! "src/*/obj" ++ "src/*/bin" ++ "output" |> File.deleteAll
+    !!"src/*/obj" ++ "src/*/bin" ++ "output" |> File.deleteAll
 
 let runLint _ =
     Trace.traceHeader "Linting the project"
@@ -232,7 +232,7 @@ let runFormat check =
     let defaultArgs = if check then [ "--check" ] else []
 
     let result =
-        !! "**/*.fs"
+        !!"**/*.fs"
         -- "packages/**/*.fs"
         -- "**/obj/**/*.fs"
         -- "**/bin/**/*.fs"
@@ -312,7 +312,7 @@ let runRelease ctx =
     let version = Option.get version.Value
 
     let files =
-        !! "output/dist/*.zip"
+        !!"output/dist/*.zip"
         ++ "output/dist/*.tar.gz"
         ++ "output/dist/*.json"
 

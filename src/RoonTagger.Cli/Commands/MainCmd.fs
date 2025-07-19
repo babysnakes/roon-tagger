@@ -72,7 +72,7 @@ let runMain (opts: ParseResults<MainArgs>) =
             let v = Info.Version()
 
             return
-                infoMessage $"{Info.Name}: {v.Major}.{v.Minor}.{v.Build} (revision {v.Revision})"
+                infoMessage $"{Info.name}: {v.Major}.{v.Minor}.{v.Build} (revision {v.Revision})"
                 |> Ok
         else
             let subCommand =

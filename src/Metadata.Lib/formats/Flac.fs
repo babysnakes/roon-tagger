@@ -4,15 +4,15 @@ open FlacLibSharp
 open RoonTagger.Metadata
 open RoonTagger.Metadata.Utils
 
-let OriginalReleaseDateTag = "ORIGINALRELEASEDATE"
-let ImportDateTag = "IMPORTDATE"
-let YearTag = "YEAR"
-let WorkTag = "WORK"
-let MovementTag = "PART"
-let SectionTag = "SECTION"
-let CreditTag = "PERSONNEL"
-let ComposerTag = "COMPOSER"
-let DiskNumberTag = "DISCNUMBER"
+let originalReleaseDateTag = "ORIGINALRELEASEDATE"
+let importDateTag = "IMPORTDATE"
+let yearTag = "YEAR"
+let workTag = "WORK"
+let movementTag = "PART"
+let sectionTag = "SECTION"
+let creditTag = "PERSONNEL"
+let composerTag = "COMPOSER"
+let diskNumberTag = "DISCNUMBER"
 
 let log = Serilog.Log.Logger
 
@@ -39,13 +39,13 @@ let setTag (track: FlacFile) (tag: RoonTag) =
 
     match tag with
     | Title title -> Ok(comment.Title <- VorbisCommentValues title)
-    | Work work -> Ok(replace WorkTag work)
-    | Movement mvmt -> Ok(replace MovementTag mvmt)
-    | Section section -> Ok(replace SectionTag section)
-    | ImportDate date -> Ok(replace ImportDateTag (formatDate date))
-    | OriginalReleaseDate date -> Ok(replace OriginalReleaseDateTag (formatDate date))
-    | Year year -> Ok(replace YearTag $"%d{year}")
-    | Composer composers -> Ok(comment.Replace(ComposerTag, VorbisCommentValues composers))
+    | Work work -> Ok(replace workTag work)
+    | Movement mvmt -> Ok(replace movementTag mvmt)
+    | Section section -> Ok(replace sectionTag section)
+    | ImportDate date -> Ok(replace importDateTag (formatDate date))
+    | OriginalReleaseDate date -> Ok(replace originalReleaseDateTag (formatDate date))
+    | Year year -> Ok(replace yearTag $"%d{year}")
+    | Composer composers -> Ok(comment.Replace(composerTag, VorbisCommentValues composers))
     | MovementIndex _
     | MovementCount _ -> Error UnsupportedTagForFormat
     | Credit _ -> Error(UnsupportedTagOperation "Credit tag does not support *set* operation, only add/delete.")
@@ -61,18 +61,18 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
     | TitleTag -> comment.Title
     | AlbumTag -> comment.Album
     | ArtistTag -> comment.Artist
-    | WorkTag -> comment[WorkTag]
-    | MovementTag -> comment[MovementTag]
-    | SectionTag -> comment[SectionTag]
-    | ImportDateTag -> comment[ImportDateTag]
-    | OriginalReleaseDateTag -> comment[OriginalReleaseDateTag]
-    | YearTag -> comment[YearTag]
-    | CreditTag -> comment[CreditTag]
+    | WorkTag -> comment[workTag]
+    | MovementTag -> comment[movementTag]
+    | SectionTag -> comment[sectionTag]
+    | ImportDateTag -> comment[importDateTag]
+    | OriginalReleaseDateTag -> comment[originalReleaseDateTag]
+    | YearTag -> comment[yearTag]
+    | CreditTag -> comment[creditTag]
     | TrackNumberTag -> comment.TrackNumber
-    | DiscNumberTag -> comment[DiskNumberTag]
+    | DiscNumberTag -> comment[diskNumberTag]
     | MovementIndexTag
     | MovementCountTag -> VorbisCommentValues()
-    | ComposerTag -> comment[ComposerTag]
+    | ComposerTag -> comment[composerTag]
     |> List.ofSeq
 
 let applyChanges (track: FlacFile) =
