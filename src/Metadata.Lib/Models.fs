@@ -159,6 +159,7 @@ module TagsMap =
             | TrackNumberTag -> Some up
             | DiscNumberTag -> Some up
 
+    /// Apply updates tags-map to existing tags-map.
     let merge (original: TagsMap) (updates: TagsMap) : TagsMap =
         let folder (state: TagsMap) (k: TagName) : TagsMap =
             state
@@ -168,8 +169,10 @@ module TagsMap =
 
         updates |> Map.keys |> List.ofSeq |> List.fold folder original
 
+    /// Delete entire tag from tags-map
     let deleteTag (key: TagName) (m: TagsMap) : TagsMap = m |> Map.remove key
 
+    /// Delete single value from specific tag in tags-map. Ignores non-existing values.
     let deleteTagValue (key: TagName) value (m: TagsMap) : TagsMap =
         m
         |> Map.change key (fun tv ->
@@ -177,3 +180,25 @@ module TagsMap =
             |> Option.bind TagValue.toList
             |> Option.map (List.filter (fun item -> item <> value))
             |> Option.map TagValue.ofList)
+
+    /// Reads an original and update tags-maps and produces a tags-map of only the modified tags + a list of tags to
+    /// completely remove.
+    let extractChanges (orig: TagsMap) (update: TagsMap) : TagsMap * TagName list =
+        let emptyValueMap, withValueMap =
+            update |> Map.partition (fun _ v -> TagValue.isEmpty v)
+
+        let diffMap =
+            withValueMap
+            |> Map.filter (fun k v -> (orig |> Map.tryFind k) <> Some v)
+
+        let delList =
+            orig
+            |> Map.filter (fun k _ -> Map.containsKey k withValueMap |> not)
+            |> Map.keys
+
+        let emptyList =
+            emptyValueMap
+            |> Map.filter (fun k _ -> Map.containsKey k orig) // new empty values don't need to be removed
+            |> Map.keys
+
+        diffMap, delList |> Seq.append emptyList |> Seq.distinct |> Seq.toList

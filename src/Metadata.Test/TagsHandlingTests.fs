@@ -19,6 +19,13 @@ module ``TagsMap Manipulation`` =
           Key: TagName
           Value: string }
 
+    type ChangesTestData =
+        { Description: string
+          Original: TagsMap
+          Updates: TagsMap
+          ExpectedMap: TagsMap
+          ExpectedDelete: TagName list }
+
     let mergeTestsData () =
         [ { Description = "title should be replaced"
             Original = Map [ (TitleTag, TagValue.ofString "old title") ]
@@ -111,6 +118,50 @@ module ``TagsMap Manipulation`` =
             Key = ArtistTag
             Value = "Another Artist" } ]
 
+    let changesTestData () =
+        [ { Description = "simple diff should work"
+            Original =
+              Map
+                  [ (ArtistTag, TagValue.ofList [ "Some Artist"; "Another Artist" ])
+                    (TrackNumberTag, TagValue.ofInt 1) ]
+            Updates =
+              Map
+                  [ (ArtistTag, TagValue.ofList [ "Some Artist"; "Second Artist" ])
+                    (TitleTag, TagValue.ofString "My Title")
+                    (TrackNumberTag, TagValue.ofInt 1) ]
+            ExpectedMap =
+              Map
+                  [ (ArtistTag, TagValue.ofList [ "Some Artist"; "Second Artist" ])
+                    (TitleTag, TagValue.ofString "My Title") ]
+            ExpectedDelete = [] }
+          { Description = "removed tags should be deleted"
+            Original =
+              Map
+                  [ (ArtistTag, TagValue.ofList [ "Some Artist"; "Second Artist" ])
+                    (ComposerTag, TagValue.ofString "My Composer") ]
+            Updates = Map [ (ArtistTag, TagValue.ofList [ "Some Artist"; "Second Artist" ]) ]
+            ExpectedMap = Map []
+            ExpectedDelete = [ ComposerTag ] }
+          { Description = "tag with empty value should be deleted instead of updated"
+            Original =
+              Map
+                  [ (ArtistTag, TagValue.ofList [ "Some Artist"; "Second Artist" ])
+                    (ComposerTag, TagValue.ofString "My Composer") ]
+            Updates =
+              Map
+                  [ (ArtistTag, TagValue.ofList [ "Some Artist"; "Second Artist" ])
+                    (ComposerTag, TagValue.ofList []) ]
+            ExpectedMap = Map []
+            ExpectedDelete = [ ComposerTag ] }
+          { Description = "new tags with empty value should not be added"
+            Original = Map [ (ArtistTag, TagValue.ofList [ "Some Artist"; "Second Artist" ]) ]
+            Updates =
+              Map
+                  [ (ArtistTag, TagValue.ofList [ "Some Artist"; "Second Artist" ])
+                    (ComposerTag, TagValue.ofList []) ]
+            ExpectedMap = Map []
+            ExpectedDelete = [] } ]
+
     [<TestCaseSource(nameof mergeTestsData)>]
     let ``merge two tags-map should yield correct results`` (testData: MergeTestData) =
         let result = TagsMap.merge testData.Original testData.Updates
@@ -121,12 +172,18 @@ module ``TagsMap Manipulation`` =
         let result = TagsMap.deleteTagValue testData.Key testData.Value testData.Original
         Assert.AreEqual(testData.Expected, result, testData.Description)
 
+    [<TestCaseSource(nameof changesTestData)>]
+    let ``extract changes should behave correctly`` (testData: ChangesTestData) =
+        let resMap, resDel = TagsMap.extractChanges testData.Original testData.Updates
+        Assert.AreEqual(testData.ExpectedMap, resMap, $"Unexpected result map in: {testData.Description}")
+        Assert.AreEqual(testData.ExpectedDelete, resDel, $"Unexpected delete list in: {testData.Description}")
+
     [<Test>]
     let ``remove tag with tag that does not exist in the TagsMap should return the same TagsMap`` () =
         let tags = Map [ (ArtistTag, TagValue.ofList [ "Artist 1"; "artist 2" ]) ]
         tags |> TagsMap.deleteTag AlbumTag |> should equal tags
 
-module ``TagNamesHelpers`` =
+module ``TagNames Helpers`` =
     open Microsoft.FSharp.Reflection
 
     /// Get a seq of all DU cases.

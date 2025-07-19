@@ -16,6 +16,30 @@ let diskNumberTag = "DISCNUMBER"
 
 let log = Serilog.Log.Logger
 
+let private applyTag (file: FlacFile) (tag: TagName) (value: TagValue) : unit =
+    let comment = file.VorbisComment
+
+    match tag with
+    | TitleTag ->
+        value
+        |> TagValue.toString
+        |> Option.map (fun s -> comment.Title <- VorbisCommentValues s)
+    | AlbumTag -> failwith "todo"
+    | ArtistTag -> failwith "todo"
+    | WorkTag -> failwith "todo"
+    | MovementTag -> failwith "todo"
+    | SectionTag -> failwith "todo"
+    | MovementIndexTag -> failwith "todo"
+    | MovementCountTag -> failwith "todo"
+    | ImportDateTag -> failwith "todo"
+    | OriginalReleaseDateTag -> failwith "todo"
+    | YearTag -> failwith "todo"
+    | ComposerTag -> failwith "todo"
+    | CreditTag -> failwith "todo"
+    | TrackNumberTag -> failwith "todo"
+    | DiscNumberTag -> failwith "todo"
+    |> ignore
+
 let private extractTagValue (track: FlacFile) (tag: TagName) : TagName * TagValue =
     let comment = track.VorbisComment
 
@@ -107,7 +131,9 @@ let getTagStringValue (track: FlacFile) (tag: TagName) =
     | ComposerTag -> comment[composerTag]
     |> List.ofSeq
 
-let applyChanges (track: FlacFile) =
+let applyTags (track: FlacFile) (original: TagsMap) (updates: TagsMap) : Result<unit, MetadataErrors list> = Ok(())
+
+let saveChanges (track: FlacFile) =
     try
         track.Save() |> Ok
     with ex ->

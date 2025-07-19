@@ -53,7 +53,7 @@ module Track =
 
     let applyTags (track: AudioTrack) =
         match track.Track with
-        | Flac file -> Flac.applyChanges file
+        | Flac file -> Flac.saveChanges file
 
 
     /// Extracts the requested tag from the track and returns it as a list of
