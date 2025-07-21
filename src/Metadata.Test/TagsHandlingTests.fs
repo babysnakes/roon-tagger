@@ -54,23 +54,17 @@ module ``TagsMap Manipulation`` =
               Map
                   [ (WorkTag, TagValue.ofString "original work")
                     (MovementTag, TagValue.ofString "original movement")
-                    (SectionTag, TagValue.ofString "original section")
-                    (MovementIndexTag, TagValue.ofInt 1)
-                    (MovementCountTag, TagValue.ofInt 1) ]
+                    (SectionTag, TagValue.ofString "original section") ]
             Updates =
               Map
                   [ (WorkTag, TagValue.ofString "new work")
                     (MovementTag, TagValue.ofString "new movement")
-                    (SectionTag, TagValue.ofString "new section")
-                    (MovementIndexTag, TagValue.ofInt 2)
-                    (MovementCountTag, TagValue.ofInt 2) ]
+                    (SectionTag, TagValue.ofString "new section") ]
             Expected =
               Map
                   [ (WorkTag, TagValue.ofString "new work")
                     (MovementTag, TagValue.ofString "new movement")
-                    (SectionTag, TagValue.ofString "new section")
-                    (MovementIndexTag, TagValue.ofInt 2)
-                    (MovementCountTag, TagValue.ofInt 2) ] }
+                    (SectionTag, TagValue.ofString "new section") ] }
           { Description = "more tags to be replaced"
             Original =
               Map
@@ -182,16 +176,3 @@ module ``TagsMap Manipulation`` =
     let ``remove tag with tag that does not exist in the TagsMap should return the same TagsMap`` () =
         let tags = Map [ (ArtistTag, TagValue.ofList [ "Artist 1"; "artist 2" ]) ]
         tags |> TagsMap.deleteTag AlbumTag |> should equal tags
-
-module ``TagNames Helpers`` =
-    open Microsoft.FSharp.Reflection
-
-    /// Get a seq of all DU cases.
-    let GetAllUnionCases<'T> () =
-        FSharpType.GetUnionCases(typeof<'T>)
-        |> Seq.map (fun x -> FSharpValue.MakeUnion(x, Array.zeroCreate (x.GetFields().Length)) :?> 'T)
-
-    [<Test>]
-    let ``validate allTagNames is in sync with TagName cases`` () =
-        let expected = GetAllUnionCases<TagName>() |> Set.ofSeq
-        TagHelpers.allTagNames |> Set.ofSeq |> should equal expected

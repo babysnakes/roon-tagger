@@ -1,5 +1,6 @@
 module Metadata.Test.FlacTests
 
+open FsUnitTyped
 open NUnit.Framework
 open FsUnit
 open TestsUtils
@@ -19,6 +20,12 @@ module ``loading flac file`` =
                 [ (AlbumTag, TagValue.ofString "The Parsonage")
                   (TitleTag, TagValue.ofString "Sailing To The Sunday School Picnic (Composed by Regina Carter)")
                   (ArtistTag, TagValue.ofList [ "Theo Bleckmann"; "Alicia Olatuja"; "Dan Tepfer"; "David Hajdu" ])
+                  (UnHandled "ALBUMARTIST",
+                   TagValue.ofList [ "Theo Bleckmann"; "Alicia Olatuja"; "Dan Tepfer"; "David Hajdu" ])
+                  (UnHandled "COMMENT",
+                   TagValue.ofString "visit: https://sunnysiderecords.bandcamp.com/album/the-parsonage")
+                  (UnHandled "DATE", TagValue.ofString "2023")
+                  (UnHandled "ISRC", TagValue.ofString "US2W62368501")
                   (CreditTag,
                    TagValue.ofList
                        [ "Theo Bleckmann - Voice"
@@ -34,3 +41,18 @@ module ``loading flac file`` =
 
         let _, meta = Formats.Flac.load path |> Result.unwrap
         meta |> should equal expected
+
+    [<Test>]
+    let ``extracted metadata looks for all defined tag names`` () =
+        // each time a new supported tag is added, A matching tag/value should be added to the flac file loaded below!
+        use tmp = new CopiedFile("all-identified-tags.flac")
+        let path = tmp.Path
+        let _, meta = Formats.Flac.load path |> Result.unwrap
+
+        let tagNames =
+            GetAllUnionCases<TagName>()
+            |> Set.ofSeq
+            |> Set.remove (UnHandled null) // cannot search for 'Unhandled null'
+
+        let result = tagNames |> Set.filter (fun t -> Map.containsKey t meta |> not)
+        result |> shouldBeEmpty

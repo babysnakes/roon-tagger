@@ -12,8 +12,6 @@ type RoonTag =
     | Work of string
     | Movement of string
     | Section of string
-    | MovementIndex of int
-    | MovementCount of int
     | ImportDate of DateTime
     | OriginalReleaseDate of DateTime
     | Year of int // Roon's "Released" field
@@ -27,8 +25,6 @@ type TagName =
     | WorkTag
     | MovementTag
     | SectionTag
-    | MovementIndexTag
-    | MovementCountTag
     | ImportDateTag
     | OriginalReleaseDateTag
     | YearTag
@@ -36,6 +32,7 @@ type TagName =
     | CreditTag
     | TrackNumberTag
     | DiscNumberTag
+    | UnHandled of string
 
 type TagValue = private { Value: string list }
 
@@ -69,8 +66,6 @@ module TagHelpers =
           WorkTag
           MovementTag
           SectionTag
-          MovementIndexTag
-          MovementCountTag
           ImportDateTag
           OriginalReleaseDateTag
           YearTag
@@ -92,6 +87,9 @@ module TagValue =
 
     /// Creates TagValue from list of strings
     let ofList (ss: string list) : TagValue = { Value = ss }
+
+    /// Creates TagValue from Seq of strings (could also accept all kinds of enumerations)
+    let ofSeq (ss: string seq) : TagValue = { Value = ss |> List.ofSeq }
 
     /// Creates TagValue from int
     let ofInt (n: int) : TagValue = { Value = [ $"%02i{n}" ] }
@@ -149,8 +147,6 @@ module TagsMap =
             | WorkTag -> Some up
             | MovementTag -> Some up
             | SectionTag -> Some up
-            | MovementIndexTag -> Some up
-            | MovementCountTag -> Some up
             | ImportDateTag -> Some up
             | OriginalReleaseDateTag -> Some up
             | YearTag -> Some up
@@ -158,6 +154,7 @@ module TagsMap =
             | CreditTag -> joinListValue up orig |> Some
             | TrackNumberTag -> Some up
             | DiscNumberTag -> Some up
+            | UnHandled _ -> Some up
 
     /// Apply updates tags-map to existing tags-map.
     let merge (original: TagsMap) (updates: TagsMap) : TagsMap =

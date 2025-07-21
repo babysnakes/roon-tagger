@@ -4,6 +4,7 @@ open FParsec.CharParsers
 open System
 open System.IO
 open RoonTagger.Metadata
+open Microsoft.FSharp.Reflection
 
 /// Get the path for a file in the project 'Resources' directory.
 let getResourcePath fileName =
@@ -45,6 +46,11 @@ let mkEmptyTrack () =
       Original = Map.empty
       Current = Map.empty
       Track = Flac null }
+
+/// Get a seq of all DU cases.
+let GetAllUnionCases<'T> () =
+    FSharpType.GetUnionCases(typeof<'T>)
+    |> Seq.map (fun x -> FSharpValue.MakeUnion(x, Array.zeroCreate (x.GetFields().Length)) :?> 'T)
 
 [<RequireQualifiedAccess>]
 module Result =

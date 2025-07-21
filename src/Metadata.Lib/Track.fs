@@ -95,7 +95,7 @@ module Track =
         let newValue = List.append current toAdd |> List.distinct
 
         match track.Track with
-        | Flac file -> Flac.setRaw file Flac.creditTag newValue
+        | Flac file -> Flac.setRaw file Flac.CreditTAG newValue
 
     let deleteCredits (track: AudioTrack) (credits: Personnel list) : Result<unit, MetadataErrors list> =
         let current = getTagStringValue track CreditTag
@@ -106,7 +106,7 @@ module Track =
             let calculated = List.removeByValues toDelete current
 
             match track.Track with
-            | Flac file -> Flac.setRaw file Flac.creditTag calculated
+            | Flac file -> Flac.setRaw file Flac.CreditTAG calculated
             |> Ok
         else
             invalidDeletes

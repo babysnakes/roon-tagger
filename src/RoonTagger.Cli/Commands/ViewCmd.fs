@@ -54,7 +54,6 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         let title = getValue TitleTag
         let work = getValue WorkTag
         let movement = getValue MovementTag
-        let movementIndex = getValue MovementIndexTag
         let tn = getValue TrackNumberTag
         let dn = getValue DiscNumberTag
         let importDate = getValue ImportDateTag
@@ -77,7 +76,6 @@ let handleCmd (args: ParseResults<ViewArgs>) =
         print "Work" work
         print "Composer" composer
         print "Movement" movement
-        print "Movement Index" movementIndex
         print "Track Number" tn
         print "Disc Number" dn
         print "Import Date" importDate
