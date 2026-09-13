@@ -1,1 +1,7 @@
-words = ["Roon"]
+words = [
+    "Cuesheet",
+    "Roon",
+    "Vorbis",
+    "bufio",
+    "metaflac",
+]

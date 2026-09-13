@@ -1,0 +1,68 @@
+package metaflac
+
+import "core:bufio"
+import "core:io"
+import "core:os"
+
+Flac_Metadata :: struct {
+	path: string,
+	blocks: [dynamic]Block,
+}
+
+Metaflac_Error :: union {
+	os.Error,
+	io.Error,
+	Not_Flac,
+}
+
+Not_Flac :: struct {}
+
+load_metadata_from_file :: proc(path: string) -> (result: Flac_Metadata, err: Metaflac_Error) {
+	result.path = path
+
+	file := os.open(path, os.O_RDONLY) or_return
+	defer os.close(file)
+	reader: bufio.Reader
+	bufio.reader_init(&reader, os.to_stream(file))
+	defer bufio.reader_destroy(&reader)
+	stream := bufio.reader_to_stream(&reader)
+
+	read_ident(stream) or_return
+
+	for {
+		hdr: [1]u8
+		io.read_full(stream, hdr[:]) or_return
+		is_last := (hdr[0] & 0x80) != 0 // first bit is 0 means more blocks follow
+		block_type := hdr[0] & 0x7F
+		len_buf: [3]u8
+		io.read_full(stream, len_buf[:]) or_return
+		data_len := u32(len_buf[0]) << 16 | u32(len_buf[1]) << 8 | u32(len_buf[2]) // read 3 bits as BE u32
+		data := make([]u8, data_len)
+		defer delete(data)
+		io.read_full(stream, data[:]) or_return
+
+		block := parse_block(block_type, data)
+		append(&result.blocks, block)
+
+		if is_last do break
+	}
+
+	// TODO: Validate blocks (e.g., StreamInfo is the first block...)
+
+	return result, err
+}
+
+// Reads the stream header to identify whether it's a valid flac file. Returns false if it's not a Flac file.
+@(private)
+read_ident :: proc(rd: io.Reader) -> Metaflac_Error {
+	buf: [4]u8
+	io.read_full(rd, buf[:]) or_return
+
+	// TODO: optionally skip ID3 tab header - this is not in the RFC, but some libraries support it.
+
+	if (string(buf[:]) != "fLaC") {
+		return Not_Flac{}
+	}
+
+	return nil
+}
