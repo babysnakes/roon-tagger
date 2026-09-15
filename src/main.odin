@@ -4,6 +4,7 @@ import "core:fmt"
 import "core:mem"
 import "core:os"
 import "core:path/filepath"
+import "core:sys/windows"
 import "metaflac"
 
 main :: proc() {
@@ -22,6 +23,11 @@ main :: proc() {
 			}
 			mem.tracking_allocator_destroy(&track)
 		}
+	}
+
+	// Display UTF-8 characters correctly in the console
+	when ODIN_OS == .Windows {
+		windows.SetConsoleOutputCP(.UTF8)
 	}
 
 	if len(os.args) != 2 {
