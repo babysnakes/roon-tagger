@@ -1,0 +1,9 @@
+// raddbg 0.9.27 project file
+
+target:
+{
+  executable: "roon-tagger.exe"
+  working_directory: ""
+  enabled: 1
+  arguments: "tmp/sample.flac"
+}
