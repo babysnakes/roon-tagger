@@ -2,6 +2,7 @@ package metaflac
 
 import "core:encoding/endian"
 import "core:fmt"
+import "core:strings"
 
 Block :: union #no_nil {
 	Stream_Info_Block,
@@ -40,7 +41,8 @@ Seek_Table_Block :: struct {
 }
 
 Vorbis_Comment_Block :: struct {
-	data: []u8,
+	vendor_string: string,
+	comments:      map[string][dynamic]string,
 }
 
 Cuesheet_Block :: struct {
@@ -106,7 +108,14 @@ print_block :: proc(block: Block) {
 		fmt.printfln("    data (length: %d)", len(b.data))
 	case Vorbis_Comment_Block:
 		fmt.println("  - Vorbis_Comment_Block:")
-		fmt.printfln("    data (length: %d)", len(b.data))
+		fmt.printfln("    vendor string: %s\n", b.vendor_string)
+		for k, vs in b.comments {
+			fmt.printfln("    * %s:", k)
+
+			for v in vs {
+				fmt.printfln("      - %s:", v)
+			}
+		}
 	case Cuesheet_Block:
 		fmt.println("  - Cuesheet_Block:")
 		fmt.printfln("    data (length: %d)", len(b.data))
@@ -164,7 +173,42 @@ parse_seek_table :: proc(data: []u8) -> (Seek_Table_Block, Block_Error) {
 }
 
 parse_vorbis_comment :: proc(data: []u8) -> (Vorbis_Comment_Block, Block_Error) {
-	return Vorbis_Comment_Block{data = data}, .None
+	defer delete(data)
+	idx: u32 = 0
+	result := Vorbis_Comment_Block{}
+
+	vs_length, vs_ok := endian.get_u32(data[idx:idx + 4], .Little)
+	if !vs_ok do return result, .Vorbis_Comment_Parse_Error
+	idx += 4
+	result.vendor_string = strings.clone_from_bytes(data[idx:idx + vs_length])
+	idx += vs_length
+	num_comments, ok_nc := endian.get_u32(data[idx:idx + 4], .Little)
+	if !ok_nc do return result, .Vorbis_Comment_Parse_Error
+	idx += 4
+
+	comments := make(map[string][dynamic]string)
+	for _ in 0 ..< num_comments {
+		comment_length, ok_cl := endian.get_u32(data[idx:idx + 4], .Little)
+		if !ok_cl do return result, .Vorbis_Comment_Parse_Error
+		idx += 4
+		comment := strings.clone_from_bytes(data[idx:idx + comment_length])
+		kv, err := strings.split_n(comment, "=", 2)
+		if err != nil do return result, .Vorbis_Comment_Parse_Error
+		if len(kv) != 2 do return result, .Vorbis_Comment_Parse_Error
+		k, v := kv[0], kv[1]
+		idx += comment_length
+		value, ok := &comments[k]
+		if ok {
+			append(value, v)
+		} else {
+			new_val: [dynamic]string
+			append(&new_val, v)
+			comments[k] = new_val
+		}
+	}
+	result.comments = comments
+
+	return result, .None
 }
 
 parse_cuesheet :: proc(data: []u8) -> (Cuesheet_Block, Block_Error) {

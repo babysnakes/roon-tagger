@@ -38,11 +38,12 @@ load_metadata_from_file :: proc(path: string) -> (result: Flac_Metadata, err: Me
 		len_buf: [3]u8
 		io.read_full(stream, len_buf[:]) or_return
 		data_len := read_3bytes_as_u32be(len_buf)
-		data := make([]u8, data_len)
-		defer delete(data)
+		data := make([]u8, data_len) // ownership of data is passed to `parse_block`
 		io.read_full(stream, data[:]) or_return
 
-		block := parse_block(block_type, data) or_return
+		block, parse_err := parse_block(block_type, data)
+		if parse_err != .None do return result, parse_err
+
 		append(&result.blocks, block)
 
 		if is_last do break
