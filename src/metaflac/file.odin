@@ -5,7 +5,7 @@ import "core:io"
 import "core:os"
 
 Flac_Metadata :: struct {
-	path: string,
+	path:   string,
 	blocks: [dynamic]Block,
 }
 
@@ -13,6 +13,7 @@ Metaflac_Error :: union {
 	os.Error,
 	io.Error,
 	Not_Flac,
+	Block_Error,
 }
 
 Not_Flac :: struct {}
@@ -36,12 +37,12 @@ load_metadata_from_file :: proc(path: string) -> (result: Flac_Metadata, err: Me
 		block_type := hdr[0] & 0x7F
 		len_buf: [3]u8
 		io.read_full(stream, len_buf[:]) or_return
-		data_len := u32(len_buf[0]) << 16 | u32(len_buf[1]) << 8 | u32(len_buf[2]) // read 3 bits as BE u32
+		data_len := read_3bytes_as_u32be(len_buf)
 		data := make([]u8, data_len)
 		defer delete(data)
 		io.read_full(stream, data[:]) or_return
 
-		block := parse_block(block_type, data)
+		block := parse_block(block_type, data) or_return
 		append(&result.blocks, block)
 
 		if is_last do break
@@ -65,4 +66,9 @@ read_ident :: proc(rd: io.Reader) -> Metaflac_Error {
 	}
 
 	return nil
+}
+
+// parse 3 bytes as u32 BigEndian
+read_3bytes_as_u32be :: proc(bytes: [3]u8) -> u32 {
+	return u32(bytes[0]) << 16 | u32(bytes[1]) << 8 | u32(bytes[2])
 }

@@ -1,6 +1,5 @@
 package roon_tagger
 
-import "core:reflect"
 import "core:fmt"
 import "core:os"
 import "core:path/filepath"
@@ -27,7 +26,7 @@ main :: proc() {
 	} else {
 		fmt.printfln("Blocks in: '%v':\n", meta.path)
 		for b in meta.blocks {
-			fmt.printfln("  * %v: size: %v", reflect.union_variant_typeid(b), metaflac.calculate_block_size(b))
+			metaflac.print_block(b)
 		}
 	}
 }

@@ -1,5 +1,8 @@
 package metaflac
 
+import "core:encoding/endian"
+import "core:fmt"
+
 Block :: union #no_nil {
 	Stream_Info_Block,
 	Padding_Block,
@@ -11,8 +14,17 @@ Block :: union #no_nil {
 	Unknown_Block,
 }
 
+// Our handling of StreamInfo is only for extracting some file info. When
+// writing back we use the original data!
 Stream_Info_Block :: struct {
-	data: []u8,
+	min_block_size:  u16,
+	max_block_size:  u16,
+	min_frame_size:  u32,
+	max_frame_size:  u32,
+	sample_rate:     u32,
+	num_channels:    u8,
+	bits_per_sample: u8,
+	data:            []u8,
 }
 
 Padding_Block :: struct {
@@ -40,10 +52,17 @@ Picture_Block :: struct {
 }
 
 Unknown_Block :: struct {
+	kind: u8,
 	data: []u8,
 }
 
-parse_block :: proc(block_type: u8, data: []u8) -> Block {
+Block_Error :: enum {
+	None,
+	Stream_Info_Parse_Error,
+	Vorbis_Comment_Parse_Error,
+}
+
+parse_block :: proc(block_type: u8, data: []u8) -> (Block, Block_Error) {
 	switch block_type {
 	case 0:
 		return parse_stream_info(data)
@@ -60,61 +79,102 @@ parse_block :: proc(block_type: u8, data: []u8) -> Block {
 	case 6:
 		return parse_picture(data)
 	case:
-		return parse_unknown(data)
+		return parse_unknown(block_type, data)
 	}
 }
 
-calculate_block_size :: proc(block: Block) -> (result: int) {
+print_block :: proc(block: Block) {
 	switch b in block {
 	case Stream_Info_Block:
-		result = len(b.data)
+		fmt.println("  - Stream_Info_Block:")
+		fmt.printfln("    min block size:          %v", b.min_block_size)
+		fmt.printfln("    max block size:          %v", b.max_block_size)
+		fmt.printfln("    min frame size:          %v", b.min_frame_size)
+		fmt.printfln("    max frame size:          %v", b.max_frame_size)
+		fmt.printfln("    sample rate:             %v", b.sample_rate)
+		fmt.printfln("    number of channels:      %v", b.num_channels)
+		fmt.printfln("    bits per sample:         %v", b.bits_per_sample)
+		fmt.printfln("    data (length: %d)", len(b.data))
 	case Padding_Block:
-		result = len(b.data)
+		fmt.println("  - Padding_Block:")
+		fmt.printfln("    data (length: %d)", len(b.data))
 	case Application_Block:
-		result = len(b.data)
+		fmt.println("  - Application_Block:")
+		fmt.printfln("    data (length: %d)", len(b.data))
 	case Seek_Table_Block:
-		result = len(b.data)
+		fmt.println("  - Seek_Table_Block:")
+		fmt.printfln("    data (length: %d)", len(b.data))
 	case Vorbis_Comment_Block:
-		result = len(b.data)
+		fmt.println("  - Vorbis_Comment_Block:")
+		fmt.printfln("    data (length: %d)", len(b.data))
 	case Cuesheet_Block:
-		result = len(b.data)
+		fmt.println("  - Cuesheet_Block:")
+		fmt.printfln("    data (length: %d)", len(b.data))
 	case Picture_Block:
-		result = len(b.data)
+		fmt.println("  - Picture_Block:")
+		fmt.printfln("    data (length: %d)", len(b.data))
 	case Unknown_Block:
-		result = len(b.data)
+		fmt.println("  - Unknown_Block:")
+		fmt.printfln("    kind: %v", b.kind)
+		fmt.printfln("    data (length: %d)", len(b.data))
 	}
-
-	return result
 }
 
-parse_stream_info :: proc(data: []u8) -> Stream_Info_Block {
-	return Stream_Info_Block{data = data}
+parse_stream_info :: proc(data: []u8) -> (Stream_Info_Block, Block_Error) {
+	result := Stream_Info_Block{}
+	idx := 0
+	ok: bool
+	result.data = data
+	result.min_block_size, ok = endian.get_u16(data[idx:idx + 2], .Big)
+	if !ok do return result, .Stream_Info_Parse_Error
+	idx += 2
+	result.max_block_size, ok = endian.get_u16(data[idx:idx + 2], .Big)
+	if !ok do return result, .Stream_Info_Parse_Error
+	idx += 2
+	result.min_frame_size = read_3bytes_as_u32be([3]u8{data[idx], data[idx + 1], data[idx + 2]})
+	idx += 3
+	result.max_frame_size = read_3bytes_as_u32be([3]u8{data[idx], data[idx + 1], data[idx + 2]})
+	idx += 3
+
+	// next 3 values are because of inconsistencies between actual data size and bytes
+	sample_first_tmp: u16
+	sample_first_tmp, ok = endian.get_u16(data[idx:idx + 2], .Big)
+	idx += 2
+	sample_second_tmp := data[idx]
+	idx += 1
+	bps_tmp := data[idx]
+
+	result.sample_rate = u32(sample_first_tmp) << 4 | u32(sample_second_tmp) >> 4
+	result.num_channels = ((sample_second_tmp >> 1) & 0x7) + 1
+	result.bits_per_sample = (((sample_second_tmp & 0x1) << 4) | bps_tmp >> 4) + 1
+
+	return result, .None
 }
 
-parse_padding :: proc(data: []u8) -> Padding_Block {
-	return Padding_Block{data = data}
+parse_padding :: proc(data: []u8) -> (Padding_Block, Block_Error) {
+	return Padding_Block{data = data}, .None
 }
 
-parse_application :: proc(data: []u8) -> Application_Block {
-	return Application_Block{data = data}
+parse_application :: proc(data: []u8) -> (Application_Block, Block_Error) {
+	return Application_Block{data = data}, .None
 }
 
-parse_seek_table :: proc(data: []u8) -> Seek_Table_Block {
-	return Seek_Table_Block{data = data}
+parse_seek_table :: proc(data: []u8) -> (Seek_Table_Block, Block_Error) {
+	return Seek_Table_Block{data = data}, .None
 }
 
-parse_vorbis_comment :: proc(data: []u8) -> Vorbis_Comment_Block {
-	return Vorbis_Comment_Block{data = data}
+parse_vorbis_comment :: proc(data: []u8) -> (Vorbis_Comment_Block, Block_Error) {
+	return Vorbis_Comment_Block{data = data}, .None
 }
 
-parse_cuesheet :: proc(data: []u8) -> Cuesheet_Block {
-	return Cuesheet_Block{data = data}
+parse_cuesheet :: proc(data: []u8) -> (Cuesheet_Block, Block_Error) {
+	return Cuesheet_Block{data = data}, .None
 }
 
-parse_picture :: proc(data: []u8) -> Picture_Block {
-	return Picture_Block{data = data}
+parse_picture :: proc(data: []u8) -> (Picture_Block, Block_Error) {
+	return Picture_Block{data = data}, .None
 }
 
-parse_unknown :: proc(data: []u8) -> Unknown_Block {
-	return Unknown_Block{data = data}
+parse_unknown :: proc(block_type: u8, data: []u8) -> (Unknown_Block, Block_Error) {
+	return Unknown_Block{kind = block_type, data = data}, .None
 }
