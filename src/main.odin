@@ -8,6 +8,8 @@ import "core:sys/windows"
 import "metaflac"
 
 main :: proc() {
+	verbose: bool
+
 	// track memory error, not sure if you must also add -sanitize:address...
 	when ODIN_DEBUG {
 		track: mem.Tracking_Allocator
@@ -16,9 +18,15 @@ main :: proc() {
 
 		defer {
 			if len(track.allocation_map) > 0 {
-				fmt.eprintln("\n\nSee memory leaks below:")
+				total: u32
 				for _, entry in track.allocation_map {
-					fmt.eprintf("%v leaked %v bytes\n", entry.location, entry.size)
+					total += u32(entry.size)
+				}
+
+				if !verbose do fmt.printfln("\n\n Memory leaks of %d bytes exists! Run with -v for details", total)
+				if verbose do fmt.eprintfln("\n\nSee memory leaks below (total: %d bytes):", total)
+				for _, entry in track.allocation_map {
+					if verbose do fmt.eprintf("%v leaked %v bytes\n", entry.location, entry.size)
 				}
 			}
 			mem.tracking_allocator_destroy(&track)
@@ -30,9 +38,9 @@ main :: proc() {
 		windows.SetConsoleOutputCP(.UTF8)
 	}
 
-	if len(os.args) != 2 {
-		fmt.eprintln("Err: invalid number of arguments!")
-		fmt.eprintfln("\nUsage: %s <path-to-flac-file>", os.args[0])
+	if len(os.args) < 2 {
+		fmt.eprintln("Err: Missing arguments!")
+		fmt.eprintfln("\nUsage: %s <path-to-flac-file> [-v]", os.args[0])
 		os.exit(1)
 	}
 
@@ -41,6 +49,8 @@ main :: proc() {
 		fmt.eprintfln("Error parsing path: %v", pathErr)
 		os.exit(1)
 	}
+
+	if len(os.args) > 2 && os.args[2] == "-v" do verbose = true
 
 	fmt.printfln("Parsing file: %s", path)
 	meta, err := metaflac.load_metadata_from_file(path)
