@@ -88,7 +88,7 @@ parse_block :: proc(block_type: u8, data: []u8) -> (Block, Block_Error) {
 print_block :: proc(block: Block) {
 	switch b in block {
 	case Stream_Info_Block:
-		fmt.println("  - Stream_Info_Block:")
+		fmt.println("  Stream_Info_Block:")
 		fmt.printfln("    min block size:          %v", b.min_block_size)
 		fmt.printfln("    max block size:          %v", b.max_block_size)
 		fmt.printfln("    min frame size:          %v", b.min_frame_size)
@@ -98,16 +98,16 @@ print_block :: proc(block: Block) {
 		fmt.printfln("    bits per sample:         %v", b.bits_per_sample)
 		fmt.printfln("    data (length: %d)", len(b.data))
 	case Padding_Block:
-		fmt.println("  - Padding_Block:")
+		fmt.println("  Padding_Block:")
 		fmt.printfln("    data (length: %d)", len(b.data))
 	case Application_Block:
-		fmt.println("  - Application_Block:")
+		fmt.println("  Application_Block:")
 		fmt.printfln("    data (length: %d)", len(b.data))
 	case Seek_Table_Block:
-		fmt.println("  - Seek_Table_Block:")
+		fmt.println("  Seek_Table_Block:")
 		fmt.printfln("    data (length: %d)", len(b.data))
 	case Vorbis_Comment_Block:
-		fmt.println("  - Vorbis_Comment_Block:")
+		fmt.println("  Vorbis_Comment_Block:")
 		fmt.printfln("    vendor string: %s\n", b.vendor_string)
 		for k, vs in b.comments {
 			fmt.printfln("    * %s:", k)
@@ -117,13 +117,13 @@ print_block :: proc(block: Block) {
 			}
 		}
 	case Cuesheet_Block:
-		fmt.println("  - Cuesheet_Block:")
+		fmt.println("  Cuesheet_Block:")
 		fmt.printfln("    data (length: %d)", len(b.data))
 	case Picture_Block:
-		fmt.println("  - Picture_Block:")
+		fmt.println("  Picture_Block:")
 		fmt.printfln("    data (length: %d)", len(b.data))
 	case Unknown_Block:
-		fmt.println("  - Unknown_Block:")
+		fmt.println("  Unknown_Block:")
 		fmt.printfln("    kind: %v", b.kind)
 		fmt.printfln("    data (length: %d)", len(b.data))
 	}
