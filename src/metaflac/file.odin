@@ -6,6 +6,7 @@ import "core:os"
 
 Flac_Metadata :: struct {
 	path:   string,
+	length: u32,
 	blocks: [dynamic]Block,
 }
 
@@ -28,6 +29,12 @@ load_metadata_from_file :: proc(path: string) -> (result: Flac_Metadata, err: Me
 	defer bufio.reader_destroy(&reader)
 	stream := bufio.reader_to_stream(&reader)
 
+	load_metadata_from_reader(stream, &result) or_return
+
+	return result, nil
+}
+
+load_metadata_from_reader :: proc(stream: io.Reader, meta: ^Flac_Metadata) -> Metaflac_Error {
 	read_ident(stream) or_return
 
 	for {
@@ -41,17 +48,17 @@ load_metadata_from_file :: proc(path: string) -> (result: Flac_Metadata, err: Me
 		data := make([]u8, data_len) // ownership of data is passed to `parse_block`
 		io.read_full(stream, data[:]) or_return
 
-		block, parse_err := parse_block(block_type, data)
-		if parse_err != .None do return result, parse_err
+		block := parse_block(block_type, data) or_return
+		append(&meta.blocks, block)
+		meta.length += (data_len + 4)
 
-		append(&result.blocks, block)
 
 		if is_last do break
 	}
 
 	// TODO: Validate blocks (e.g., StreamInfo is the first block...)
 
-	return result, err
+	return nil
 }
 
 // Reads the stream header to identify whether it's a valid flac file. Returns false if it's not a Flac file.
