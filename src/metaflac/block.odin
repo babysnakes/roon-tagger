@@ -29,7 +29,7 @@ Stream_Info_Block :: struct {
 }
 
 Padding_Block :: struct {
-	data: []u8,
+	size: int,
 }
 
 Application_Block :: struct {
@@ -99,7 +99,7 @@ print_block :: proc(block: Block) {
 		fmt.printfln("    data (length: %d)", len(b.data))
 	case Padding_Block:
 		fmt.println("  Padding_Block:")
-		fmt.printfln("    data (length: %d)", len(b.data))
+		fmt.printfln("    size: %d", b.size)
 	case Application_Block:
 		fmt.println("  Application_Block:")
 		fmt.printfln("    data (length: %d)", len(b.data))
@@ -161,7 +161,8 @@ parse_stream_info :: proc(data: []u8) -> (Stream_Info_Block, Block_Error) {
 }
 
 parse_padding :: proc(data: []u8) -> (Padding_Block, Block_Error) {
-	return Padding_Block{data = data}, .None
+	defer delete(data)
+	return Padding_Block{size = len(data)}, .None
 }
 
 parse_application :: proc(data: []u8) -> (Application_Block, Block_Error) {
