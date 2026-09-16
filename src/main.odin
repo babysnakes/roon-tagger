@@ -59,7 +59,7 @@ main :: proc() {
 		fmt.eprintfln("Error loading metadata from %v: %v", meta.path, err)
 	} else {
 		fmt.printfln("Total metadata size: %d bytes", meta.length)
-		fmt.println("\nBlocks:\n")
+		fmt.println("\nBlocks:")
 		for b in meta.blocks {
 			metaflac.print_block(b)
 			fmt.println("")
