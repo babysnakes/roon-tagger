@@ -129,6 +129,35 @@ print_block :: proc(block: Block) {
 	}
 }
 
+release_block :: proc(block: ^Block) {
+	switch b in block {
+	case Stream_Info_Block:
+		delete(b.data)
+	case Application_Block:
+		delete(b.data)
+	case Seek_Table_Block:
+		delete(b.data)
+	case Vorbis_Comment_Block:
+		for k, vs in b.comments {
+			delete(k)
+			for v in vs {
+				delete(v)
+			}
+			delete(vs)
+		}
+		delete(b.comments)
+		delete(b.vendor_string)
+	case Cuesheet_Block:
+		delete(b.data)
+	case Picture_Block:
+		delete(b.data)
+	case Unknown_Block:
+		delete(b.data)
+	case Padding_Block:
+		// nothing
+	}
+}
+
 parse_stream_info :: proc(data: []u8) -> (Stream_Info_Block, Block_Error) {
 	result := Stream_Info_Block{}
 	idx := 0
@@ -192,19 +221,20 @@ parse_vorbis_comment :: proc(data: []u8) -> (Vorbis_Comment_Block, Block_Error) 
 		comment_length, ok_cl := endian.get_u32(data[idx:idx + 4], .Little)
 		if !ok_cl do return result, .Vorbis_Comment_Parse_Error
 		idx += 4
-		comment := strings.clone_from_bytes(data[idx:idx + comment_length])
+		comment := string(data[idx:idx + comment_length])
 		kv, err := strings.split_n(comment, "=", 2)
 		if err != nil do return result, .Vorbis_Comment_Parse_Error
 		if len(kv) != 2 do return result, .Vorbis_Comment_Parse_Error
-		k, v := kv[0], kv[1]
+		defer delete(kv)
+		v := strings.clone(kv[1])
 		idx += comment_length
-		value, ok := &comments[k]
+		value, ok := &comments[kv[0]]
 		if ok {
 			append(value, v)
 		} else {
 			new_val: [dynamic]string
 			append(&new_val, v)
-			comments[k] = new_val
+			comments[strings.clone(kv[0])] = new_val
 		}
 	}
 	result.comments = comments
