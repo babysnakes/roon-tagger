@@ -54,6 +54,7 @@ main :: proc() {
 
 	fmt.printfln("Parsing file: %s", path)
 	meta, err := metaflac.load_metadata_from_file(path)
+	defer metaflac.release_metadata(&meta)
 
 	if err != nil {
 		fmt.eprintfln("Error loading metadata from %v: %v", meta.path, err)

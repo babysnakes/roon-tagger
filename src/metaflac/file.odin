@@ -61,6 +61,14 @@ load_metadata_from_reader :: proc(stream: io.Reader, meta: ^Flac_Metadata) -> Me
 	return nil
 }
 
+// Release memory allocated by metadata
+release_metadata :: proc(meta: ^Flac_Metadata) {
+	for &b in meta.blocks {
+		release_block(&b)
+	}
+	defer delete(meta.blocks)
+}
+
 // Reads the stream header to identify whether it's a valid flac file. Returns false if it's not a Flac file.
 @(private)
 read_ident :: proc(rd: io.Reader) -> Metaflac_Error {
