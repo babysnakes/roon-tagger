@@ -253,3 +253,12 @@ parse_picture :: proc(data: []u8) -> (Picture_Block, Block_Error) {
 parse_unknown :: proc(block_type: u8, data: []u8) -> (Unknown_Block, Block_Error) {
 	return Unknown_Block{kind = block_type, data = data}, .None
 }
+
+// Vorbis Comments only allow specific range of UTF-8 characters (Ux0020 to ]x007E) excluding '='.
+validate_comment :: proc(comment: string) -> bool {
+	result := true
+	for r in comment {
+		if r < 0x0020 || r > 0x007E || r == 0x003D do result = false
+	}
+	return result
+}
