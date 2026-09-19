@@ -55,7 +55,6 @@ load_metadata_from_reader :: proc(stream: io.Reader, meta: ^Flac_Metadata) -> Me
 		append(&meta.blocks, block)
 		meta.length += (data_len + 4)
 
-
 		if is_last do break
 	}
 
@@ -95,4 +94,10 @@ read_ident :: proc(rd: io.Reader) -> Metaflac_Error {
 // parse 3 bytes as u32 BigEndian
 read_3bytes_as_u32be :: proc(bytes: [3]u8) -> u32 {
 	return u32(bytes[0]) << 16 | u32(bytes[1]) << 8 | u32(bytes[2])
+}
+
+// write u32 to 3 bytes using big endian format (in reality the u32 should be
+// smaller than 24bits)
+write_u32_be_3bytes :: proc(value: u32) -> [3]u8 {
+	return {u8(value >> 16), u8(value >> 8), u8(value)}
 }

@@ -113,7 +113,7 @@ print_block :: proc(block: Block) {
 			fmt.printfln("    * %s:", k)
 
 			for v in vs {
-				fmt.printfln("      - %s:", v)
+				fmt.printfln("      - %s", v)
 			}
 		}
 	case Cuesheet_Block:
@@ -127,6 +127,15 @@ print_block :: proc(block: Block) {
 		fmt.printfln("    kind: %v", b.kind)
 		fmt.printfln("    data (length: %d)", len(b.data))
 	}
+}
+
+write_blocks_data :: proc(meta: ^Flac_Metadata) -> ([dynamic]u8, u32) {
+	data: [dynamic]u8
+	data_length: u32 = 0
+	for idx in 0 ..< len(meta.blocks) {
+		data_length += write_block(meta.blocks[idx], &data)
+	}
+	return data, data_length
 }
 
 release_block :: proc(block: Block) {
@@ -154,8 +163,83 @@ release_block :: proc(block: Block) {
 	case Unknown_Block:
 		delete(b.data)
 	case Padding_Block:
-		// nothing
+	// nothing
 	}
+}
+
+write_block :: proc(block: Block, writer: ^[dynamic]u8) -> (result: u32) {
+	data: []u8
+	encoded: [dynamic]u8
+	defer delete(encoded)
+
+	switch b in block {
+	case Stream_Info_Block:
+		data = b.data
+	case Application_Block:
+		data = b.data
+	case Seek_Table_Block:
+		data = b.data
+	case Cuesheet_Block:
+		data = b.data
+	case Picture_Block:
+		data = b.data
+	case Unknown_Block:
+		data = b.data
+	case Vorbis_Comment_Block:
+		encoded = encode_vorbis_comment(b)
+		data = encoded[:]
+	case Padding_Block:
+		return 0
+	}
+
+	kind := block_type(block)
+	append(writer, kind) // is_last is false in this context so we ignore it.
+
+	length := u32(len(data))
+	ensure(length < 0xFFFFFF, "block size too large") // TODO: also add warn log
+	length_bytes := write_u32_be_3bytes(u32(length))
+	append(writer, ..length_bytes[:])
+	append(writer, ..data)
+	result += (length + 4)
+	return result
+}
+
+// Write padding as the last block in the metadata
+write_padding :: proc(size: u32, writer: ^[dynamic]u8) {
+	byte: u8 = 0x80 // indicates last block
+	byte |= 1 // padding kind
+	append(writer, byte)
+
+	ensure(size < 0xFFFFFF, "padding size too large") // TODO: also add warn log
+	length_bytes := write_u32_be_3bytes(size)
+	append(writer, ..length_bytes[:])
+
+	padding := make([]u8, size) // by default filled with 0x00
+	defer delete(padding)
+	append(writer, ..padding)
+}
+
+block_type :: proc(block: Block) -> (kind: u8) {
+	switch b in block {
+	case Stream_Info_Block:
+		kind = 0
+	case Padding_Block:
+		kind = 1
+	case Application_Block:
+		kind = 2
+	case Seek_Table_Block:
+		kind = 3
+	case Vorbis_Comment_Block:
+		kind = 4
+	case Cuesheet_Block:
+		kind = 5
+	case Picture_Block:
+		kind = 6
+	case Unknown_Block:
+		kind = b.kind
+	}
+
+	return kind
 }
 
 parse_stream_info :: proc(data: []u8) -> (Stream_Info_Block, Block_Error) {
@@ -252,6 +336,43 @@ parse_picture :: proc(data: []u8) -> (Picture_Block, Block_Error) {
 
 parse_unknown :: proc(block_type: u8, data: []u8) -> (Unknown_Block, Block_Error) {
 	return Unknown_Block{kind = block_type, data = data}, .None
+}
+
+encode_vorbis_comment :: proc(vc: Vorbis_Comment_Block) -> [dynamic]u8 {
+	result: [dynamic]u8
+
+	vc_length: [4]u8
+	ensure(
+		endian.put_u32(vc_length[:], .Little, u32(len(vc.vendor_string))),
+		"Failed making LE vc length",
+	)
+	append(&result, ..vc_length[:])
+	append(&result, vc.vendor_string)
+
+	num_comments: u32
+	for _, vs in vc.comments {
+		num_comments += u32(len(vs))
+	}
+	nc_bytes: [4]u8
+	ensure(endian.put_u32(nc_bytes[:], .Little, num_comments), "Failed making LE num_comments")
+	append(&result, ..nc_bytes[:])
+
+	for k, vs in vc.comments {
+		for v in vs {
+			length := u32(len(k)) + 1 + u32(len(v))
+			len_bytes: [4]u8
+			ensure(
+				endian.put_u32(len_bytes[:], .Little, length),
+				"Failed making LE comment length",
+			)
+			append(&result, ..len_bytes[:])
+			append(&result, k)
+			append(&result, '=')
+			append(&result, v)
+		}
+	}
+
+	return result
 }
 
 // Vorbis Comments only allow specific range of UTF-8 characters (Ux0020 to ]x007E) excluding '='.
