@@ -13,11 +13,14 @@ Flac_Metadata :: struct {
 Metaflac_Error :: union {
 	os.Error,
 	io.Error,
-	Not_Flac,
+	Flac_Error,
 	Block_Error,
 }
 
-Not_Flac :: struct {}
+Flac_Error :: enum {
+	Not_Flac,
+	Stream_Info_Error,
+}
 
 load_metadata_from_file :: proc(path: string) -> (result: Flac_Metadata, err: Metaflac_Error) {
 	result.path = path
@@ -56,11 +59,16 @@ load_metadata_from_reader :: proc(stream: io.Reader, meta: ^Flac_Metadata) -> Me
 		if is_last do break
 	}
 
-	// TODO: Validate blocks (e.g., StreamInfo is the first block...)
+	return validate_metadata(meta)
+}
+
+validate_metadata :: proc(meta: ^Flac_Metadata) -> Metaflac_Error {
+	if len(meta.blocks) < 1 do return .Stream_Info_Error
+	_, type_ok := meta.blocks[0].(Stream_Info_Block)
+	if !type_ok do return .Stream_Info_Error
 
 	return nil
 }
-
 // Release memory allocated by metadata
 release_metadata :: proc(meta: ^Flac_Metadata) {
 	for b in meta.blocks {
@@ -78,7 +86,7 @@ read_ident :: proc(rd: io.Reader) -> Metaflac_Error {
 	// TODO: optionally skip ID3 tab header - this is not in the RFC, but some libraries support it.
 
 	if (string(buf[:]) != "fLaC") {
-		return Not_Flac{}
+		return .Not_Flac
 	}
 
 	return nil

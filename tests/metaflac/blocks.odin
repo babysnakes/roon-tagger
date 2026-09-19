@@ -1,4 +1,4 @@
-package blocks
+package metaflac_tests
 
 import "../../src/metaflac"
 import "core:testing"

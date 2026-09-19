@@ -1,3 +1,3 @@
 package tests
 
-@(require) import "blocks"
+@(require) import "metaflac"
