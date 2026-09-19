@@ -63,8 +63,8 @@ load_metadata_from_reader :: proc(stream: io.Reader, meta: ^Flac_Metadata) -> Me
 
 // Release memory allocated by metadata
 release_metadata :: proc(meta: ^Flac_Metadata) {
-	for &b in meta.blocks {
-		release_block(&b)
+	for b in meta.blocks {
+		release_block(b)
 	}
 	defer delete(meta.blocks)
 }

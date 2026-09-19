@@ -129,7 +129,7 @@ print_block :: proc(block: Block) {
 	}
 }
 
-release_block :: proc(block: ^Block) {
+release_block :: proc(block: Block) {
 	switch b in block {
 	case Stream_Info_Block:
 		delete(b.data)
