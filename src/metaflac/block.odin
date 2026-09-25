@@ -85,6 +85,21 @@ parse_block :: proc(block_type: u8, data: []u8) -> (Block, Block_Error) {
 	}
 }
 
+// Get pointer to the stream info block of the metadata
+// Note: Assumes the metadata validity is verified - the first metadata block *must* be a stream info.
+stream_info :: proc(meta: ^Flac_Metadata) -> ^Stream_Info_Block {
+	return &meta.blocks[0].(Stream_Info_Block)
+}
+
+vorbis_comment :: proc(meta: ^Flac_Metadata) -> ^Vorbis_Comment_Block {
+	for &b in meta.blocks {
+		if vc, ok := &b.(Vorbis_Comment_Block); ok do return vc
+	}
+	// we do not append as it may already have block with `is_last` indication
+	inject_at(&meta.blocks, 1, Vorbis_Comment_Block{})
+	return &meta.blocks[0].(Vorbis_Comment_Block)
+}
+
 print_block :: proc(block: Block) {
 	switch b in block {
 	case Stream_Info_Block:
@@ -129,6 +144,7 @@ print_block :: proc(block: Block) {
 	}
 }
 
+// Converts the provided metadata blocks to bytes. Removes padding!
 write_blocks_data :: proc(meta: ^Flac_Metadata) -> ([dynamic]u8, u32) {
 	data: [dynamic]u8
 	data_length: u32 = 0
@@ -292,6 +308,10 @@ parse_vorbis_comment :: proc(data: []u8) -> (Vorbis_Comment_Block, Block_Error) 
 	result := Vorbis_Comment_Block{}
 
 	vs_length, vs_ok := endian.get_u32(data[idx:idx + 4], .Little)
+	if vs_length < 1 {
+		// TODO: Log warning
+		return result, .Vorbis_Comment_Parse_Error
+	}
 	if !vs_ok do return result, .Vorbis_Comment_Parse_Error
 	idx += 4
 	result.vendor_string = strings.clone_from_bytes(data[idx:idx + vs_length])
