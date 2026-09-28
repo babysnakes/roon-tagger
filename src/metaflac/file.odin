@@ -86,7 +86,7 @@ save_metadata :: proc(meta: ^Flac_Metadata) -> Metaflac_Error {
 		new_flac := os.create(tmp_path) or_return
 		new_stream := os.to_stream(new_flac)
 
-		// Note: place the defers in a scope that will close the files before
+		// place the defers in a scope that will close the files before
 		// the rename.
 		{
 			defer os.close(cur_flac)
@@ -105,8 +105,7 @@ save_metadata :: proc(meta: ^Flac_Metadata) -> Metaflac_Error {
 			}
 		}
 
-		// TODO We must better handle the error here, the user must be notified
-		// about the possible corrupt file!
+		// TODO We must better handle the error here, the user must be notified about the
 		os.rename(tmp_path, meta.path) or_return
 		return nil
 	}

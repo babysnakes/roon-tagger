@@ -1,11 +1,10 @@
 package roon_tagger
 
+import "core:flags"
 import "core:fmt"
 import "core:mem"
 import "core:os"
-import "core:path/filepath"
 import "core:sys/windows"
-import "metaflac"
 
 main :: proc() {
 	verbose: bool
@@ -38,32 +37,28 @@ main :: proc() {
 		windows.SetConsoleOutputCP(.UTF8)
 	}
 
-	if len(os.args) < 2 {
-		fmt.eprintln("Err: Missing arguments!")
-		fmt.eprintfln("\nUsage: %s <path-to-flac-file> [-v]", os.args[0])
-		os.exit(1)
-	}
-
-	path, pathErr := filepath.abs(os.args[1])
-	if pathErr != nil {
-		fmt.eprintfln("Error parsing path: %v", pathErr)
-		os.exit(1)
-	}
-
-	if len(os.args) > 2 && os.args[2] == "-v" do verbose = true
-
-	fmt.printfln("Parsing file: %s", path)
-	meta, err := metaflac.load_metadata_from_file(path)
-	defer metaflac.release_metadata(&meta)
-
-	if err != nil {
-		fmt.eprintfln("Error loading metadata from %v: %v", meta.path, err)
+	args: []string
+	if (len(os.args) > 1) {
+		args = os.args[:2]
 	} else {
-		fmt.printfln("Total metadata size: %d bytes", meta.length)
-		fmt.println("\nBlocks:")
-		for b in meta.blocks {
-			metaflac.print_block(b)
-			fmt.println("")
-		}
+		args = os.args
+	}
+
+	main_opts: Main_Options
+	flags.register_type_setter(main_command_type_setter)
+	flags.parse_or_exit(&main_opts, args, .Odin)
+
+	// now we have to parse again because the base command has passed
+	switch main_opts.command {
+	case .view:
+		flags.register_type_setter(nil)
+		flags.register_flag_checker(view_cmd_flag_checker)
+		opts: View_Options
+		// TODO: why does it not prints help on error?
+		flags.parse_or_exit(&opts, os.args, .Odin)
+		verbose = opts.verbose
+		ensure(view_flac(opts.file))
+	case .set_tags:
+		unimplemented("to do")
 	}
 }
