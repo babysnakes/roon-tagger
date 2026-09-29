@@ -1,14 +1,15 @@
-package metaflac_tests
+#+test
+
+package metaflac
 
 import "core:encoding/endian"
-import "../../src/metaflac"
 import "core:testing"
 
 @(test)
 valid_comments :: proc(t: ^testing.T) {
 	valid_comments: []string = {"~~~~~~~~~~", "`Hello World`"}
 	for c in valid_comments {
-		testing.expectf(t, metaflac.validate_comment(c), "Expected %s to be valid", c)
+		testing.expectf(t, validate_comment(c), "Expected %s to be valid", c)
 	}
 }
 
@@ -29,7 +30,7 @@ invalid_comments :: proc(t: ^testing.T) {
 		"Done.\n",
 	}
 	for c in invalid_comments {
-		testing.expectf(t, metaflac.validate_comment(c) == false, "Expected '%s' to be invalid", c)
+		testing.expectf(t, validate_comment(c) == false, "Expected '%s' to be invalid", c)
 	}
 }
 
@@ -37,6 +38,6 @@ invalid_comments :: proc(t: ^testing.T) {
 zero_length_vorbis_comment_is_illegal :: proc(t: ^testing.T) {
 	zero_length_header := make([]u8, 8) // we actually need 4 bytes but we'll leave some spare just in case
 	ensure(endian.put_u32(zero_length_header[0:4], .Little, 0))
-	_, err := metaflac.parse_vorbis_comment(zero_length_header)
-	testing.expect_value(t, err, metaflac.Block_Error.Vorbis_Comment_Parse_Error)
+	_, err := parse_vorbis_comment(zero_length_header)
+	testing.expect_value(t, err, Block_Error.Vorbis_Comment_Parse_Error)
 }

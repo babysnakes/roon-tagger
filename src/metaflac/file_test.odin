@@ -1,18 +1,17 @@
-#+feature using-stmt dynamic-literals
-package metaflac_tests
+#+feature dynamic-literals
+#+test
 
-import "../../src/metaflac"
-import "../helpers"
+package metaflac
+
 import "core:bytes"
 import "core:os"
 import "core:slice"
 import "core:strings"
 import "core:testing"
+import helpers "../test_helpers"
 
 @(test)
 errors_on_empty_blocks :: proc(t: ^testing.T) {
-	using metaflac
-
 	meta := Flac_Metadata {
 		path   = "",
 		blocks = [dynamic]Block{},
@@ -25,22 +24,18 @@ errors_on_empty_blocks :: proc(t: ^testing.T) {
 
 @(test)
 errors_on_first_block_not_stream_info :: proc(t: ^testing.T) {
-	using metaflac
-
 	meta := Flac_Metadata {
 		path   = "",
 		blocks = [dynamic]Block{Padding_Block{}, Stream_Info_Block{}},
 	}
 
-	result := metaflac.validate_metadata(&meta)
+	result := validate_metadata(&meta)
 	testing.expect_value(t, result, Flac_Error.Stream_Info_Error)
 	release_metadata(&meta)
 }
 
 @(test)
 save_metadata_and_read_it_back_should_be_equal :: proc(t: ^testing.T) {
-	using metaflac
-
 	meta := get_sample_small_metadata()
 	defer release_metadata(&meta)
 	data: [dynamic]u8
@@ -88,8 +83,6 @@ save_metadata_and_read_it_back_should_be_equal :: proc(t: ^testing.T) {
 
 @(test)
 save_file_in_place_should_work_correctly :: proc(t: ^testing.T) {
-	using metaflac
-
 	defer free_all(context.temp_allocator)
 	tmpdir, tmp_err := os.mkdir_temp("", "roon-tagger-test", context.temp_allocator)
 	ensure(tmp_err == nil, "error creating tmp directory")
@@ -115,8 +108,6 @@ save_file_in_place_should_work_correctly :: proc(t: ^testing.T) {
 
 @(test)
 save_file_with_larger_metadata_works_correctly :: proc(t: ^testing.T) {
-	using metaflac
-
 	defer free_all(context.temp_allocator)
 	tmpdir, tmp_err := os.mkdir_temp("", "roon-tagger-test", context.temp_allocator)
 	ensure(tmp_err == nil, "error creating tmp directory")

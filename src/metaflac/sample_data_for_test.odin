@@ -1,12 +1,12 @@
-#+feature using-stmt dynamic-literals
-package metaflac_tests
+#+feature dynamic-literals
+#+test
 
-import "../../src/metaflac"
+package metaflac
+
 import "core:slice"
 import "core:strings"
 
-get_sample_small_metadata :: proc() -> metaflac.Flac_Metadata {
-	using metaflac
+get_sample_small_metadata :: proc() -> Flac_Metadata {
 
 	result: Flac_Metadata
 	result.path = ""
