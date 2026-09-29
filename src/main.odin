@@ -46,7 +46,7 @@ main :: proc() {
 
 	main_opts: Main_Options
 	flags.register_type_setter(main_command_type_setter)
-	flags.parse_or_exit(&main_opts, args, .Odin)
+	flags.parse_or_exit(&main_opts, args, .Unix)
 
 	// now we have to parse again because the base command has passed
 	switch main_opts.command {
@@ -54,11 +54,14 @@ main :: proc() {
 		flags.register_type_setter(nil)
 		flags.register_flag_checker(view_cmd_flag_checker)
 		opts: View_Options
-		// TODO: why does it not prints help on error?
-		flags.parse_or_exit(&opts, os.args, .Odin)
+		flags.parse_or_exit(&opts, os.args, .Unix)
 		verbose = opts.verbose
 		ensure(view_flac(opts.file))
 	case .set_tags:
-		unimplemented("to do")
+		flags.register_type_setter(set_tags_command_type_setter)
+		opts: Set_Tags_Options
+		flags.parse_or_exit(&opts, os.args, .Unix)
+		verbose = opts.verbose
+		ensure(set_tags_run(opts))
 	}
 }
