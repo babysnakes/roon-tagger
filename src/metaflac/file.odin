@@ -1,9 +1,13 @@
 package metaflac
 
 import "core:bufio"
+import "core:fmt"
 import "core:io"
 import "core:os"
 import "core:strings"
+import "core:time"
+
+MAX_DELAY :: 500 * time.Millisecond
 
 Flac_Metadata :: struct {
 	path:   string,
@@ -80,7 +84,6 @@ save_metadata :: proc(meta: ^Flac_Metadata) -> Metaflac_Error {
 		ensure(written == len(blocks), "BUG: mismatch number of bytes written to Flac file")
 	} else {
 		tmp_path := strings.concatenate({meta.path, ".tmp"})
-		defer delete(tmp_path)
 		cur_flac := os.open(meta.path, os.O_RDONLY) or_return
 		cur_stream := os.to_stream(cur_flac)
 		new_flac := os.create(tmp_path) or_return
@@ -94,19 +97,24 @@ save_metadata :: proc(meta: ^Flac_Metadata) -> Metaflac_Error {
 
 			write_padding(1024, &blocks) // give it a default of 1024 bytes
 			io.write_string(new_stream, "fLaC") or_return
-			io.write(new_stream, blocks[:])
+			io.write(new_stream, blocks[:]) or_return
 			skip_metadata(cur_stream) or_return
 
 			buf: [64 * 1024]u8 // larger buffer than the default in io.copy
 			_, c_err := io.copy_buffer(new_stream, cur_stream, buf[:])
 			if c_err != nil {
-				defer os.remove(tmp_path)
 				return c_err
 			}
 		}
 
-		// TODO We must better handle the error here, the user must be notified about the
-		os.rename(tmp_path, meta.path) or_return
+		defer if os.exists(tmp_path) {
+			rm_err := remove_with_retry(tmp_path)
+			if rm_err != nil {
+				fmt.eprintfln("Error removing temp file: %v", rm_err)
+			}
+		}
+		// TODO We must better handle the error here, the user must be notified about this error (e.g. in case of read-only file)
+		rename_with_retry(tmp_path, meta.path) or_return
 		return nil
 	}
 
@@ -171,4 +179,34 @@ read_3bytes_as_u32be :: proc(bytes: [3]u8) -> u32 {
 // smaller than 24bits)
 write_u32_be_3bytes :: proc(value: u32) -> [3]u8 {
 	return {u8(value >> 16), u8(value >> 8), u8(value)}
+}
+
+// A safeguard against some other process (e.g. virus scanner) keeps the file
+// open and prevents renaming it (mostly on windows)
+@(private = "file")
+rename_with_retry :: proc(from, to: string) -> (err: os.Error) {
+	delay := 10 * time.Millisecond
+	for _ in 0 ..< 10 {
+		err = os.rename(from, to)
+		if err == nil do return nil
+		time.sleep(delay)
+		delay = min(delay * 2, MAX_DELAY)
+	}
+
+	return err
+}
+
+// A safeguard against some other process (e.g. virus scanner) keeps the file
+// open and prevents deleting it (mostly on windows)
+@(private = "file")
+remove_with_retry :: proc(path: string) -> (err: os.Error) {
+	delay := 10 * time.Millisecond
+	for _ in 0 ..< 10 {
+		err = os.remove(path)
+		if err == nil do return nil
+		time.sleep(delay)
+		delay = min(delay * 2, MAX_DELAY)
+	}
+
+	return err
 }
