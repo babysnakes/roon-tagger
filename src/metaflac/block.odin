@@ -2,6 +2,8 @@ package metaflac
 
 import "core:encoding/endian"
 import "core:fmt"
+import "core:mem"
+import "core:slice"
 import "core:strings"
 
 Block :: union #no_nil {
@@ -64,24 +66,24 @@ Block_Error :: enum {
 	Vorbis_Comment_Parse_Error,
 }
 
-parse_block :: proc(block_type: u8, data: []u8) -> (Block, Block_Error) {
+parse_block :: proc(block_type: u8, data: []u8, allocator: mem.Allocator) -> (Block, Block_Error) {
 	switch block_type {
 	case 0:
-		return parse_stream_info(data)
+		return parse_stream_info(data, allocator)
 	case 1:
-		return parse_padding(data)
+		return parse_padding(data, allocator)
 	case 2:
-		return parse_application(data)
+		return parse_application(data, allocator)
 	case 3:
-		return parse_seek_table(data)
+		return parse_seek_table(data, allocator)
 	case 4:
-		return parse_vorbis_comment(data)
+		return parse_vorbis_comment(data, allocator)
 	case 5:
-		return parse_cuesheet(data)
+		return parse_cuesheet(data, allocator)
 	case 6:
-		return parse_picture(data)
+		return parse_picture(data, allocator)
 	case:
-		return parse_unknown(block_type, data)
+		return parse_unknown(block_type, data, allocator)
 	}
 }
 
@@ -152,35 +154,6 @@ write_blocks_data :: proc(meta: ^Flac_Metadata) -> ([dynamic]u8, u32) {
 		data_length += write_block(meta.blocks[idx], &data)
 	}
 	return data, data_length
-}
-
-release_block :: proc(block: Block) {
-	switch b in block {
-	case Stream_Info_Block:
-		delete(b.data)
-	case Application_Block:
-		delete(b.data)
-	case Seek_Table_Block:
-		delete(b.data)
-	case Vorbis_Comment_Block:
-		for k, vs in b.comments {
-			delete(k)
-			for v in vs {
-				delete(v)
-			}
-			delete(vs)
-		}
-		delete(b.comments)
-		delete(b.vendor_string)
-	case Cuesheet_Block:
-		delete(b.data)
-	case Picture_Block:
-		delete(b.data)
-	case Unknown_Block:
-		delete(b.data)
-	case Padding_Block:
-	// nothing
-	}
 }
 
 write_block :: proc(block: Block, writer: ^[dynamic]u8) -> (result: u32) {
@@ -258,11 +231,17 @@ block_type :: proc(block: Block) -> (kind: u8) {
 	return kind
 }
 
-parse_stream_info :: proc(data: []u8) -> (Stream_Info_Block, Block_Error) {
+parse_stream_info :: proc(
+	data: []u8,
+	allocator: mem.Allocator,
+) -> (
+	Stream_Info_Block,
+	Block_Error,
+) {
 	result := Stream_Info_Block{}
 	idx := 0
 	ok: bool
-	result.data = data
+	result.data = slice.clone(data, allocator)
 	result.min_block_size, ok = endian.get_u16(data[idx:idx + 2], .Big)
 	if !ok do return result, .Stream_Info_Parse_Error
 	idx += 2
@@ -289,21 +268,31 @@ parse_stream_info :: proc(data: []u8) -> (Stream_Info_Block, Block_Error) {
 	return result, .None
 }
 
-parse_padding :: proc(data: []u8) -> (Padding_Block, Block_Error) {
-	defer delete(data)
+parse_padding :: proc(data: []u8, allocator: mem.Allocator) -> (Padding_Block, Block_Error) {
 	return Padding_Block{size = len(data)}, .None
 }
 
-parse_application :: proc(data: []u8) -> (Application_Block, Block_Error) {
-	return Application_Block{data = data}, .None
+parse_application :: proc(
+	data: []u8,
+	allocator: mem.Allocator,
+) -> (
+	Application_Block,
+	Block_Error,
+) {
+	return Application_Block{data = slice.clone(data, allocator)}, .None
 }
 
-parse_seek_table :: proc(data: []u8) -> (Seek_Table_Block, Block_Error) {
-	return Seek_Table_Block{data = data}, .None
+parse_seek_table :: proc(data: []u8, allocator: mem.Allocator) -> (Seek_Table_Block, Block_Error) {
+	return Seek_Table_Block{data = slice.clone(data, allocator)}, .None
 }
 
-parse_vorbis_comment :: proc(data: []u8) -> (Vorbis_Comment_Block, Block_Error) {
-	defer delete(data)
+parse_vorbis_comment :: proc(
+	data: []u8,
+	allocator: mem.Allocator,
+) -> (
+	Vorbis_Comment_Block,
+	Block_Error,
+) {
 	idx: u32 = 0
 	result := Vorbis_Comment_Block{}
 
@@ -314,13 +303,13 @@ parse_vorbis_comment :: proc(data: []u8) -> (Vorbis_Comment_Block, Block_Error) 
 	}
 	if !vs_ok do return result, .Vorbis_Comment_Parse_Error
 	idx += 4
-	result.vendor_string = strings.clone_from_bytes(data[idx:idx + vs_length])
+	result.vendor_string = strings.clone_from_bytes(data[idx:idx + vs_length], allocator)
 	idx += vs_length
 	num_comments, ok_nc := endian.get_u32(data[idx:idx + 4], .Little)
 	if !ok_nc do return result, .Vorbis_Comment_Parse_Error
 	idx += 4
 
-	comments := make(map[string][dynamic]string)
+	comments := make(map[string][dynamic]string, allocator)
 	for _ in 0 ..< num_comments {
 		comment_length, ok_cl := endian.get_u32(data[idx:idx + 4], .Little)
 		if !ok_cl do return result, .Vorbis_Comment_Parse_Error
@@ -330,15 +319,15 @@ parse_vorbis_comment :: proc(data: []u8) -> (Vorbis_Comment_Block, Block_Error) 
 		if err != nil do return result, .Vorbis_Comment_Parse_Error
 		if len(kv) != 2 do return result, .Vorbis_Comment_Parse_Error
 		defer delete(kv)
-		v := strings.clone(kv[1])
+		v := strings.clone(kv[1], allocator)
 		idx += comment_length
 		value, ok := &comments[kv[0]]
 		if ok {
 			append(value, v)
 		} else {
-			new_val: [dynamic]string
+			new_val := make([dynamic]string, allocator)
 			append(&new_val, v)
-			comments[strings.clone(kv[0])] = new_val
+			comments[strings.clone(kv[0], allocator)] = new_val
 		}
 	}
 	result.comments = comments
@@ -346,16 +335,23 @@ parse_vorbis_comment :: proc(data: []u8) -> (Vorbis_Comment_Block, Block_Error) 
 	return result, .None
 }
 
-parse_cuesheet :: proc(data: []u8) -> (Cuesheet_Block, Block_Error) {
-	return Cuesheet_Block{data = data}, .None
+parse_cuesheet :: proc(data: []u8, allocator: mem.Allocator) -> (Cuesheet_Block, Block_Error) {
+	return Cuesheet_Block{data = slice.clone(data, allocator)}, .None
 }
 
-parse_picture :: proc(data: []u8) -> (Picture_Block, Block_Error) {
-	return Picture_Block{data = data}, .None
+parse_picture :: proc(data: []u8, allocator: mem.Allocator) -> (Picture_Block, Block_Error) {
+	return Picture_Block{data = slice.clone(data, allocator)}, .None
 }
 
-parse_unknown :: proc(block_type: u8, data: []u8) -> (Unknown_Block, Block_Error) {
-	return Unknown_Block{kind = block_type, data = data}, .None
+parse_unknown :: proc(
+	block_type: u8,
+	data: []u8,
+	allocator: mem.Allocator,
+) -> (
+	Unknown_Block,
+	Block_Error,
+) {
+	return Unknown_Block{kind = block_type, data = slice.clone(data, allocator)}, .None
 }
 
 encode_vorbis_comment :: proc(vc: Vorbis_Comment_Block) -> [dynamic]u8 {

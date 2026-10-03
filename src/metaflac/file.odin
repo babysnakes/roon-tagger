@@ -1,5 +1,7 @@
 package metaflac
 
+import "core:mem"
+import "core:mem/virtual"
 import "core:bufio"
 import "core:fmt"
 import "core:io"
@@ -10,6 +12,7 @@ import "core:time"
 MAX_DELAY :: 500 * time.Millisecond
 
 Flac_Metadata :: struct {
+	arena: virtual.Arena,
 	path:   string,
 	length: u32,
 	blocks: [dynamic]Block,
@@ -18,6 +21,7 @@ Flac_Metadata :: struct {
 Metaflac_Error :: union {
 	os.Error,
 	io.Error,
+	mem.Allocator_Error,
 	Flac_Error,
 	Block_Error,
 }
@@ -27,8 +31,16 @@ Flac_Error :: enum {
 	Stream_Info_Error,
 }
 
-load_metadata_from_file :: proc(path: string) -> (result: Flac_Metadata, err: Metaflac_Error) {
-	result.path = path
+load_metadata_from_file :: proc(path: string) -> (meta: ^Flac_Metadata, err: Metaflac_Error) {
+	meta = virtual.arena_growing_bootstrap_new(Flac_Metadata, "arena") or_return
+	defer if err != nil {
+		release_metadata(meta)
+		meta = nil
+	}
+
+	allocator := virtual.arena_allocator(&meta.arena)
+	meta.path = strings.clone(path, allocator) or_return
+	meta.blocks = make([dynamic]Block, allocator) or_return
 
 	file := os.open(path, os.O_RDONLY) or_return
 	defer os.close(file)
@@ -37,26 +49,29 @@ load_metadata_from_file :: proc(path: string) -> (result: Flac_Metadata, err: Me
 	defer bufio.reader_destroy(&reader)
 	stream := bufio.reader_to_stream(&reader)
 
-	load_metadata_from_reader(stream, &result) or_return
+	load_metadata_from_reader(stream, meta) or_return
 
-	return result, nil
+	return meta, nil
 }
 
 load_metadata_from_reader :: proc(stream: io.Reader, meta: ^Flac_Metadata) -> Metaflac_Error {
 	read_ident(stream) or_return
 
+	allocator := virtual.arena_allocator(&meta.arena)
+	scratch: [dynamic]u8
+	defer delete(scratch)
+
 	for {
-		hdr: [1]u8
-		io.read_full(stream, hdr[:]) or_return
-		is_last := (hdr[0] & 0x80) != 0 // first bit is 0 means more blocks follow
-		block_type := hdr[0] & 0x7F
+		hdr := io.read_byte(stream) or_return
+		is_last := (hdr & 0x80) != 0 // first bit is 0 means more blocks follow
+		block_type := hdr & 0x7F
 		len_buf: [3]u8
 		io.read_full(stream, len_buf[:]) or_return
 		data_len := read_3bytes_as_u32be(len_buf)
-		data := make([]u8, data_len) // ownership of data is passed to `parse_block`
-		io.read_full(stream, data[:]) or_return
+		resize(&scratch, int(data_len)) or_return
+		io.read_full(stream, scratch[:]) or_return
 
-		block := parse_block(block_type, data) or_return
+		block := parse_block(block_type, scratch[:], allocator) or_return
 		append(&meta.blocks, block)
 		meta.length += (data_len + 4)
 
@@ -83,38 +98,39 @@ save_metadata :: proc(meta: ^Flac_Metadata) -> Metaflac_Error {
 		written := io.write(stream, blocks[:]) or_return
 		ensure(written == len(blocks), "BUG: mismatch number of bytes written to Flac file")
 	} else {
-		tmp_path := strings.concatenate({meta.path, ".tmp"})
-		cur_flac := os.open(meta.path, os.O_RDONLY) or_return
-		cur_stream := os.to_stream(cur_flac)
-		new_flac := os.create(tmp_path) or_return
-		new_stream := os.to_stream(new_flac)
+	tmp_path := strings.concatenate({meta.path, ".tmp"})
+	defer delete(tmp_path)
+	cur_flac := os.open(meta.path, os.O_RDONLY) or_return
+	cur_stream := os.to_stream(cur_flac)
+	new_flac := os.create(tmp_path) or_return
+	new_stream := os.to_stream(new_flac)
 
-		// place the defers in a scope that will close the files before
-		// the rename.
-		{
-			defer os.close(cur_flac)
-			defer os.close(new_flac)
+	// place the defers in a scope that will close the files before
+	// the rename.
+	{
+		defer os.close(cur_flac)
+		defer os.close(new_flac)
 
-			write_padding(1024, &blocks) // give it a default of 1024 bytes
-			io.write_string(new_stream, "fLaC") or_return
-			io.write(new_stream, blocks[:]) or_return
-			skip_metadata(cur_stream) or_return
+		write_padding(1024, &blocks) // give it a default of 1024 bytes
+		io.write_string(new_stream, "fLaC") or_return
+		io.write(new_stream, blocks[:]) or_return
+		skip_metadata(cur_stream) or_return
 
-			buf: [64 * 1024]u8 // larger buffer than the default in io.copy
-			_, c_err := io.copy_buffer(new_stream, cur_stream, buf[:])
-			if c_err != nil {
-				return c_err
-			}
+		buf: [64 * 1024]u8 // larger buffer than the default in io.copy
+		_, c_err := io.copy_buffer(new_stream, cur_stream, buf[:])
+		if c_err != nil {
+			return c_err
 		}
+	}
 
-		defer if os.exists(tmp_path) {
-			rm_err := remove_with_retry(tmp_path)
-			if rm_err != nil {
-				fmt.eprintfln("Error removing temp file: %v", rm_err)
-			}
+	defer if os.exists(tmp_path) {
+		rm_err := remove_with_retry(tmp_path)
+		if rm_err != nil {
+			fmt.eprintfln("Error removing temp file: %v", rm_err)
 		}
-		// TODO We must better handle the error here, the user must be notified about this error (e.g. in case of read-only file)
-		rename_with_retry(tmp_path, meta.path) or_return
+	}
+	// TODO We must better handle the error here, the user must be notified about this error (e.g. in case of read-only file)
+	rename_with_retry(tmp_path, meta.path) or_return
 		return nil
 	}
 
@@ -149,10 +165,8 @@ validate_metadata :: proc(meta: ^Flac_Metadata) -> Metaflac_Error {
 }
 // Release memory allocated by metadata
 release_metadata :: proc(meta: ^Flac_Metadata) {
-	for b in meta.blocks {
-		release_block(b)
-	}
-	defer delete(meta.blocks)
+	arena := meta.arena
+	virtual.arena_destroy(&arena)
 }
 
 // Reads the stream header to identify whether it's a valid flac file. Returns false if it's not a Flac file.

@@ -3,13 +3,16 @@
 
 package metaflac
 
+import "core:mem"
+import "core:mem/virtual"
 import "core:slice"
 import "core:strings"
 
-get_sample_small_metadata :: proc() -> Flac_Metadata {
+get_sample_small_metadata :: proc() -> ^Flac_Metadata {
 
-	result: Flac_Metadata
-	result.path = ""
+	result := mk_empty_flac_metadata()
+	allocator := virtual.arena_allocator(&result.arena)
+
 	si_block := Stream_Info_Block {
 		min_block_size  = 4096,
 		max_block_size  = 4096,
@@ -55,17 +58,19 @@ get_sample_small_metadata :: proc() -> Flac_Metadata {
 				0xA1,
 				0x02,
 			},
+			allocator,
 		),
 	}
+	comments := make(map[string][dynamic]string, allocator)
+	comments[strings.clone("TITLE", allocator)] = mk_comment_value("empty", allocator)
+	comments[strings.clone("COMMENT", allocator)] = mk_comment_value(
+		"fre:ac - free audio converter <https://www.freac.org/>",
+		allocator,
+	)
+	comments[strings.clone("ENCODER", allocator)] = mk_comment_value("fre:ac v1.1.4", allocator)
 	vc_block := Vorbis_Comment_Block {
-		vendor_string = strings.clone("reference libFLAC 1.3.3 20190804"),
-		comments = map[string][dynamic]string {
-			strings.clone("TITLE") = {strings.clone("empty")},
-			strings.clone("COMMENT") = {
-				strings.clone("fre:ac - free audio converter <https://www.freac.org/>"),
-			},
-			strings.clone("ENCODER") = {strings.clone("fre:ac v1.1.4")},
-		},
+		vendor_string = strings.clone("reference libFLAC 1.3.3 20190804", allocator),
+		comments      = comments,
 	}
 	sk_block := Seek_Table_Block {
 		data = slice.clone(
@@ -89,14 +94,22 @@ get_sample_small_metadata :: proc() -> Flac_Metadata {
 				0x08,
 				0xB4,
 			},
+			allocator,
 		),
 	}
 	pad_block := Padding_Block {
 		size = 512,
 	}
 
-	result.blocks = [dynamic]Block{si_block, vc_block, sk_block, pad_block}
+	result.blocks = make([dynamic]Block, allocator)
+	append(&result.blocks, si_block, vc_block, sk_block, pad_block)
 	result.length = 726
 
+	return result
+}
+
+mk_comment_value :: proc(v: string, allocator: mem.Allocator) -> [dynamic]string {
+	result := make([dynamic]string, allocator)
+	append(&result, v)
 	return result
 }

@@ -13,7 +13,7 @@ view_flac :: proc(path: string) -> bool {
 
 	fmt.printfln("Parsing file: %s", full_path)
 	meta, err := metaflac.load_metadata_from_file(full_path)
-	defer metaflac.release_metadata(&meta)
+	defer metaflac.release_metadata(meta)
 
 	if err != nil {
 		fmt.eprintfln("Error loading metadata from %v: %v", meta.path, err)

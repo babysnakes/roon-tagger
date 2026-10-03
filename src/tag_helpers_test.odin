@@ -15,7 +15,8 @@ successfully_split_multi_value :: proc(t: ^testing.T) {
 	}
 	defer delete(expected)
 
-	result := split_multi_value(source, ",")
+	result := split_multi_value(source, ",", context.temp_allocator)
 	defer delete(result)
 	testing.expect(t, slice.equal(expected[:], result[:]))
+	defer free_all(context.temp_allocator)
 }

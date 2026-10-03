@@ -61,6 +61,7 @@ main :: proc() {
 		flags.register_type_setter(set_tags_command_type_setter)
 		opts: Set_Tags_Options
 		flags.parse_or_exit(&opts, os.args, .Unix)
+		defer delete(opts.overflow)
 		verbose = opts.verbose
 		ensure(set_tags_run(opts))
 	}
