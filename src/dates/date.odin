@@ -8,6 +8,7 @@ To be replaced once Odin does have a parser for date strings.
 */
 package dates
 
+import "core:fmt"
 import "core:strconv"
 import "core:strings"
 import "core:time"
@@ -45,4 +46,11 @@ parse_date :: proc(str_date: string) -> (d: Date_Tag, err: Date_Error) {
 	//
 	date := datetime.components_to_date(year, month, day) or_return
 	return Date_Tag{date}, .None
+}
+
+// Represents `Date_Tag` as string (to save as tag value)
+as_string :: proc(d: Date_Tag) -> string {
+	builder, err := strings.builder_make()
+	fmt.ensuref(err == nil, "Error allocating string builder: %v", err)
+	return fmt.sbprintf(&builder, "%d-%d-%d", d.date.year, d.date.month, d.date.day)
 }

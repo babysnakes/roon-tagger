@@ -1,6 +1,10 @@
 words = [
     "ALBUMARTIST",
     "Cuesheet",
+    "IMPORTDATE",
+    "ORIGINALRELEASEDATE",
+    "PEERSONNEL",
+    "RELEASEDATE",
     "Roon",
     "Shepp",
     "Vorbis",

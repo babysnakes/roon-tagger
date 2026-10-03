@@ -25,12 +25,17 @@ View_Options :: struct {
 
 Set_Tags_Options :: struct {
 	command:      string `args:"pos=0,required" usage:"set-tags"`,
-	import_date:  dates.Date_Tag `args:"name=I" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
-	release_date: dates.Date_Tag `args:"name=R" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
+	title:        string `usage:"The title of the song"`,
+	import_date:  Maybe(
+		dates.Date_Tag,
+	) `args:"name=I" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
+	release_date: Maybe(
+		dates.Date_Tag,
+	) `args:"name=R" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
+	year:         int `usage:"Year of release"`,
 	composer:     string `usage:"Add composer tag and credit, Separate multiple values by comma"`,
 	conductor:    string `usage:"Add conductor tag and credit, Separate multiple values by comma"`,
-	year:         int `usage:"Year of release"`,
-	verbose: bool `args:"name=v" usage:"Display memory leaks details"`,
+	verbose:      bool `args:"name=v" usage:"Display memory leaks details"`,
 	overflow:     [dynamic]string `usage:"Files to process"`,
 }
 
@@ -88,9 +93,9 @@ set_tags_command_type_setter :: proc(
 	handled: bool,
 	alloc_error: runtime.Allocator_Error,
 ) {
-	if data_type == dates.Date_Tag {
+	if data_type == Maybe(dates.Date_Tag) {
 		handled = true
-		ptr := cast(^dates.Date_Tag)data
+		ptr := cast(^Maybe(dates.Date_Tag))data
 		dt, err := dates.parse_date(unparsed_value)
 		if err != .None {
 			error = fmt.tprintf("Error parsing date: %v", err)
