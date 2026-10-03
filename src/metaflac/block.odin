@@ -99,7 +99,7 @@ vorbis_comment :: proc(meta: ^Flac_Metadata) -> ^Vorbis_Comment_Block {
 	}
 	// we do not append as it may already have block with `is_last` indication
 	inject_at(&meta.blocks, 1, Vorbis_Comment_Block{})
-	return &meta.blocks[0].(Vorbis_Comment_Block)
+	return &meta.blocks[1].(Vorbis_Comment_Block)
 }
 
 print_block :: proc(block: Block) {

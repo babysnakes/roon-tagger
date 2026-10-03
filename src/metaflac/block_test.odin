@@ -3,6 +3,7 @@
 package metaflac
 
 import "core:encoding/endian"
+import "core:fmt"
 import "core:testing"
 
 @(test)
@@ -41,4 +42,11 @@ zero_length_vorbis_comment_is_illegal :: proc(t: ^testing.T) {
 	_, err := parse_vorbis_comment(zero_length_header, context.temp_allocator)
 	defer free_all(context.temp_allocator)
 	testing.expect_value(t, err, Block_Error.Vorbis_Comment_Parse_Error)
+}
+
+@(test)
+vorbis_comment_returns_instance_even_if_not_exists_originally :: proc(t: ^testing.T) {
+	meta := mk_empty_flac_metadata()
+	append(&meta.blocks, Stream_Info_Block{}, Padding_Block{}) // no vorbis comment
+	vc := vorbis_comment(meta) // this is enough to test, it would fail it not returning the right type
 }
