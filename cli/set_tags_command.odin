@@ -1,10 +1,11 @@
-package roon_tagger
+package cli
 
-import "core:strings"
 import "core:fmt"
 import "core:mem/virtual"
-import "metaflac"
-import "dates"
+import "core:strings"
+import "project:lib"
+import "project:lib/dates"
+import "project:lib/metaflac"
 
 set_tags_run :: proc(opts: Set_Tags_Options) -> bool {
 	if len(opts.overflow) == 0 {
@@ -23,33 +24,33 @@ set_tags_run :: proc(opts: Set_Tags_Options) -> bool {
 		tags := metaflac.vorbis_comment(meta)
 
 		if len(opts.composer) > 0 {
-			composers := split_multi_value(opts.composer, ",", allocator)
-			tags.comments[TAG_COMPOSER] = composers
+			composers := lib.split_multi_value(opts.composer, ",", allocator)
+			tags.comments[lib.TAG_COMPOSER] = composers
 			for c in composers {
-				tags_add_credit(c, "Composer", meta)
+				lib.tags_add_credit(c, "Composer", meta)
 			}
 		}
 		if len(opts.conductor) > 0 {
-			conductors := split_multi_value(opts.conductor, ",", allocator)
-			tags.comments[TAG_CONDUCTOR] = conductors
+			conductors := lib.split_multi_value(opts.conductor, ",", allocator)
+			tags.comments[lib.TAG_CONDUCTOR] = conductors
 			for c in conductors {
-				tags_add_credit(c, "Conductor", meta)
+				lib.tags_add_credit(c, "Conductor", meta)
 			}
 		}
-		if opts.year > 0 do tags_set_int_tag(TAG_YEAR, opts.year, meta)
-		if len(opts.title) > 0 do tags_set_tag(TAG_TITLE, opts.title, meta)
+		if opts.year > 0 do lib.tags_set_int_tag(lib.TAG_YEAR, opts.year, meta)
+		if len(opts.title) > 0 do lib.tags_set_tag(lib.TAG_TITLE, opts.title, meta)
 
 		i_date, i_ok := opts.import_date.?
 		if i_ok {
 			date_str := dates.as_string(i_date)
 			defer delete(date_str)
-			tags_set_tag(TAG_IMPORTDATE, strings.clone(date_str, allocator), meta)
+			lib.tags_set_tag(lib.TAG_IMPORTDATE, strings.clone(date_str, allocator), meta)
 		}
 		r_date, r_ok := opts.release_date.?
 		if r_ok {
 			date_str := dates.as_string(r_date)
 			defer delete(date_str)
-			tags_set_tag(TAG_RELEASEDATE, strings.clone(date_str, allocator), meta)
+			lib.tags_set_tag(lib.TAG_RELEASEDATE, strings.clone(date_str, allocator), meta)
 		}
 
 		save_err := metaflac.save_metadata(meta)

@@ -1,9 +1,9 @@
-package roon_tagger
+package lib
 
-import "core:slice"
-import "core:mem/virtual"
-import "core:mem"
 import "core:fmt"
+import "core:mem"
+import "core:mem/virtual"
+import "core:slice"
 import "core:strings"
 import "metaflac"
 
@@ -49,7 +49,7 @@ tags_add_credit :: proc(person, credit: string, meta: ^metaflac.Flac_Metadata) -
 //
 // **Important**: It's the caller responsibility to have the value lifetime
 // longer then the lifetime of the supplied `Flac_Metadata`
-tags_set_tag ::proc(tag, value: string, meta: ^metaflac.Flac_Metadata) -> metaflac.Metaflac_Error {
+tags_set_tag :: proc(tag, value: string, meta: ^metaflac.Flac_Metadata) -> metaflac.Metaflac_Error {
 	allocator := virtual.arena_allocator(&meta.arena)
 	vc := metaflac.vorbis_comment(meta)
 	tag_name := strings.to_upper(tag, allocator)

@@ -231,13 +231,7 @@ block_type :: proc(block: Block) -> (kind: u8) {
 	return kind
 }
 
-parse_stream_info :: proc(
-	data: []u8,
-	allocator: mem.Allocator,
-) -> (
-	Stream_Info_Block,
-	Block_Error,
-) {
+parse_stream_info :: proc(data: []u8, allocator: mem.Allocator) -> (Stream_Info_Block, Block_Error) {
 	result := Stream_Info_Block{}
 	idx := 0
 	ok: bool
@@ -272,13 +266,7 @@ parse_padding :: proc(data: []u8, allocator: mem.Allocator) -> (Padding_Block, B
 	return Padding_Block{size = len(data)}, .None
 }
 
-parse_application :: proc(
-	data: []u8,
-	allocator: mem.Allocator,
-) -> (
-	Application_Block,
-	Block_Error,
-) {
+parse_application :: proc(data: []u8, allocator: mem.Allocator) -> (Application_Block, Block_Error) {
 	return Application_Block{data = slice.clone(data, allocator)}, .None
 }
 
@@ -286,13 +274,7 @@ parse_seek_table :: proc(data: []u8, allocator: mem.Allocator) -> (Seek_Table_Bl
 	return Seek_Table_Block{data = slice.clone(data, allocator)}, .None
 }
 
-parse_vorbis_comment :: proc(
-	data: []u8,
-	allocator: mem.Allocator,
-) -> (
-	Vorbis_Comment_Block,
-	Block_Error,
-) {
+parse_vorbis_comment :: proc(data: []u8, allocator: mem.Allocator) -> (Vorbis_Comment_Block, Block_Error) {
 	idx: u32 = 0
 	result := Vorbis_Comment_Block{}
 
@@ -343,14 +325,7 @@ parse_picture :: proc(data: []u8, allocator: mem.Allocator) -> (Picture_Block, B
 	return Picture_Block{data = slice.clone(data, allocator)}, .None
 }
 
-parse_unknown :: proc(
-	block_type: u8,
-	data: []u8,
-	allocator: mem.Allocator,
-) -> (
-	Unknown_Block,
-	Block_Error,
-) {
+parse_unknown :: proc(block_type: u8, data: []u8, allocator: mem.Allocator) -> (Unknown_Block, Block_Error) {
 	return Unknown_Block{kind = block_type, data = slice.clone(data, allocator)}, .None
 }
 
@@ -358,10 +333,7 @@ encode_vorbis_comment :: proc(vc: Vorbis_Comment_Block) -> [dynamic]u8 {
 	result: [dynamic]u8
 
 	vc_length: [4]u8
-	ensure(
-		endian.put_u32(vc_length[:], .Little, u32(len(vc.vendor_string))),
-		"Failed making LE vc length",
-	)
+	ensure(endian.put_u32(vc_length[:], .Little, u32(len(vc.vendor_string))), "Failed making LE vc length")
 	append(&result, ..vc_length[:])
 	append(&result, vc.vendor_string)
 
@@ -377,10 +349,7 @@ encode_vorbis_comment :: proc(vc: Vorbis_Comment_Block) -> [dynamic]u8 {
 		for v in vs {
 			length := u32(len(k)) + 1 + u32(len(v))
 			len_bytes: [4]u8
-			ensure(
-				endian.put_u32(len_bytes[:], .Little, length),
-				"Failed making LE comment length",
-			)
+			ensure(endian.put_u32(len_bytes[:], .Little, length), "Failed making LE comment length")
 			append(&result, ..len_bytes[:])
 			append(&result, k)
 			append(&result, '=')

@@ -1,8 +1,8 @@
-package roon_tagger
+package cli
 
 import "core:fmt"
 import "core:path/filepath"
-import "metaflac"
+import "project:lib/metaflac"
 
 view_flac :: proc(path: string) -> bool {
 	full_path, pathErr := filepath.abs(path)

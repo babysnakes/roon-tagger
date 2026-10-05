@@ -6,6 +6,7 @@ metadata. This is a rewrite in Odin, old pre-released binaries can be downloaded
 
 ### Development Setup
 
-Currently only have latest Odin version.
+- Have the latest _Odin_ version installed.
+- Add the `project` collection (`-collection:project=.`) to your various _Odin_ invocations.
 
 [rel]: https://github.com/babysnakes/roon-tagger/releases

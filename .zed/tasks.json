@@ -1,0 +1,136 @@
+[
+  // The fir section is copied from Zed's odin extension source. It adds the project collection to all templates.
+  // https://github.com/zed-extensions/odin/raw/147d54670bac4e51aa82f6d394c5bf0ced888246/languages/odin/tasks.json
+  {
+    "label": "run: '$ZED_FILENAME'",
+    "command": "odin",
+    "args": ["run", "$ZED_FILE", "-collection:project=.", "-file"],
+    "tags": ["odin-main"],
+  },
+  {
+    "label": "run: package '$ZED_RELATIVE_DIR'",
+    "command": "odin",
+    "args": ["run", "-collection:project=.", "$ZED_DIRNAME"],
+    "tags": ["odin-main"],
+  },
+  {
+    "label": "test: '$ZED_SYMBOL'",
+    "command": "odin",
+    "args": [
+      "test",
+      "$ZED_DIRNAME",
+      "-collection:project=.",
+      "-define:ODIN_TEST_NAMES=$ZED_SYMBOL",
+      "-define:ODIN_TEST_CLIPBOARD=false",
+      "-define:ODIN_TEST_FANCY=false",
+    ],
+    "tags": ["odin-test"],
+  },
+  {
+    "label": "test: '$ZED_RELATIVE_DIR'",
+    "command": "odin",
+    "args": [
+      "test",
+      "$ZED_DIRNAME",
+      "-collection:project=.",
+      "-define:ODIN_TEST_CLIPBOARD=false",
+    ],
+    "tags": ["odin-test-all"],
+  },
+  {
+    "label": "check: package '$ZED_RELATIVE_DIR'",
+    "command": "odin",
+    "args": ["check", "-collection:project=.", "$ZED_DIRNAME"],
+  },
+  {
+    "label": "check: package '$ZED_RELATIVE_DIR' (vet)",
+    "command": "odin",
+    "args": ["check", "-collection:project=.", "$ZED_DIRNAME", "-vet"],
+  },
+  {
+    "label": "build: package '$ZED_RELATIVE_DIR' (debug)",
+    "command": "odin",
+    "args": ["build", "-collection:project=.", "$ZED_DIRNAME", "-debug"],
+  },
+  // End of Odin extension templates
+  {
+    // Build project
+    "label": "build",
+    "command": "odin build cli -collection:project=. -debug -vet -strict-style -vet-tabs -warnings-as-errors -out:bin/roon-tagger.exe",
+    // "cwd": "$ZED_DIRNAME",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "show_command": true,
+    "save": "current",
+    // Represents the tags for inline runnable indicators, or spawning multiple tasks at once.
+    // "tags": []
+  },
+  {
+    // Builds the current test for external debugger
+    "label": "build current test",
+    "command": "odin",
+    "args": [
+      "build",
+      "$ZED_RELATIVE_DIR",
+      "-collection:project=.",
+      "-build-mode:test",
+      "-define:ODIN_TEST_NAMES=$ZED_SYMBOL",
+      "-out:bin/current-test.exe",
+    ],
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "show_command": true,
+    "save": "current",
+  },
+  {
+    // Run current file with flac sample
+    "label": "run with sample",
+    "command": "bin/roon-tagger.exe tmp/sample.flac",
+    // "cwd": "$ZED_DIRNAME",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "show_command": true,
+    // "save": "current"
+    // Represents the tags for inline runnable indicators, or spawning multiple tasks at once.
+    // "tags": []
+  },
+  {
+    // Run All tests
+    "label": "test all",
+    "command": "odin test cli -collection:project=. --all-packages",
+    // "cwd": "$ZED_DIRNAME",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "show_command": true,
+    // "save": "current"
+    // Represents the tags for inline runnable indicators, or spawning multiple tasks at once.
+    // "tags": []
+  },
+  {
+    // Debug with RadDBG
+    "label": "debugger",
+    "command": "C:\\Users\\haim\\Local\\Apps\\Remedybg\\remedybg.exe",
+    "args": ["roon-tagger.rdbg"],
+    // "cwd": "$ZED_DIRNAME",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "show_command": true,
+    // "save": "current"
+    // Represents the tags for inline runnable indicators, or spawning multiple tasks at once.
+    // "tags": []
+  },
+]

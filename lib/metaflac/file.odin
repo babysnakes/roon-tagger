@@ -1,10 +1,10 @@
 package metaflac
 
-import "core:mem"
-import "core:mem/virtual"
 import "core:bufio"
 import "core:fmt"
 import "core:io"
+import "core:mem"
+import "core:mem/virtual"
 import "core:os"
 import "core:strings"
 import "core:time"
@@ -12,7 +12,7 @@ import "core:time"
 MAX_DELAY :: 500 * time.Millisecond
 
 Flac_Metadata :: struct {
-	arena: virtual.Arena,
+	arena:  virtual.Arena,
 	path:   string,
 	length: u32,
 	blocks: [dynamic]Block,
@@ -98,39 +98,39 @@ save_metadata :: proc(meta: ^Flac_Metadata) -> Metaflac_Error {
 		written := io.write(stream, blocks[:]) or_return
 		ensure(written == len(blocks), "BUG: mismatch number of bytes written to Flac file")
 	} else {
-	tmp_path := strings.concatenate({meta.path, ".tmp"})
-	defer delete(tmp_path)
-	cur_flac := os.open(meta.path, os.O_RDONLY) or_return
-	cur_stream := os.to_stream(cur_flac)
-	new_flac := os.create(tmp_path) or_return
-	new_stream := os.to_stream(new_flac)
+		tmp_path := strings.concatenate({meta.path, ".tmp"})
+		defer delete(tmp_path)
+		cur_flac := os.open(meta.path, os.O_RDONLY) or_return
+		cur_stream := os.to_stream(cur_flac)
+		new_flac := os.create(tmp_path) or_return
+		new_stream := os.to_stream(new_flac)
 
-	// place the defers in a scope that will close the files before
-	// the rename.
-	{
-		defer os.close(cur_flac)
-		defer os.close(new_flac)
+		// place the defers in a scope that will close the files before
+		// the rename.
+		{
+			defer os.close(cur_flac)
+			defer os.close(new_flac)
 
-		write_padding(1024, &blocks) // give it a default of 1024 bytes
-		io.write_string(new_stream, "fLaC") or_return
-		io.write(new_stream, blocks[:]) or_return
-		skip_metadata(cur_stream) or_return
+			write_padding(1024, &blocks) // give it a default of 1024 bytes
+			io.write_string(new_stream, "fLaC") or_return
+			io.write(new_stream, blocks[:]) or_return
+			skip_metadata(cur_stream) or_return
 
-		buf: [64 * 1024]u8 // larger buffer than the default in io.copy
-		_, c_err := io.copy_buffer(new_stream, cur_stream, buf[:])
-		if c_err != nil {
-			return c_err
+			buf: [64 * 1024]u8 // larger buffer than the default in io.copy
+			_, c_err := io.copy_buffer(new_stream, cur_stream, buf[:])
+			if c_err != nil {
+				return c_err
+			}
 		}
-	}
 
-	defer if os.exists(tmp_path) {
-		rm_err := remove_with_retry(tmp_path)
-		if rm_err != nil {
-			fmt.eprintfln("Error removing temp file: %v", rm_err)
+		defer if os.exists(tmp_path) {
+			rm_err := remove_with_retry(tmp_path)
+			if rm_err != nil {
+				fmt.eprintfln("Error removing temp file: %v", rm_err)
+			}
 		}
-	}
-	// TODO We must better handle the error here, the user must be notified about this error (e.g. in case of read-only file)
-	rename_with_retry(tmp_path, meta.path) or_return
+		// TODO We must better handle the error here, the user must be notified about this error (e.g. in case of read-only file)
+		rename_with_retry(tmp_path, meta.path) or_return
 		return nil
 	}
 

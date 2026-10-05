@@ -1,6 +1,6 @@
 #+test
 
-package roon_tagger
+package cli
 
 import "core:fmt"
 import "core:log"
@@ -8,9 +8,10 @@ import "core:os"
 import "core:slice"
 import "core:testing"
 import "core:time/datetime"
-import "dates"
-import "metaflac"
-import "test_helpers"
+import "project:lib"
+import "project:lib/dates"
+import "project:lib/metaflac"
+import "project:lib/test_helpers"
 
 @(test)
 set_tags_all_fields_should_work :: proc(t: ^testing.T) {
@@ -39,42 +40,42 @@ set_tags_all_fields_should_work :: proc(t: ^testing.T) {
 	comments := metaflac.vorbis_comment(meta).comments
 
 	log.info("testing title ...")
-	testing.expect_value(t, 1, len(comments[TAG_TITLE]))
-	testing.expect_value(t, "A new title", comments[TAG_TITLE][0])
+	testing.expect_value(t, 1, len(comments[lib.TAG_TITLE]))
+	testing.expect_value(t, "A new title", comments[lib.TAG_TITLE][0])
 
 	log.info("testing year ...")
-	testing.expect_value(t, 1, len(comments[TAG_YEAR]))
-	testing.expect_value(t, "1999", comments[TAG_YEAR][0])
+	testing.expect_value(t, 1, len(comments[lib.TAG_YEAR]))
+	testing.expect_value(t, "1999", comments[lib.TAG_YEAR][0])
 
 	log.info("testing import date ...")
-	testing.expect_value(t, 1, len(comments[TAG_IMPORTDATE]))
-	testing.expect_value(t, "2020-7-13", comments[TAG_IMPORTDATE][0])
+	testing.expect_value(t, 1, len(comments[lib.TAG_IMPORTDATE]))
+	testing.expect_value(t, "2020-7-13", comments[lib.TAG_IMPORTDATE][0])
 
 	log.info("testing release date ...")
-	testing.expect_value(t, 1, len(comments[TAG_RELEASEDATE]))
-	testing.expect_value(t, "2018-1-1", comments[TAG_RELEASEDATE][0])
+	testing.expect_value(t, 1, len(comments[lib.TAG_RELEASEDATE]))
+	testing.expect_value(t, "2018-1-1", comments[lib.TAG_RELEASEDATE][0])
 
 	log.info("testing conductor ...")
-	testing.expect_value(t, 2, len(comments[TAG_CONDUCTOR]))
-	testing.expect_value(t, "My Conductor", comments[TAG_CONDUCTOR][0])
-	testing.expect_value(t, "Other Conductor", comments[TAG_CONDUCTOR][1])
+	testing.expect_value(t, 2, len(comments[lib.TAG_CONDUCTOR]))
+	testing.expect_value(t, "My Conductor", comments[lib.TAG_CONDUCTOR][0])
+	testing.expect_value(t, "Other Conductor", comments[lib.TAG_CONDUCTOR][1])
 	testing.expect(
 		t,
-		slice.contains(comments[TAG_PERSONNEL][:], "My Conductor - Conductor"),
+		slice.contains(comments[lib.TAG_PERSONNEL][:], "My Conductor - Conductor"),
 		"missing conductor credit",
 	)
 	testing.expect(
 		t,
-		slice.contains(comments[TAG_PERSONNEL][:], "Other Conductor - Conductor"),
+		slice.contains(comments[lib.TAG_PERSONNEL][:], "Other Conductor - Conductor"),
 		"missing conductor credit",
 	)
 
 	log.info("testing composer ...")
-	testing.expect_value(t, 1, len(comments[TAG_COMPOSER]))
-	testing.expect_value(t, "My Composer", comments[TAG_COMPOSER][0])
+	testing.expect_value(t, 1, len(comments[lib.TAG_COMPOSER]))
+	testing.expect_value(t, "My Composer", comments[lib.TAG_COMPOSER][0])
 	testing.expect(
 		t,
-		slice.contains(comments[TAG_PERSONNEL][:], "My Composer - Composer"),
+		slice.contains(comments[lib.TAG_PERSONNEL][:], "My Composer - Composer"),
 		"missing composer credit",
 	)
 }

@@ -3,13 +3,13 @@
 
 package metaflac
 
+import helpers "../test_helpers"
 import "core:bytes"
+import "core:mem/virtual"
 import "core:os"
 import "core:slice"
 import "core:strings"
 import "core:testing"
-import "core:mem/virtual"
-import helpers "../test_helpers"
 
 @(test)
 errors_on_empty_blocks :: proc(t: ^testing.T) {
@@ -58,11 +58,7 @@ save_metadata_and_read_it_back_should_be_equal :: proc(t: ^testing.T) {
 	result_stream_info, si_ok := result.blocks[0].(Stream_Info_Block)
 	meta_stream_info, _ := meta.blocks[0].(Stream_Info_Block)
 	testing.expect(t, si_ok, "first block is not Stream_Info")
-	testing.expect(
-		t,
-		slice.equal(meta_stream_info.data, result_stream_info.data),
-		"stream info not equal",
-	)
+	testing.expect(t, slice.equal(meta_stream_info.data, result_stream_info.data), "stream info not equal")
 
 	meta_vorbis, _ := meta.blocks[1].(Vorbis_Comment_Block)
 	result_vorbis, rv_ok := result.blocks[1].(Vorbis_Comment_Block)

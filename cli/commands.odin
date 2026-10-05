@@ -1,9 +1,9 @@
-package roon_tagger
+package cli
 
 import "base:runtime"
 import "core:fmt"
 import "core:os"
-import "dates"
+import "project:lib/dates"
 
 // Available sub-commands
 Command :: enum {
@@ -26,12 +26,8 @@ View_Options :: struct {
 Set_Tags_Options :: struct {
 	command:      string `args:"pos=0,required" usage:"set-tags"`,
 	title:        string `usage:"The title of the song"`,
-	import_date:  Maybe(
-		dates.Date_Tag,
-	) `args:"name=I" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
-	release_date: Maybe(
-		dates.Date_Tag,
-	) `args:"name=R" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
+	import_date:  Maybe(dates.Date_Tag) `args:"name=I" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
+	release_date: Maybe(dates.Date_Tag) `args:"name=R" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
 	year:         int `usage:"Year of release"`,
 	composer:     string `usage:"Add composer tag and credit, Separate multiple values by comma"`,
 	conductor:    string `usage:"Add conductor tag and credit, Separate multiple values by comma"`,
@@ -65,14 +61,7 @@ main_command_type_setter :: proc(
 	return
 }
 
-view_cmd_flag_checker :: proc(
-	model: rawptr,
-	name: string,
-	value: any,
-	args_tag: string,
-) -> (
-	error: string,
-) {
+view_cmd_flag_checker :: proc(model: rawptr, name: string, value: any, args_tag: string) -> (error: string) {
 	if name == "file" {
 		file := value.(string)
 		if !os.exists(file) {

@@ -17,6 +17,5 @@ tmp.*
 
 # IDEs and tools
 .idea/
-.zed/
 *.rdbg
 *.rdi

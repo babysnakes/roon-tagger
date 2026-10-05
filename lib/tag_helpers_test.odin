@@ -1,7 +1,7 @@
 #+feature dynamic-literals
 #+test
 
-package roon_tagger
+package lib
 
 import "core:fmt"
 import "core:log"

@@ -1,4 +1,4 @@
-package roon_tagger
+package cli
 
 import "core:flags"
 import "core:fmt"
