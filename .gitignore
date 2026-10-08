@@ -3,6 +3,7 @@
 *
 !*/
 !*.*
+!ext/*
 
 # Windows build artifacts
 *.exe

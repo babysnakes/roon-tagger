@@ -20,18 +20,18 @@ Main_Options :: struct {
 View_Options :: struct {
 	command: string `args:"pos=0,required" usage:"view"`,
 	file:    string `args:"pos=1,required" usage:"Flac file to view"`,
-	verbose: bool `args:"name=v" usage:"Display memory leaks details"`,
+	verbose: bool `args:"short=v" usage:"Display memory leaks details"`,
 }
 
 Set_Tags_Options :: struct {
 	command:      string `args:"pos=0,required" usage:"set-tags"`,
 	title:        string `usage:"The title of the song"`,
-	import_date:  Maybe(dates.Date_Tag) `args:"name=I" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
-	release_date: Maybe(dates.Date_Tag) `args:"name=R" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
+	import_date:  Maybe(dates.Date_Tag) `args:"short=I" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
+	release_date: Maybe(dates.Date_Tag) `args:"short=R" usage:"Import date (format: 'yyyy-mm-dd' or 'today')"`,
 	year:         int `usage:"Year of release"`,
 	composer:     string `usage:"Add composer tag and credit, Separate multiple values by comma"`,
 	conductor:    string `usage:"Add conductor tag and credit, Separate multiple values by comma"`,
-	verbose:      bool `args:"name=v" usage:"Display memory leaks details"`,
+	verbose:      bool `args:"short=v" usage:"Display memory leaks details"`,
 	overflow:     [dynamic]string `usage:"Files to process"`,
 }
 

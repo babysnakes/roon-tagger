@@ -1,6 +1,6 @@
 package cli
 
-import "core:flags"
+import flags "project:ext/pflags"
 import "core:fmt"
 import "core:mem"
 import "core:os"
