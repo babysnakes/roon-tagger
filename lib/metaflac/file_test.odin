@@ -79,7 +79,7 @@ save_file_in_place_should_work_correctly :: proc(t: ^testing.T) {
 	tmpdir, tmp_err := os.mkdir_temp("", "roon-tagger-test", context.temp_allocator)
 	ensure(tmp_err == nil, "error creating tmp directory")
 	defer os.remove_all(tmpdir)
-	flac_file := helpers.copy_fixture("minimal.flac", tmpdir, context.temp_allocator)
+	flac_file := helpers.copy_fixture("minimal.flac", tmpdir)
 
 	meta_orig, meta_err := load_metadata_from_file(flac_file)
 	allocator := virtual.arena_allocator(&meta_orig.arena)
@@ -106,7 +106,7 @@ save_file_with_larger_metadata_works_correctly :: proc(t: ^testing.T) {
 	tmpdir, tmp_err := os.mkdir_temp("", "roon-tagger-test", context.temp_allocator)
 	ensure(tmp_err == nil, "error creating tmp directory")
 	defer os.remove_all(tmpdir)
-	flac_file := helpers.copy_fixture("no-padding.flac", tmpdir, context.temp_allocator)
+	flac_file := helpers.copy_fixture("no-padding.flac", tmpdir)
 
 	meta_orig, meta_err := load_metadata_from_file(flac_file)
 	allocator := virtual.arena_allocator(&meta_orig.arena)
