@@ -1,5 +1,6 @@
 words = [
     "ALBUMARTIST",
+    "Cli",
     "Cuesheet",
     "IMPORTDATE",
     "ORIGINALRELEASEDATE",
@@ -11,5 +12,7 @@ words = [
     "bufio",
     "fre",
     "metaflac",
+    "nvim",
+    "omitempty",
     "unparsed",
 ]

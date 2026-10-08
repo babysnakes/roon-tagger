@@ -18,7 +18,7 @@ set_tags_all_fields_should_work :: proc(t: ^testing.T) {
 	tmpdir, tmp_err := os.mkdir_temp("", "set-tags-test", context.temp_allocator)
 	ensure(tmp_err == nil, "error creating tmp directory")
 	defer os.remove_all(tmpdir)
-	test_flac := test_helpers.copy_fixture("with-credits.flac", tmpdir, context.temp_allocator)
+	test_flac := test_helpers.copy_fixture("with-credits.flac", tmpdir)
 
 	overflow := make([dynamic]string, context.temp_allocator)
 	append(&overflow, test_flac)
