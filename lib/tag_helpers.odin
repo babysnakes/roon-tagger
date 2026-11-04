@@ -1,9 +1,11 @@
 package lib
 
 import "core:fmt"
+import "core:log"
 import "core:mem"
 import "core:mem/virtual"
 import "core:slice"
+import "core:strconv"
 import "core:strings"
 import "metaflac"
 
@@ -16,6 +18,10 @@ TAG_RELEASEDATE :: "ORIGINALRELEASEDATE"
 TAG_PERSONNEL :: "PEERSONNEL"
 TAG_TITLE :: "TITLE"
 TAG_YEAR :: "YEAR"
+TAG_TRACK_NUMBER :: "TRACKNUMBER"
+TAG_TRACK_TOTAL :: "TRACKTOTAL"
+TAG_DISC_NUMBER :: "DISCNUMBER"
+TAG_DISC_TOTAL :: "DISCTOTAL"
 
 split_multi_value :: proc(s: string, sep: string = ";", allocator: mem.Allocator) -> [dynamic]string {
 	result := make([dynamic]string, allocator)
@@ -70,4 +76,45 @@ tags_set_int_tag :: proc(tag: string, value: int, meta: ^metaflac.Flac_Metadata)
 	allocator := virtual.arena_allocator(&meta.arena)
 	new_value := strings.clone(fmt.tprint(value), allocator)
 	return tags_set_tag(tag, new_value, meta)
+}
+
+// Extracts the track, total_tracks, and disc number from the metadata.
+// Returns '0' for every missing value.
+// Returns `!ok` if value exists but not number.
+get_track_ordering :: proc(meta: ^metaflac.Flac_Metadata) -> (track, total_tracks, disc: int, ok: bool) {
+	log.debugf("Extracting ordering of track: %s", meta.path)
+	vc := metaflac.vorbis_comment(meta)
+	track = extract_num_tag(TAG_TRACK_NUMBER, vc) or_return
+	total_tracks = extract_num_tag(TAG_TRACK_TOTAL, vc) or_return
+	disc = extract_num_tag(TAG_DISC_NUMBER, vc) or_return
+	ok = track >= 0 && total_tracks >= 0 && disc >= 0
+	log.debugf("track: %d, total_tracks: %d, disc: %d, err: %d", track, total_tracks, disc, ok)
+	return
+}
+
+// Compare the ordering of 2 tracks. Track without specified track/disc is considered as track 0 and disc 0.
+//
+// Note: ignores invalid values, treats them as 0
+cmp_track_ordering :: proc(track1, track2: ^metaflac.Flac_Metadata) -> slice.Ordering {
+	tr1, _, disc1, ok1 := get_track_ordering(track1)
+	if !ok1 do tr1, disc1 = 0, 0
+	tr2, _, disc2, ok2 := get_track_ordering(track2)
+	if !ok2 do tr2, disc2 = 0, 0
+
+	if tr1 == tr2 && disc1 == disc2 do return slice.Ordering.Equal
+	if disc1 == disc2 {
+		if tr1 > tr2 do return slice.Ordering.Greater
+		if tr1 < tr2 do return slice.Ordering.Less
+		unreachable()
+	} else {
+		if disc1 > disc2 do return slice.Ordering.Greater
+		if disc1 < disc2 do return slice.Ordering.Less
+		unreachable()
+	}
+}
+
+extract_num_tag :: proc(tag: string, vorbis: ^metaflac.Vorbis_Comment_Block) -> (val: int, ok: bool) {
+	raw := vorbis.comments[tag]
+	if len(raw) == 0 do return 0, true
+	return strconv.parse_int(raw[0])
 }

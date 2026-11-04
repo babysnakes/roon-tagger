@@ -1,4 +1,4 @@
-#+feature dynamic-literals
+#+feature dynamic-literals using-stmt
 #+test
 
 package lib
@@ -85,4 +85,72 @@ t_tags_set_tag_behaves_correctly :: proc(t: ^testing.T) {
 	fmt.ensuref(err == nil, "tags_set_tag error: %v", err)
 	testing.expect_value(t, 1, len(vc.comments["SUBJECT1"]))
 	testing.expect_value(t, "my other subject", vc.comments["SUBJECT1"][0])
+}
+
+@(test)
+t_get_track_ordering_behaves_correctly :: proc(t: ^testing.T) {
+	meta := metaflac.get_sample_small_metadata()
+	defer metaflac.release_metadata(meta)
+
+	log.info("testing: empty track should return zero values")
+	tr1, tt1, cd1, ok1 := get_track_ordering(meta)
+	testing.expect_value(t, tr1, 0)
+	testing.expect_value(t, tt1, 0)
+	testing.expect_value(t, cd1, 0)
+	testing.expect_value(t, ok1, true)
+
+	log.info("testing: fully specified ordering should return correctly")
+	tags_set_int_tag(TAG_TRACK_NUMBER, 1, meta)
+	tags_set_int_tag(TAG_TRACK_TOTAL, 1, meta)
+	tags_set_int_tag(TAG_DISC_NUMBER, 1, meta)
+	tr2, tt2, cd2, ok2 := get_track_ordering(meta)
+	testing.expect_value(t, tr2, 1)
+	testing.expect_value(t, tt2, 1)
+	testing.expect_value(t, cd2, 1)
+	testing.expect_value(t, ok2, true)
+
+	log.info("testing: negative value returns error")
+	tags_set_int_tag(TAG_TRACK_NUMBER, -1, meta)
+	tr3, _, _, ok3 := get_track_ordering(meta)
+	testing.expect_value(t, tr3, -1) // just to make sure test is correct
+	testing.expect_value(t, ok3, false)
+	tags_set_int_tag(TAG_TRACK_NUMBER, 0, meta) // reset
+
+	log.info("testing: invalid value returns error")
+	tags_set_tag(TAG_DISC_NUMBER, "invalid", meta)
+	_, _, _, ok4 := get_track_ordering(meta)
+	testing.expect_value(t, ok4, false)
+}
+@(test)
+t_cmp_track_ordering_behaves_correctly :: proc(t: ^testing.T) {
+	using slice.Ordering
+
+	track1 := metaflac.get_sample_small_metadata()
+	track2 := metaflac.get_sample_small_metadata()
+	defer metaflac.release_metadata(track1)
+	defer metaflac.release_metadata(track2)
+
+	log.info("testing: tracks with unspecified ordering are equal")
+	r1 := cmp_track_ordering(track1, track2)
+	testing.expect_value(t, r1, Equal)
+
+	log.info("testing: tracks on the same disc are handled according to track order")
+	tags_set_int_tag(TAG_TRACK_NUMBER, 1, track1)
+	tags_set_int_tag(TAG_TRACK_NUMBER, 2, track2)
+	r2 := cmp_track_ordering(track1, track2)
+	testing.expect_value(t, r2, Less)
+	tags_set_int_tag(TAG_DISC_NUMBER, 3, track1)
+	r3 := cmp_track_ordering(track1, track2)
+	testing.expect_value(t, r3, Greater)
+
+	log.info("testing: tracks on different discs are treated according to disc order")
+	tags_set_int_tag(TAG_TRACK_NUMBER, 2, track1)
+	tags_set_int_tag(TAG_DISC_NUMBER, 1, track1)
+	tags_set_int_tag(TAG_TRACK_NUMBER, 1, track2)
+	tags_set_int_tag(TAG_DISC_NUMBER, 2, track2)
+	r4 := cmp_track_ordering(track1, track2)
+	testing.expect_value(t, r4, Less)
+	tags_set_int_tag(TAG_DISC_NUMBER, 3, track1)
+	r5 := cmp_track_ordering(track1, track2)
+	testing.expect_value(t, r5, Greater)
 }
