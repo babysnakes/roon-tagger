@@ -1,13 +1,18 @@
 package cli
 
+import "core:slice"
 import flags "project:ext/pflags"
 import "core:fmt"
 import "core:mem"
 import "core:os"
 import "core:sys/windows"
+import "core:log"
+
+LOG_FILE :: "roon-tagger.log"
 
 main :: proc() {
-	verbose: bool
+	// TODO (haim) this is a terrible hack but it will work for now until I'll implement main command options correctly
+	verbose := slice.contains(os.args, "-v")
 
 	// track memory error, not sure if you must also add -sanitize:address...
 	when ODIN_DEBUG {
@@ -32,6 +37,17 @@ main :: proc() {
 		}
 	}
 
+	// Logging
+	logger := log.nil_logger()
+	if verbose {
+		handle, err := os.open(LOG_FILE, os.O_RDWR | os.O_APPEND | os.O_CREATE)
+		fmt.ensuref(err == nil, "Error opening log file: %v", err)
+		logger = log.create_file_logger(handle)
+		logger.lowest_level = log.Level.Debug
+	}
+	if verbose do defer log.destroy_file_logger(logger)
+	context.logger = logger
+
 	// Display UTF-8 characters correctly in the console
 	when ODIN_OS == .Windows {
 		windows.SetConsoleOutputCP(.UTF8)
@@ -55,14 +71,12 @@ main :: proc() {
 		flags.register_flag_checker(view_cmd_flag_checker)
 		opts: View_Options
 		flags.parse_or_exit(&opts, os.args, .Unix)
-		verbose = opts.verbose
 		ensure(view_flac(opts.file))
 	case .set_tags:
 		flags.register_type_setter(set_tags_command_type_setter)
 		opts: Set_Tags_Options
 		flags.parse_or_exit(&opts, os.args, .Unix)
 		defer delete(opts.overflow)
-		verbose = opts.verbose
 		ensure(set_tags_run(opts))
 	}
 }

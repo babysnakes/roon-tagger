@@ -20,3 +20,4 @@ tmp.*
 .idea/
 *.rdbg
 *.rdi
+*.log
