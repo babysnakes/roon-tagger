@@ -123,8 +123,6 @@ t_get_track_ordering_behaves_correctly :: proc(t: ^testing.T) {
 }
 @(test)
 t_cmp_track_ordering_behaves_correctly :: proc(t: ^testing.T) {
-	using slice.Ordering
-
 	track1 := metaflac.get_sample_small_metadata()
 	track2 := metaflac.get_sample_small_metadata()
 	defer metaflac.release_metadata(track1)
@@ -132,16 +130,16 @@ t_cmp_track_ordering_behaves_correctly :: proc(t: ^testing.T) {
 
 	log.info("testing: tracks with unspecified ordering are equal")
 	r1 := cmp_track_ordering(track1, track2)
-	testing.expect_value(t, r1, Equal)
+	testing.expect_value(t, r1, .Equal)
 
 	log.info("testing: tracks on the same disc are handled according to track order")
 	tags_set_int_tag(TAG_TRACK_NUMBER, 1, track1)
 	tags_set_int_tag(TAG_TRACK_NUMBER, 2, track2)
 	r2 := cmp_track_ordering(track1, track2)
-	testing.expect_value(t, r2, Less)
+	testing.expect_value(t, r2, .Less)
 	tags_set_int_tag(TAG_DISC_NUMBER, 3, track1)
 	r3 := cmp_track_ordering(track1, track2)
-	testing.expect_value(t, r3, Greater)
+	testing.expect_value(t, r3, .Greater)
 
 	log.info("testing: tracks on different discs are treated according to disc order")
 	tags_set_int_tag(TAG_TRACK_NUMBER, 2, track1)
@@ -149,8 +147,8 @@ t_cmp_track_ordering_behaves_correctly :: proc(t: ^testing.T) {
 	tags_set_int_tag(TAG_TRACK_NUMBER, 1, track2)
 	tags_set_int_tag(TAG_DISC_NUMBER, 2, track2)
 	r4 := cmp_track_ordering(track1, track2)
-	testing.expect_value(t, r4, Less)
+	testing.expect_value(t, r4, .Less)
 	tags_set_int_tag(TAG_DISC_NUMBER, 3, track1)
 	r5 := cmp_track_ordering(track1, track2)
-	testing.expect_value(t, r5, Greater)
+	testing.expect_value(t, r5, .Greater)
 }
