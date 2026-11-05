@@ -43,9 +43,9 @@ main :: proc() {
 		handle, err := os.open(LOG_FILE, os.O_RDWR | os.O_APPEND | os.O_CREATE)
 		fmt.ensuref(err == nil, "Error opening log file: %v", err)
 		logger = log.create_file_logger(handle)
-		logger.lowest_level = log.Level.Debug
+		logger.lowest_level = .Debug
 	}
-	if verbose do defer log.destroy_file_logger(logger)
+	defer if verbose do log.destroy_file_logger(logger)
 	context.logger = logger
 
 	// Display UTF-8 characters correctly in the console

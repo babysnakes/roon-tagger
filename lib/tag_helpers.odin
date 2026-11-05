@@ -103,12 +103,12 @@ cmp_track_ordering :: proc(track1, track2: ^metaflac.Flac_Metadata) -> slice.Ord
 
 	if tr1 == tr2 && disc1 == disc2 do return slice.Ordering.Equal
 	if disc1 == disc2 {
-		if tr1 > tr2 do return slice.Ordering.Greater
-		if tr1 < tr2 do return slice.Ordering.Less
+		if tr1 > tr2 do return .Greater
+		if tr1 < tr2 do return .Less
 		unreachable()
 	} else {
-		if disc1 > disc2 do return slice.Ordering.Greater
-		if disc1 < disc2 do return slice.Ordering.Less
+		if disc1 > disc2 do return .Greater
+		if disc1 < disc2 do return .Less
 		unreachable()
 	}
 }

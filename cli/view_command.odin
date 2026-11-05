@@ -10,6 +10,7 @@ view_flac :: proc(path: string) -> bool {
 		fmt.eprintfln("Error parsing path: %v", pathErr)
 		return false
 	}
+	defer delete(full_path)
 
 	fmt.printfln("Parsing file: %s", full_path)
 	meta, err := metaflac.load_metadata_from_file(full_path)
