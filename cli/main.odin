@@ -78,5 +78,16 @@ main :: proc() {
 		flags.parse_or_exit(&opts, os.args, .Unix)
 		defer delete(opts.overflow)
 		ensure(set_tags_run(opts))
+	case .edit_titles:
+		flags.register_type_setter(nil) // reset type setter
+		opts: Edit_Titles_Options
+		flags.parse_or_exit(&opts, os.args, .Unix)
+		defer delete(opts.overflow)
+		ensure(edit_titles_run(opts))
+	case .config:
+		flags.register_type_setter(nil) // reset type setter
+		opts: Config_Options
+		flags.parse_or_exit(&opts, os.args, .Unix)
+		ensure(config_run(opts))
 	}
 }

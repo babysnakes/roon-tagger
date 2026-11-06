@@ -9,11 +9,13 @@ import "project:lib/dates"
 Command :: enum {
 	view,
 	set_tags,
+	edit_titles,
+	config,
 }
 
 // Main Command
 Main_Options :: struct {
-	command:  Command `args:"pos=0,required" usage:"Valid commands: view | set-tags"`,
+	command:  Command `args:"pos=0,required" usage:"Valid commands: view | set-tags | edit-titles | config"`,
 	overflow: [dynamic]string `usage:"Command arguments"`,
 }
 
@@ -35,6 +37,21 @@ Set_Tags_Options :: struct {
 	overflow:     [dynamic]string `usage:"Files to process"`,
 }
 
+Edit_Titles_Options :: struct {
+	command:  string `args:"pos=0,required" usage:"edit-titles"`,
+	wait:     bool `args:"short=w" usage:"Invoke editor externally, Wait for ENTER to parse new titles"`,
+	editor:   string `usage:"Use specified editor to edit titles - command arguments should be separated by commas"`,
+	verbose:  bool `args:"short=v" usage:"Display memory leaks details"`,
+	overflow: [dynamic]string `usage:"Files to process"`,
+}
+
+Config_Options :: struct {
+	command:   string `args:"pos=0,required" usage:"config"`,
+	editor:    string `usage:"Comma separated list of command + options (e.g., \"code,-w,-n\"), should accept file as last argument"`,
+	no_editor: bool `args:"short=E" usage:"Delete saved editor"`,
+	verbose:   bool `args:"short=v" usage:"Display memory leaks details"`,
+}
+
 main_command_type_setter :: proc(
 	data: rawptr,
 	data_type: typeid,
@@ -49,14 +66,18 @@ main_command_type_setter :: proc(
 		handled = true
 		ptr := cast(^Command)data
 
-		if unparsed_value == "view" {
+		switch unparsed_value {
+		case "view":
 			ptr^ = .view
-		} else if unparsed_value == "set-tags" {
+		case "set-tags":
 			ptr^ = .set_tags
-		} else {
+		case "edit-titles":
+			ptr^ = .edit_titles
+		case "config":
+			ptr^ = .config
+		case:
 			error = "Invalid command"
 		}
-
 	}
 	return
 }
