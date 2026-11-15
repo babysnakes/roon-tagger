@@ -1,12 +1,14 @@
 package cli
 
-import "core:slice"
-import flags "project:ext/pflags"
+import "base:runtime"
 import "core:fmt"
+import "core:log"
 import "core:mem"
 import "core:os"
+import "core:slice"
 import "core:sys/windows"
-import "core:log"
+import flags "project:ext/pflags"
+import "project:lib"
 
 LOG_FILE :: "roon-tagger.log"
 
@@ -14,7 +16,7 @@ main :: proc() {
 	// TODO (haim) this is a terrible hack but it will work for now until I'll implement main command options correctly
 	verbose := slice.contains(os.args, "-v")
 
-	// track memory error, not sure if you must also add -sanitize:address...
+	// track memory error,
 	when ODIN_DEBUG {
 		track: mem.Tracking_Allocator
 		mem.tracking_allocator_init(&track, context.allocator)
@@ -49,10 +51,27 @@ main :: proc() {
 	context.logger = logger
 
 	// Display UTF-8 characters correctly in the console
+	// TODO (haim) - consider removing once using a proper terminal UI library.
 	when ODIN_OS == .Windows {
 		windows.SetConsoleOutputCP(.UTF8)
 	}
 
+	err := run()
+	if err != nil {
+		switch e in err {
+		case lib.General_RT_Error:
+			fmt.eprintln(e.error)
+		case os.Error:
+			fmt.eprintfln("OS Error: %v", e)
+		case runtime.Allocator_Error:
+			fmt.eprintfln("Memory Bug: %v", e)
+		}
+
+		os.exit(1)
+	}
+}
+
+run :: proc() -> Cli_Error {
 	args: []string
 	if (len(os.args) > 1) {
 		args = os.args[:2]
@@ -60,6 +79,8 @@ main :: proc() {
 		args = os.args
 	}
 
+	// TODO (haim) this should probably removed once we finalize argument
+	//      parsing, we should manually check for subcommand.
 	main_opts: Main_Options
 	flags.register_type_setter(main_command_type_setter)
 	flags.parse_or_exit(&main_opts, args, .Unix)
@@ -71,23 +92,24 @@ main :: proc() {
 		flags.register_flag_checker(view_cmd_flag_checker)
 		opts: View_Options
 		flags.parse_or_exit(&opts, os.args, .Unix)
-		ensure(view_flac(opts.file))
+		view_flac(opts.file) or_return
 	case .set_tags:
 		flags.register_type_setter(set_tags_command_type_setter)
 		opts: Set_Tags_Options
 		flags.parse_or_exit(&opts, os.args, .Unix)
 		defer delete(opts.overflow)
-		ensure(set_tags_run(opts))
+		set_tags_run(opts) or_return
 	case .edit_titles:
 		flags.register_type_setter(nil) // reset type setter
 		opts: Edit_Titles_Options
 		flags.parse_or_exit(&opts, os.args, .Unix)
 		defer delete(opts.overflow)
-		ensure(edit_titles_run(opts))
+		edit_titles_run(opts) or_return
 	case .config:
 		flags.register_type_setter(nil) // reset type setter
 		opts: Config_Options
 		flags.parse_or_exit(&opts, os.args, .Unix)
-		ensure(config_run(opts))
+		config_run(opts) or_return
 	}
+	return nil
 }

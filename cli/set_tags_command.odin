@@ -1,23 +1,27 @@
 package cli
 
 import "core:fmt"
+import "core:log"
 import "core:mem/virtual"
 import "core:strings"
 import "project:lib"
 import "project:lib/dates"
 import "project:lib/metaflac"
 
-set_tags_run :: proc(opts: Set_Tags_Options) -> bool {
+set_tags_run :: proc(opts: Set_Tags_Options) -> Cli_Error {
 	if len(opts.overflow) == 0 {
-		fmt.eprintfln("At least one file should be specified")
-		return false
+		// TODO (haim) should be part of the options validation
+		//      (or at least look like it)
+		log.error("At least one file should be specified")
+		return lib.General_RT_Error{"At least one file should be specified"}
 	}
 
 	for path in opts.overflow {
 		meta, err := metaflac.load_metadata_from_file(path)
 		if err != nil {
-			fmt.eprintfln("Error extracting metadata from '%s': %v", path, err)
-			return false
+			msg := fmt.tprintf("Error extracting metadata from '%s': %v", path, err)
+			log.error(msg)
+			return lib.General_RT_Error{msg}
 		}
 		allocator := virtual.arena_allocator(&meta.arena)
 		defer metaflac.release_metadata(meta)
@@ -55,11 +59,12 @@ set_tags_run :: proc(opts: Set_Tags_Options) -> bool {
 
 		save_err := metaflac.save_metadata(meta)
 		if save_err != nil {
-			fmt.eprintfln("Error saving flac metadata '%s': %v", meta.path, save_err)
-			return false
+			msg := fmt.tprintf("Error saving flac metadata '%s': %v", meta.path, save_err)
+			log.error(msg)
+			return lib.General_RT_Error{msg}
 		}
 
 	}
 
-	return true
+	return nil
 }
