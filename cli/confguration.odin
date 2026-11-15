@@ -1,12 +1,13 @@
 package cli
 
-import "core:log"
 import "core:encoding/json"
 import "core:fmt"
+import "core:log"
 import "core:mem"
 import "core:os"
 import "core:path/filepath"
 import "core:strings"
+import "project:lib"
 
 CLI_CONFIG_FILE_NAME_V1 :: "cli_config_v1.json"
 
@@ -30,7 +31,7 @@ load_config :: proc(
 	data := os.read_entire_file(config_file, context.temp_allocator) or_return
 
 	j_err := json.unmarshal(data, &config, allocator = allocator)
-	if j_err != nil do err = General_Error{fmt.tprintf("Error parsing config file: %v", j_err)}
+	if j_err != nil do err = lib.General_RT_Error{fmt.tprintf("Error parsing config file: %v", j_err)}
 	_normalize_config(&config)
 	return
 }
@@ -51,14 +52,14 @@ save_config :: proc(config: ^Cli_Config_V1, config_dir: string) -> (err: Cli_Err
 
 	json_data, j_err := json.marshal(config^, {pretty = true}, context.temp_allocator)
 	if j_err != nil {
-		err = General_Error{fmt.tprintf("Error marshaling config: %v", j_err)}
+		err = lib.General_RT_Error{fmt.tprintf("Error marshaling config: %v", j_err)}
 		return
 	}
 	os.write_entire_file(config_file, json_data) or_return
 	return nil
 }
 
-@(private="file")
+@(private = "file")
 _normalize_config :: proc(conf: ^Cli_Config_V1) {
 	editor, defined := conf.editor.?
 	if defined && len(editor) == 0 do conf.editor = nil

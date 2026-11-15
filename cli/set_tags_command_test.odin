@@ -33,7 +33,7 @@ set_tags_all_fields_should_work :: proc(t: ^testing.T) {
 	}
 
 	result := set_tags_run(opts)
-	testing.expect(t, result, "failed running set-tags")
+	testing.expect(t, result == nil, "failed running set-tags")
 
 	meta, err := metaflac.load_metadata_from_file(test_flac)
 	fmt.ensuref(err == nil, "failed reading tmp file: %v", err)
