@@ -5,6 +5,9 @@
 !*.*
 !ext/*
 
+# temporary working files
+resources/*.json
+
 # Windows build artifacts
 *.exe
 *.pdb
