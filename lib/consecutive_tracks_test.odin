@@ -39,10 +39,7 @@ t_to_consecutive_tracks_behaves_correctly :: proc(t: ^testing.T) {
 	testing.expect_value(t, ok3, false)
 }
 
-set_ordering_for_track :: proc(
-	track_num, total_track, disc: int,
-	track: ^metaflac.Flac_Metadata,
-) -> metaflac.Metaflac_Error {
+set_ordering_for_track :: proc(track_num, total_track, disc: int, track: ^metaflac.Flac_Metadata) -> Lib_Error {
 	tags_set_int_tag(TAG_TRACK_NUMBER, track_num, track) or_return
 	tags_set_int_tag(TAG_TRACK_TOTAL, total_track, track) or_return
 	tags_set_int_tag(TAG_DISC_NUMBER, disc, track) or_return
