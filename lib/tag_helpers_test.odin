@@ -6,6 +6,7 @@ package lib
 import "core:fmt"
 import "core:log"
 import "core:slice"
+import "core:strings"
 import "core:testing"
 import "metaflac"
 
@@ -60,6 +61,58 @@ t_tags_add_credit_does_not_cause_duplicate_credits :: proc(t: ^testing.T) {
 	vc := metaflac.vorbis_comment(meta)
 	testing.expect_value(t, len(vc.comments[TAG_PERSONNEL]), 2)
 	testing.expect(t, slice.contains(vc.comments[TAG_PERSONNEL][:], "John Coltrane - Saxophone"))
+}
+
+@(test)
+t_tags_del_credit_deletes_specified_credit :: proc(t: ^testing.T) {
+	meta := metaflac.get_sample_small_metadata()
+	defer metaflac.release_metadata(meta)
+	err := tags_add_credit("Archie Shepp", "Saxophone", meta)
+	ensure(err == nil)
+	err = tags_add_credit("John Coltrane", "Saxophone", meta)
+	ensure(err == nil)
+
+	del_err := tags_del_credit("John Coltrane", "Saxophone", meta)
+
+	testing.expect(t, del_err == nil, "error deleting credit")
+	vc := metaflac.vorbis_comment(meta)
+	testing.expect_value(t, len(vc.comments[TAG_PERSONNEL]), 1)
+}
+
+@(test)
+t_tags_del_credit_errors_on_missing_credit :: proc(t: ^testing.T) {
+	meta := metaflac.get_sample_small_metadata()
+	defer metaflac.release_metadata(meta)
+	err := tags_add_credit("Archie Shepp", "Saxophone", meta)
+	ensure(err == nil)
+	err = tags_add_credit("John Coltrane", "Saxophone", meta)
+	ensure(err == nil)
+	// Odin's test runner fails on every error log so we need to hide it
+	orig_logger := context.logger
+	defer context.logger = orig_logger // just in case something fails
+	context.logger = log.nil_logger()
+
+	del_err := tags_del_credit("John Coltrane", "Tenor Saxophone", meta)
+	context.logger = orig_logger
+
+	error := del_err.(General_RT_Error) // fails if type doesn't match
+	testing.expect(t, strings.contains(error.error, "matching"), "expected error to contain 'matching'")
+	vc := metaflac.vorbis_comment(meta)
+	testing.expect_value(t, len(vc.comments[TAG_PERSONNEL]), 2)
+}
+
+@(test)
+t_tags_del_credit_removes_header_if_no_more_credits_left :: proc(t: ^testing.T) {
+	meta := metaflac.get_sample_small_metadata()
+	defer metaflac.release_metadata(meta)
+	err := tags_add_credit("Archie Shepp", "Saxophone", meta)
+	ensure(err == nil)
+
+	del_err := tags_del_credit("Archie Shepp", "Saxophone", meta)
+
+	testing.expect(t, del_err == nil, "error deleting credit")
+	vc := metaflac.vorbis_comment(meta)
+	testing.expect_value(t, TAG_PERSONNEL in vc.comments, false)
 }
 
 @(test)

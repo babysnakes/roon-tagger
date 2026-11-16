@@ -34,7 +34,7 @@ split_multi_value :: proc(s: string, sep: string = ";", allocator: mem.Allocator
 }
 
 // Adds a specific `PERSONNEL` credit from the supplied `person` / `credit` if not already exists.
-tags_add_credit :: proc(person, credit: string, meta: ^metaflac.Flac_Metadata) -> metaflac.Metaflac_Error {
+tags_add_credit :: proc(person, credit: string, meta: ^metaflac.Flac_Metadata) -> Lib_Error {
 	allocator := virtual.arena_allocator(&meta.arena)
 	credit_line := strings.concatenate({person, " - ", credit}, allocator) or_return
 	vc := metaflac.vorbis_comment(meta)
@@ -51,11 +51,43 @@ tags_add_credit :: proc(person, credit: string, meta: ^metaflac.Flac_Metadata) -
 	return nil
 }
 
+// Remove A SPECIFIC `PERSONNEL` credit from the supplied `person` / 'credit`, Errors if doesn't exist.
+tags_del_credit :: proc(person, credit: string, meta: ^metaflac.Flac_Metadata) -> Lib_Error {
+	credit_line := strings.concatenate({person, " - ", credit}) or_return
+	defer delete(credit_line)
+	return tags_del_credit_raw(credit_line, meta)
+}
+
+// Remove A SPECIFIC `PERSONNEL` credit that matches the supplied entry, Errors if doesn't exist.
+tags_del_credit_raw :: proc(credit: string, meta: ^metaflac.Flac_Metadata) -> Lib_Error {
+	vc := metaflac.vorbis_comment(meta)
+	missing: bool
+
+	if credits, ok := &vc.comments[TAG_PERSONNEL]; ok {
+		i, _ := slice.linear_search(credits[:], credit)
+		missing = i < 0
+		if !missing {
+			ordered_remove(credits, i)
+			if len(credits) == 0 do delete_key(&vc.comments, TAG_PERSONNEL)
+		}
+	} else {
+		missing = true
+	}
+
+	if missing {
+		err := fmt.tprintf("Error removing credit - could not find credit matching: '%s'", credit)
+		log.error(err)
+		return General_RT_Error{err}
+	}
+
+	return nil
+}
+
 // Set/Replace the tag to a single value. Sets the tag to _upper_case_ and trims the value.
 //
 // **Important**: It's the caller responsibility to have the value lifetime
 // longer then the lifetime of the supplied `Flac_Metadata`
-tags_set_tag :: proc(tag, value: string, meta: ^metaflac.Flac_Metadata) -> metaflac.Metaflac_Error {
+tags_set_tag :: proc(tag, value: string, meta: ^metaflac.Flac_Metadata) -> Lib_Error {
 	allocator := virtual.arena_allocator(&meta.arena)
 	vc := metaflac.vorbis_comment(meta)
 	tag_name := strings.to_upper(tag, allocator)
@@ -72,7 +104,7 @@ tags_set_tag :: proc(tag, value: string, meta: ^metaflac.Flac_Metadata) -> metaf
 	return nil
 }
 
-tags_set_int_tag :: proc(tag: string, value: int, meta: ^metaflac.Flac_Metadata) -> metaflac.Metaflac_Error {
+tags_set_int_tag :: proc(tag: string, value: int, meta: ^metaflac.Flac_Metadata) -> Lib_Error {
 	allocator := virtual.arena_allocator(&meta.arena)
 	new_value := strings.clone(fmt.tprint(value), allocator)
 	return tags_set_tag(tag, new_value, meta)

@@ -1,10 +1,10 @@
 package lib
 
-import "project:lib/metaflac"
+import "core:mem"
 
 // A catch all lib error
 Lib_Error :: union {
-	metaflac.Flac_Error,
+	mem.Allocator_Error,
 	General_RT_Error,
 }
 
