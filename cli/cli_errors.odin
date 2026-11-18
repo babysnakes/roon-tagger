@@ -8,4 +8,5 @@ Cli_Error :: union {
 	os.Error,
 	runtime.Allocator_Error,
 	lib.General_RT_Error,
+	lib.Lib_Error,
 }

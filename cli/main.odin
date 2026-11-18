@@ -58,15 +58,7 @@ main :: proc() {
 
 	err := run()
 	if err != nil {
-		switch e in err {
-		case lib.General_RT_Error:
-			fmt.eprintln(e.error)
-		case os.Error:
-			fmt.eprintfln("OS Error: %v", e)
-		case runtime.Allocator_Error:
-			fmt.eprintfln("Memory Bug: %v", e)
-		}
-
+		report_cli_error(err)
 		os.exit(1)
 	}
 }
@@ -110,6 +102,40 @@ run :: proc() -> Cli_Error {
 		opts: Config_Options
 		flags.parse_or_exit(&opts, os.args, .Unix)
 		config_run(opts) or_return
+	case .credits:
+		flags.register_type_setter(nil)
+		flags.register_flag_checker(credits_cmd_flag_checker)
+		opts: Credits_Options
+		flags.parse_or_exit(&opts, os.args, .Unix)
+		defer {
+			delete(opts.add)
+			delete(opts.del)
+			delete(opts.del_raw)
+			delete(opts.overflow)
+		}
+		credits_run(opts) or_return
 	}
 	return nil
+}
+
+report_cli_error :: proc(err: Cli_Error) {
+	switch e in err {
+	case lib.General_RT_Error:
+		fmt.eprintln(e.error)
+	case os.Error:
+		fmt.eprintfln("OS Error: %v", e)
+	case runtime.Allocator_Error:
+		fmt.panicf("[BUG] memory error: %v", e)
+	case lib.Lib_Error:
+		report_lib_error(e)
+	}
+}
+
+report_lib_error :: proc(err: lib.Lib_Error) {
+	switch e in err {
+	case mem.Allocator_Error:
+		fmt.panicf("[BUG] memory error: %v", e)
+	case lib.General_RT_Error:
+		fmt.eprintln(e.error)
+	}
 }

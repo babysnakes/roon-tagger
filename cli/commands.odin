@@ -3,6 +3,7 @@ package cli
 import "base:runtime"
 import "core:fmt"
 import "core:os"
+import "core:strings"
 import "project:lib/dates"
 
 // Available sub-commands
@@ -11,11 +12,12 @@ Command :: enum {
 	set_tags,
 	edit_titles,
 	config,
+	credits,
 }
 
 // Main Command
 Main_Options :: struct {
-	command:  Command `args:"pos=0,required" usage:"Valid commands: view | set-tags | edit-titles | config"`,
+	command:  Command `args:"pos=0,required" usage:"Valid commands: view | set-tags | edit-titles | config | credits"`,
 	overflow: [dynamic]string `usage:"Command arguments"`,
 }
 
@@ -52,6 +54,16 @@ Config_Options :: struct {
 	verbose:   bool `args:"short=v" usage:"Display memory leaks details"`,
 }
 
+Credits_Options :: struct {
+	command:         string `args:"pos=0,required" usage:"credits"`,
+	add:             [dynamic]string `usage:"Add credit in the form of \"person:role1,role2\", multiple occurrences allowed."`,
+	del:             [dynamic]string `usage:"Delete credit(s) in the form of \"person:role1,role2\", multiple occurrences allowed."`,
+	del_raw:         [dynamic]string `usage:"Delete an exact credit entry, multiple occurrences allowed."`,
+	skip_validation: bool `usage:"Don't validate credits against Roon's supported roles"`,
+	verbose:         bool `args:"short=v" usage:"Display memory leaks details"`,
+	overflow:        [dynamic]string `usage:"Files to process"`,
+}
+
 main_command_type_setter :: proc(
 	data: rawptr,
 	data_type: typeid,
@@ -75,6 +87,8 @@ main_command_type_setter :: proc(
 			ptr^ = .edit_titles
 		case "config":
 			ptr^ = .config
+		case "credits":
+			ptr^ = .credits
 		case:
 			error = "Invalid command"
 		}
@@ -106,6 +120,7 @@ set_tags_command_type_setter :: proc(
 	if data_type == Maybe(dates.Date_Tag) {
 		handled = true
 		ptr := cast(^Maybe(dates.Date_Tag))data
+		// TODO (haim) consider returning string as error for easier reporting
 		dt, err := dates.parse_date(unparsed_value)
 		if err != .None {
 			error = fmt.tprintf("Error parsing date: %v", err)
@@ -114,5 +129,26 @@ set_tags_command_type_setter :: proc(
 		}
 	}
 
+	return
+}
+
+credits_cmd_flag_checker :: proc(model: rawptr, name: string, value: any, args_tag: string) -> (error: string) {
+	switch name {
+	case "add", "del":
+		credits := value.([dynamic]string)
+		lc := len(credits)
+		parts, err1 := strings.split_n(credits[lc - 1], ":", 2)
+		if err1 != .None do fmt.panicf("[Bug]: memory error parsing argument (%s): %v", name, err1)
+		defer delete(parts)
+		if len(strings.trim_space(parts[0])) == 0 do return fmt.tprintf("--%s: missing name", name)
+		if len(parts) < 2 do return fmt.tprintf("--%s: missing credit roles", name)
+		roles, err2 := strings.split(parts[1], ",")
+		if err2 != .None do fmt.panicf("[Bug]: memory error parsing argument (%s): %v", name, err2)
+		defer delete(roles)
+		for r in roles {
+			if len(strings.trim_space(r)) == 0 do return fmt.tprintf("--%s: empty role supplied", name)
+		}
+
+	}
 	return
 }
