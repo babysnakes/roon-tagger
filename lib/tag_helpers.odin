@@ -48,6 +48,7 @@ tags_add_credit :: proc(person, credit: string, meta: ^metaflac.Flac_Metadata) -
 		vc.comments[TAG_PERSONNEL] = new_credits
 	}
 
+	log.debug("Added credit:", credit_line)
 	return nil
 }
 

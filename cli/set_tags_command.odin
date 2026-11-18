@@ -10,8 +10,6 @@ import "project:lib/metaflac"
 
 set_tags_run :: proc(opts: Set_Tags_Options) -> Cli_Error {
 	if len(opts.overflow) == 0 {
-		// TODO (haim) should be part of the options validation
-		//      (or at least look like it)
 		log.error("At least one file should be specified")
 		return lib.General_RT_Error{"At least one file should be specified"}
 	}
