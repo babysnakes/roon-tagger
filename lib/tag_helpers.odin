@@ -36,14 +36,16 @@ split_multi_value :: proc(s: string, sep: string = ";", allocator: mem.Allocator
 // Adds a specific `PERSONNEL` credit from the supplied `person` / `credit` if not already exists.
 tags_add_credit :: proc(person, credit: string, meta: ^metaflac.Flac_Metadata) -> Lib_Error {
 	allocator := virtual.arena_allocator(&meta.arena)
-	credit_line := strings.concatenate({person, " - ", credit}, allocator) or_return
+	credit_line, cl_err := strings.concatenate({person, " - ", credit}, allocator)
+	if cl_err != .None do fmt.panicf("[Bug]: memory error: %v", cl_err)
 	vc := metaflac.vorbis_comment(meta)
 
 	if credits, ok := &vc.comments[TAG_PERSONNEL]; ok {
 		if slice.contains(credits[:], credit_line) do return nil
 		append(credits, credit_line)
 	} else {
-		new_credits := make([dynamic]string, allocator) or_return
+		new_credits, c_err := make([dynamic]string, allocator)
+		if c_err != .None do fmt.panicf("[Bug]: memory error: %v", c_err)
 		append(&new_credits, credit_line)
 		vc.comments[TAG_PERSONNEL] = new_credits
 	}
@@ -54,7 +56,8 @@ tags_add_credit :: proc(person, credit: string, meta: ^metaflac.Flac_Metadata) -
 
 // Remove A SPECIFIC `PERSONNEL` credit from the supplied `person` / 'credit`, Errors if doesn't exist.
 tags_del_credit :: proc(person, credit: string, meta: ^metaflac.Flac_Metadata) -> Lib_Error {
-	credit_line := strings.concatenate({person, " - ", credit}) or_return
+	credit_line, cl_err := strings.concatenate({person, " - ", credit})
+	if cl_err != .None do fmt.panicf("[Bug]: memory error: %v", cl_err)
 	defer delete(credit_line)
 	return tags_del_credit_raw(credit_line, meta)
 }
@@ -97,7 +100,8 @@ tags_set_tag :: proc(tag, value: string, meta: ^metaflac.Flac_Metadata) -> Lib_E
 		clear(tag_value)
 		append(tag_value, strings.trim_space(value))
 	} else {
-		new_value := make([dynamic]string, allocator) or_return
+		new_value, err := make([dynamic]string, allocator)
+		if err != .None do fmt.panicf("[Bug]: memory error: %v", err)
 		append(&new_value, strings.trim_space(value))
 		vc.comments[tag_name] = new_value
 	}

@@ -39,10 +39,10 @@ credits_run :: proc(opts: Credits_Options) -> Cli_Error {
 		// by now we assume that add/del input are formatted correctly, only trimming might be needed.
 		for s in opts.add {
 			parts, err1 := strings.split_n(s, ":", 2)
-			if err1 != .None do fmt.panicf("[Bug]: memory error processing parameter (%s): %v", s, err1)
+			if err1 != .None do fmt.panicf("[Bug]: memory error: %v", err1)
 			defer delete(parts)
 			roles, err2 := strings.split(parts[1], ",")
-			if err1 != .None do fmt.panicf("[Bug]: memory error processing roles (%s): %v", parts[1], err2)
+			if err1 != .None do fmt.panicf("[Bug]: memory error: %v", err2)
 			defer delete(roles)
 			for role in roles {
 				t_role := strings.trim_space(role)
@@ -64,10 +64,10 @@ credits_run :: proc(opts: Credits_Options) -> Cli_Error {
 
 		for s in opts.del {
 			parts, err1 := strings.split_n(s, ":", 2)
-			if err1 != .None do fmt.panicf("[Bug]: memory error processing parameter (%s): %v", s, err1)
+			if err1 != .None do fmt.panicf("[Bug]: memory error: %v", err1)
 			defer delete(parts)
 			roles, err2 := strings.split(parts[1], ",")
-			if err1 != .None do fmt.panicf("[Bug]: memory error processing roles (%s): %v", parts[1], err2)
+			if err1 != .None do fmt.panicf("[Bug]: memory error: %v", err2)
 			defer delete(roles)
 			for role in roles {
 				r_err := lib.tags_del_credit(strings.trim_space(parts[0]), strings.trim_space(role), meta)

@@ -1,9 +1,9 @@
 package metaflac
 
+import "base:runtime"
 import "core:bufio"
 import "core:fmt"
 import "core:io"
-import "core:mem"
 import "core:mem/virtual"
 import "core:os"
 import "core:strings"
@@ -21,7 +21,6 @@ Flac_Metadata :: struct {
 Metaflac_Error :: union {
 	os.Error,
 	io.Error,
-	mem.Allocator_Error,
 	Flac_Error,
 	Block_Error,
 }
@@ -32,15 +31,20 @@ Flac_Error :: enum {
 }
 
 load_metadata_from_file :: proc(path: string) -> (meta: ^Flac_Metadata, err: Metaflac_Error) {
-	meta = virtual.arena_growing_bootstrap_new(Flac_Metadata, "arena") or_return
+	m_err: runtime.Allocator_Error
+	meta, m_err = virtual.arena_growing_bootstrap_new(Flac_Metadata, "arena")
+	if m_err != .None do fmt.panicf("[Bug]: memory error: %v", m_err)
+
 	defer if err != nil {
 		release_metadata(meta)
 		meta = nil
 	}
 
 	allocator := virtual.arena_allocator(&meta.arena)
-	meta.path = strings.clone(path, allocator) or_return
-	meta.blocks = make([dynamic]Block, allocator) or_return
+	meta.path, m_err = strings.clone(path, allocator)
+	if m_err != .None do fmt.panicf("[Bug]: memory error: %v", m_err)
+	meta.blocks, m_err = make([dynamic]Block, allocator)
+	if m_err != .None do fmt.panicf("[Bug]: memory error: %v", m_err)
 
 	file := os.open(path, os.O_RDONLY) or_return
 	defer os.close(file)
@@ -68,7 +72,8 @@ load_metadata_from_reader :: proc(stream: io.Reader, meta: ^Flac_Metadata) -> Me
 		len_buf: [3]u8
 		io.read_full(stream, len_buf[:]) or_return
 		data_len := read_3bytes_as_u32be(len_buf)
-		resize(&scratch, int(data_len)) or_return
+		err := resize(&scratch, int(data_len))
+		if err != .None do fmt.panicf("[Bug]: memory error: %v", err)
 		io.read_full(stream, scratch[:]) or_return
 
 		block := parse_block(block_type, scratch[:], allocator) or_return

@@ -26,7 +26,8 @@ load_config :: proc(
 	config: Cli_Config_V1,
 	err: Cli_Error,
 ) {
-	config_file := filepath.join({config_dir, CLI_CONFIG_FILE_NAME_V1}, context.temp_allocator) or_return
+	config_file, p_err := filepath.join({config_dir, CLI_CONFIG_FILE_NAME_V1}, context.temp_allocator)
+	if p_err != .None do fmt.panicf("[Bug]: memory error: %v", p_err)
 	if !os.exists(config_file) do return
 	data := os.read_entire_file(config_file, context.temp_allocator) or_return
 
@@ -41,7 +42,8 @@ load_config :: proc(
 // This function allocates temporary data to the `temp_allocator`, it's
 // advisable to free it after.
 save_config :: proc(config: ^Cli_Config_V1, config_dir: string) -> (err: Cli_Error) {
-	config_file := filepath.join({config_dir, CLI_CONFIG_FILE_NAME_V1}, context.temp_allocator) or_return
+	config_file, p_err := filepath.join({config_dir, CLI_CONFIG_FILE_NAME_V1}, context.temp_allocator)
+	if p_err != .None do fmt.panicf("[Bug]: memory error: %v", p_err)
 	_normalize_config(config)
 
 	if os.exists(config_file) {
