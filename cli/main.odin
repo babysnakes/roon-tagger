@@ -1,6 +1,5 @@
 package cli
 
-import "base:runtime"
 import "core:fmt"
 import "core:log"
 import "core:mem"
@@ -124,8 +123,6 @@ report_cli_error :: proc(err: Cli_Error) {
 		fmt.eprintln(e.error)
 	case os.Error:
 		fmt.eprintfln("OS Error: %v", e)
-	case runtime.Allocator_Error:
-		fmt.panicf("[BUG] memory error: %v", e)
 	case lib.Lib_Error:
 		report_lib_error(e)
 	}
@@ -133,8 +130,6 @@ report_cli_error :: proc(err: Cli_Error) {
 
 report_lib_error :: proc(err: lib.Lib_Error) {
 	switch e in err {
-	case mem.Allocator_Error:
-		fmt.panicf("[BUG] memory error: %v", e)
 	case lib.General_RT_Error:
 		fmt.eprintln(e.error)
 	}
