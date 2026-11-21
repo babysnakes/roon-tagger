@@ -1,7 +1,9 @@
 package cli
 
+import "base:runtime"
 import "core:encoding/json"
 import "core:fmt"
+import "core:io"
 import "core:log"
 import "core:mem"
 import "core:os"
@@ -66,6 +68,30 @@ save_config :: proc(config: ^Cli_Config_V1, config_dir: string) -> (err: Cli_Err
 	}
 	os.write_entire_file(config_file, json_data) or_return
 	return nil
+}
+
+// Extracts the user config directory (cross platform) based on dev/release mode.
+//
+// Note: Uses `context.temp_allocator`
+get_config_dir :: proc() -> (result: string, err: Cli_Error) {
+	// TODO (haim) consider making it more explicit
+	config_dir_name := "roon-tagger"
+	when ODIN_DEBUG {
+		config_dir_name = "roon-tagger-dev"
+	}
+
+	user_config_dir, u_err := os.user_config_dir(context.temp_allocator)
+	switch e in u_err {
+	case runtime.Allocator_Error:
+		fmt.panicf("[Bug]: memory error: %v", e)
+	case os.General_Error, io.Error, os.Platform_Error:
+		msg := fmt.tprintf("fetching config dir: %v", u_err)
+		log.error("Error", msg)
+		return result, lib.General_RT_Error{msg}
+	}
+	config_dir, d_err := filepath.join({user_config_dir, config_dir_name}, context.temp_allocator)
+	if d_err != .None do fmt.panicf("[Bug]: memory error: %v", d_err)
+	return config_dir, nil
 }
 
 @(private = "file")

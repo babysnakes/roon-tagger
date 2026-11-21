@@ -125,7 +125,7 @@ get_track_ordering :: proc(meta: ^metaflac.Flac_Metadata) -> (track, total_track
 	total_tracks = extract_num_tag(TAG_TRACK_TOTAL, vc) or_return
 	disc = extract_num_tag(TAG_DISC_NUMBER, vc) or_return
 	ok = track >= 0 && total_tracks >= 0 && disc >= 0
-	log.debugf("track: %d, total_tracks: %d, disc: %d, err: %d", track, total_tracks, disc, ok)
+	log.debug("track: ", track, ", total_tracks: ", total_tracks, ", disc: ", disc, ", ok: ", ok, sep = "")
 	return
 }
 
@@ -150,8 +150,17 @@ cmp_track_ordering :: proc(track1, track2: ^metaflac.Flac_Metadata) -> slice.Ord
 	}
 }
 
+// Extracts a single numeric value from tag. Ignores other values if exists.
 extract_num_tag :: proc(tag: string, vorbis: ^metaflac.Vorbis_Comment_Block) -> (val: int, ok: bool) {
 	raw := vorbis.comments[tag]
 	if len(raw) == 0 do return 0, true
 	return strconv.parse_int(raw[0])
+}
+
+// Extracts a value which is assumed to be single string. Ignores other values if exists.
+// Returns defined indicator
+extract_single_value :: proc(tag: string, vorbis: ^metaflac.Vorbis_Comment_Block) -> (val: string, defined: bool) {
+	values := vorbis.comments[tag] or_return
+	if len(values) == 0 do return
+	return values[0], true
 }

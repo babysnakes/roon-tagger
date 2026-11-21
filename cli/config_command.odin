@@ -1,11 +1,7 @@
 package cli
 
-import "base:runtime"
 import "core:fmt"
-import "core:io"
 import "core:log"
-import "core:os"
-import "core:path/filepath"
 import "core:strings"
 import "project:ext/colors"
 import "project:lib"
@@ -18,24 +14,7 @@ config_run :: proc(opts: Config_Options) -> Cli_Error {
 		return lib.General_RT_Error{"specifying both `no-editor` and `editor` does not make sense"}
 	}
 
-	// TODO (haim) consider making it more explicit
-	config_dir_name := "roon-tagger"
-	when ODIN_DEBUG {
-		config_dir_name = "roon-tagger-dev"
-	}
-
-	user_config_dir, u_err := os.user_config_dir(context.temp_allocator)
-	switch e in u_err {
-	case runtime.Allocator_Error:
-		fmt.panicf("[Bug]: memory error: %v", e)
-	case os.General_Error, io.Error, os.Platform_Error:
-		msg := fmt.tprintf("fetching config dir: %v", u_err)
-		log.error("Error", msg)
-		return lib.General_RT_Error{msg}
-	}
-	config_dir, d_err := filepath.join({user_config_dir, config_dir_name}, context.temp_allocator)
-	if d_err != .None do fmt.panicf("[Bug]: memory error: %v", d_err)
-
+	config_dir := get_config_dir() or_return
 	config, c_err := load_config(config_dir, context.temp_allocator)
 	if c_err != nil {
 		msg := fmt.tprintf("loading config: %v", c_err)
@@ -48,11 +27,7 @@ config_run :: proc(opts: Config_Options) -> Cli_Error {
 		config.editor = nil
 		edited = true
 	case editor_defined:
-		cmd, s_err := strings.split(opts.editor, ",", context.temp_allocator)
-		if s_err != .None do fmt.panicf("[Bug]: memory error: %v", s_err)
-		for &c in cmd {
-			c = strings.trim_space(c)
-		}
+		cmd := extract_editor(opts.editor)
 		config.editor = cmd
 		edited = true
 	case opts.show:
@@ -62,8 +37,8 @@ config_run :: proc(opts: Config_Options) -> Cli_Error {
 	}
 
 	if opts.show {
-		// fmt.printfln("%s %v\n", colors.blue("Config:"), config)
-		print_config(config)
+		fmt.printfln("\n%s %T", colors.blue("Config:"), config)
+		fmt.printfln("  * %s: %v", colors.blue("editor"), config.editor)
 	}
 
 	if edited {
@@ -79,7 +54,14 @@ config_run :: proc(opts: Config_Options) -> Cli_Error {
 	return nil
 }
 
-print_config :: proc(config: Cli_Config_V1) {
-	fmt.printfln("\n%s %T", colors.blue("Config:"), config)
-	fmt.printfln("  * %s: %v", colors.blue("editor"), config.editor)
+// Extracts an editor from a string.
+//
+// Note: forwards the code location in case of panic
+extract_editor :: proc(editor: string, loc := #caller_location) -> []string {
+	cmd, s_err := strings.split(editor, ",", context.temp_allocator)
+	if s_err != .None do fmt.panicf("[Bug]: memory error: %v", s_err, loc = loc)
+	for &c in cmd {
+		c = strings.trim_space(c)
+	}
+	return cmd
 }
