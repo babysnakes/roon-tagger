@@ -51,6 +51,7 @@ Config_Options :: struct {
 	command:   string `args:"pos=0,required" usage:"config"`,
 	editor:    string `usage:"Comma separated list of command + options (e.g., \"code,-w,-n\"), should accept file as last argument"`,
 	no_editor: bool `args:"short=E" usage:"Delete saved editor"`,
+	show:      bool `usage:"Display configuration"`,
 	verbose:   bool `args:"short=v" usage:"Display memory leaks details"`,
 }
 

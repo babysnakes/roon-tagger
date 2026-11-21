@@ -16,6 +16,7 @@ Cli_Config_V1 :: struct {
 }
 
 // Load the config file from within the specified directory. Normalizes the config.
+// Returns default config if not exists.
 //
 // This function allocates temporary data to the `temp_allocator`, it's
 // advisable to free it after.
@@ -50,6 +51,12 @@ save_config :: proc(config: ^Cli_Config_V1, config_dir: string) -> (err: Cli_Err
 		log.info("Creating a backup of existing config")
 		bak_file := strings.concatenate({config_file, ".bak"}, context.temp_allocator)
 		os.copy_file(bak_file, config_file) or_return
+	}
+
+	if !os.exists(config_dir) {
+		log.debug("creating config directory:", config_dir)
+		err := os.make_directory_all(config_dir)
+		if err != nil do return lib.General_RT_Error{fmt.tprintf("creating config directory: %v", err)}
 	}
 
 	json_data, j_err := json.marshal(config^, {pretty = true}, context.temp_allocator)
