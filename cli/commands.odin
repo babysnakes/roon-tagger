@@ -137,17 +137,18 @@ credits_cmd_flag_checker :: proc(model: rawptr, name: string, value: any, args_t
 	switch name {
 	case "add", "del":
 		credits := value.([dynamic]string)
-		lc := len(credits)
-		parts, err1 := strings.split_n(credits[lc - 1], ":", 2)
-		if err1 != .None do fmt.panicf("[Bug]: memory error: %v", err1)
-		defer delete(parts)
-		if len(strings.trim_space(parts[0])) == 0 do return fmt.tprintf("--%s: missing name", name)
-		if len(parts) < 2 do return fmt.tprintf("--%s: missing credit roles", name)
-		roles, err2 := strings.split(parts[1], ",")
-		if err2 != .None do fmt.panicf("[Bug]: memory error: %v", err2)
-		defer delete(roles)
-		for r in roles {
-			if len(strings.trim_space(r)) == 0 do return fmt.tprintf("--%s: empty role supplied", name)
+		for c in credits {
+			parts, err1 := strings.split_n(c, ":", 2)
+			if err1 != .None do fmt.panicf("[Bug]: memory error: %v", err1)
+			defer delete(parts)
+			if len(strings.trim_space(parts[0])) == 0 do return fmt.tprintf("--%s '%s': missing name", name, c)
+			if len(parts) < 2 do return fmt.tprintf("--%s '%s': missing credit roles", name, c)
+			roles, err2 := strings.split(parts[1], ",")
+			if err2 != .None do fmt.panicf("[Bug]: memory error: %v", err2)
+			defer delete(roles)
+			for r in roles {
+				if len(strings.trim_space(r)) == 0 do return fmt.tprintf("--%s '%s': empty role supplied", name, c)
+			}
 		}
 
 	}
